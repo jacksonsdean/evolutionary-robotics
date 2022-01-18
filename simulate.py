@@ -5,7 +5,10 @@ simulation_fps = 60
 
 # create physics engine client
 physicsClient = p.connect(p.GUI)
-for step in range(1000):
-    p.stepSimulation()
-    time.sleep(1./simulation_fps)
+while True:
+    try:
+        p.stepSimulation()
+        time.sleep(1./simulation_fps)
+    except KeyboardInterrupt:
+        break
 p.disconnect()
