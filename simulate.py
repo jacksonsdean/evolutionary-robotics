@@ -15,7 +15,7 @@ p.setGravity(0,0,-9.8)
 planeId = p.loadURDF("plane.urdf")
 
 # load world sdf file
-p.loadSDF("box.sdf")
+p.loadSDF("boxes.sdf")
 
 while True:
     try:
