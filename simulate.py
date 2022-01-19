@@ -2,7 +2,7 @@ import pybullet as p
 import pybullet_data
 import time
 
-simulation_fps = 60
+simulation_fps = 600
 
 # create physics engine client
 physicsClient = p.connect(p.GUI)
