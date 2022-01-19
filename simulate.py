@@ -1,11 +1,22 @@
 import pybullet as p
+import pybullet_data
 import time
 
 simulation_fps = 60
 
 # create physics engine client
 physicsClient = p.connect(p.GUI)
+p.setAdditionalSearchPath(pybullet_data.getDataPath()) # used by loadURDF
+
+# set up gravity
+p.setGravity(0,0,-9.8)
+
+# add floor
+planeId = p.loadURDF("plane.urdf")
+
+# load world sdf file
 p.loadSDF("box.sdf")
+
 while True:
     try:
         p.stepSimulation()
