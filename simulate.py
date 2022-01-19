@@ -13,9 +13,10 @@ p.setGravity(0,0,-9.8)
 
 # add floor
 planeId = p.loadURDF("plane.urdf")
+robotId = p.loadURDF("body.urdf")
 
 # load world sdf file
-p.loadSDF("boxes.sdf")
+p.loadSDF("world.sdf")
 
 while True:
     try:
