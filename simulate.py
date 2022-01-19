@@ -11,8 +11,10 @@ p.setAdditionalSearchPath(pybullet_data.getDataPath()) # used by loadURDF
 # set up gravity
 p.setGravity(0,0,-9.8)
 
-# add floor
+# load floor
 planeId = p.loadURDF("plane.urdf")
+
+# load robot
 robotId = p.loadURDF("body.urdf")
 
 # load world sdf file
