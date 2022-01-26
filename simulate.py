@@ -5,7 +5,7 @@ import pyrosim.pyrosim as pyrosim
 import numpy as np
 
 simulation_fps = 600
-simulation_length = 100
+simulation_length = 300
 
 # create physics engine client
 physicsClient = p.connect(p.GUI)
