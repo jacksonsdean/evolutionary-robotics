@@ -1,6 +1,7 @@
 import pybullet as p
 import pybullet_data
 import time
+import pyrosim.pyrosim as pyrosim
 
 simulation_fps = 600
 
@@ -20,10 +21,16 @@ robotId = p.loadURDF("body.urdf")
 # load world sdf file
 p.loadSDF("world.sdf")
 
+# prepare sensors for robot with id robotId
+pyrosim.Prepare_To_Simulate(robotId)
+
 while True:
     try:
         p.stepSimulation()
-        time.sleep(1./simulation_fps)
+        # sensors:
+        backLegTouch = pyrosim.Get_Touch_Sensor_Value_For_Link("BackLeg")
+        print("BackLeg:", backLegTouch)
+        time.sleep(1./simulation_fps) # sleep
     except KeyboardInterrupt:
         break
     except p.error as e:
