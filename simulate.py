@@ -32,8 +32,7 @@ while True:
     try:
         p.stepSimulation()
         # sensors:
-        backLegTouch = pyrosim.Get_Touch_Sensor_Value_For_Link("BackLeg")
-        backLegSensorValues[step] = pyrosim.Get_Touch_Sensor
+        backLegSensorValues[step] = pyrosim.Get_Touch_Sensor_Value_For_Link("BackLeg")
         # print("BackLeg:", backLegTouch)
         
         step+=1
