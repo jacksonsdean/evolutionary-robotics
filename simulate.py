@@ -1,12 +1,12 @@
-import math
+import random
 import pybullet as p
 import pybullet_data
 import time
 import pyrosim.pyrosim as pyrosim
 import numpy as np
 
-simulation_fps = 60
-simulation_length = 30000
+simulation_fps = 240
+simulation_length = 1000
 
 # create physics engine client
 physicsClient = p.connect(p.GUI)
@@ -29,6 +29,9 @@ pyrosim.Prepare_To_Simulate(robotId)
 backLegSensorValues = np.zeros(simulation_length)
 frontLegSensorValues = np.zeros(simulation_length)
 
+targetAngles = np.sin(np.linspace(-np.pi, np.pi, simulation_length)) * np.pi/4.
+np.save("data/targetAngles.npy", targetAngles)
+
 step = 0
 while True:
     try:
@@ -42,14 +45,14 @@ while True:
             bodyIndex = robotId,
             jointName = "Torso_BackLeg",
             controlMode = p.POSITION_CONTROL,
-            targetPosition = -math.pi/4.0,
-            maxForce = 500)
+            targetPosition = targetAngles[step],
+            maxForce = 100)
         pyrosim.Set_Motor_For_Joint(
             bodyIndex = robotId,
             jointName = "Torso_FrontLeg",
             controlMode = p.POSITION_CONTROL,
-            targetPosition = math.pi/4.0,
-            maxForce = 500)
+            targetPosition = targetAngles[step],
+            maxForce = 100)
         
         step+=1
         if step >= simulation_length:
