@@ -1,10 +1,11 @@
+import math
 import pybullet as p
 import pybullet_data
 import time
 import pyrosim.pyrosim as pyrosim
 import numpy as np
 
-simulation_fps = 600
+simulation_fps = 60
 simulation_length = 30000
 
 # create physics engine client
@@ -41,7 +42,13 @@ while True:
             bodyIndex = robotId,
             jointName = "Torso_BackLeg",
             controlMode = p.POSITION_CONTROL,
-            targetPosition = 0.0,
+            targetPosition = -math.pi/4.0,
+            maxForce = 500)
+        pyrosim.Set_Motor_For_Joint(
+            bodyIndex = robotId,
+            jointName = "Torso_FrontLeg",
+            controlMode = p.POSITION_CONTROL,
+            targetPosition = math.pi/4.0,
             maxForce = 500)
         
         step+=1
