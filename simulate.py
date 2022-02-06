@@ -5,7 +5,7 @@ import pyrosim.pyrosim as pyrosim
 import numpy as np
 
 simulation_fps = 600
-simulation_length = 300
+simulation_length = 30000
 
 # create physics engine client
 physicsClient = p.connect(p.GUI)
@@ -35,6 +35,14 @@ while True:
         # sensors:
         backLegSensorValues[step] = pyrosim.Get_Touch_Sensor_Value_For_Link("BackLeg")
         frontLegSensorValues[step] = pyrosim.Get_Touch_Sensor_Value_For_Link("FrontLeg")
+
+        # motors
+        pyrosim.Set_Motor_For_Joint(
+            bodyIndex = robotId,
+            jointName = "Torso_BackLeg",
+            controlMode = p.POSITION_CONTROL,
+            targetPosition = 0.0,
+            maxForce = 500)
         
         step+=1
         if step >= simulation_length:
