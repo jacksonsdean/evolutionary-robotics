@@ -7,9 +7,12 @@ class Motor():
     def __init__(self, jointName, robotId):
         self.jointName = jointName
         self.robotId = robotId
+        if self.jointName == "Torso_BackLeg":
+            self.freq = c.frontMotorFreq/2
+        else:
+            self.freq = c.frontMotorFreq
         self.phaseOffset = c.frontMotorPhaseOffset
         self.amplitude = c.frontMotorAmplitude
-        self.freq = c.frontMotorFreq
         
         self.motorValues = np.sin(np.linspace(-self.freq*np.pi + self.phaseOffset, self.freq*np.pi + self.phaseOffset, c.simulation_length)) * self.amplitude
     
