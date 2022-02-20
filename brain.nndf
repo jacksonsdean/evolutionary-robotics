@@ -1,0 +1,3 @@
+<neuralNetwork>
+    <neuron name = "0" type = "sensor" linkName = "Torso" />
+</neuralNetwork>
