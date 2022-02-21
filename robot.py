@@ -33,3 +33,5 @@ class Robot():
     def Act(self, step):
         for motor in self.motors.values():
             motor.SetValue(step)
+    def Think(self, step):
+        ...

@@ -32,6 +32,7 @@ class Simulation():
             try:
                 p.stepSimulation() # step
                 self.robot.Sense(step) # update sensors
+                self.robot.Think(step) # update neurons
                 self.robot.Act(step) # update motors
                 
                 step+=1
