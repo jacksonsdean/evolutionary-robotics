@@ -72,7 +72,6 @@ class NEURON:
 
     def Update_Hidden_Or_Motor_Neuron(self):
         sum_ = 0.0
-
         self.Set_Value(sum_)
 
 # -------------------------- Private methods -------------------------
