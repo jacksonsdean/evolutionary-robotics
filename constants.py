@@ -3,7 +3,7 @@ import numpy as np
 gravity = 0, 0, -9.8
 
 simulation_fps = 240
-simulation_length = 1000
+simulation_length = 300
 
 frontMotorAmplitude = np.pi/4.
 frontMotorFreq = 10.
