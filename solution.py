@@ -2,7 +2,6 @@ import numpy as np
 import pyrosim.pyrosim as pyrosim
 
 import os
-os.system("conda activate evo-robots")
 
 class Solution():
     def __init__(self):
