@@ -46,4 +46,6 @@ class Simulation():
             except p.error as e:
                 print("\n","error in pybullet:", e)
                 break
-        
+
+    def get_fitness(self):
+        self.robot.get_fitness()

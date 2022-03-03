@@ -15,3 +15,5 @@ backMotorPhaseOffset = 0.0
 
 front_max_force = 100.
 back_max_force = 100.
+
+num_gens = 2

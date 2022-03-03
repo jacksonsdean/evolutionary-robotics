@@ -7,3 +7,4 @@ if __name__ == '__main__':
         Generate()
     sim = Simulation()
     sim.run()
+    sim.get_fitness()

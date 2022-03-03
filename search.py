@@ -1,6 +1,7 @@
 from hillclimber import HillClimber
+import constants as c
 
-hc = HillClimber()
+hc = HillClimber(c.num_gens)
 hc.evolve()
 
 

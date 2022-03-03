@@ -12,8 +12,11 @@ class Solution():
     def evaluate(self):
         self.Generate_Brain()
         os.system("python simulate.py")
-        
-    
+        with open("fitness.txt") as f:
+            self.fitness = float(f.read())
+        f.close()
+        print(self.fitness)
+        exit()
     def Create_World(self):
         pyrosim.Start_SDF("world.sdf")
         pyrosim.Send_Cube(name="Box", pos=[x-2., y+2., z], size=[length, width, height])
