@@ -10,19 +10,23 @@ class Solution():
         self.weights = self.weights * 2. - 1.
     
     def evaluate(self):
-        self.Generate_Brain()
+        self.generate_brain()
         os.system("python simulate.py")
         with open("fitness.txt") as f:
             self.fitness = float(f.read())
         f.close()
-        print(self.fitness)
-        exit()
-    def Create_World(self):
+
+    def mutate(self):
+        mutate_row = np.random.randint(0, 3)
+        mutate_col = np.random.randint(0, 2)
+        self.weights[mutate_row, mutate_col] = np.random.rand() * 2. - 1.
+
+    def create_world(self):
         pyrosim.Start_SDF("world.sdf")
         pyrosim.Send_Cube(name="Box", pos=[x-2., y+2., z], size=[length, width, height])
         pyrosim.End()
         
-    def Generate_Body(self):
+    def generate_body(self):
         pyrosim.Start_URDF("body.urdf")
         pyrosim.Send_Cube(name="Torso", pos=[1.5, 0, 1.5], size=[length, width, height])
         pyrosim.Send_Joint( name = "Torso_BackLeg" , parent= "Torso" , child = "BackLeg" , type = "revolute", position = [1,0,1])
@@ -31,7 +35,7 @@ class Solution():
         pyrosim.Send_Cube(name="FrontLeg", pos=[.5, 0, -.5], size=[length, width, height])
         pyrosim.End()
 
-    def Generate_Brain(self):
+    def generate_brain(self):
         pyrosim.Start_NeuralNetwork("brain.nndf")
         
         # Neurons:
