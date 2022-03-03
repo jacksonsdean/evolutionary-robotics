@@ -19,7 +19,7 @@ class HillClimber():
         self.select()
     
     def print_fitnesses(self):
-        print("parent fitness:", self.parent.fitness, end=" | ")
+        print("\nparent fitness:", self.parent.fitness, end=" | ")
         print("child fitness:", self.child.fitness)
 
     def spawn(self):

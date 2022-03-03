@@ -12,7 +12,7 @@ from world import World
 class Simulation():
     def __init__(self):
         # create physics engine client
-        self.physicsClient = p.connect(p.GUI)
+        self.physicsClient = p.connect(p.DIRECT)
         p.setAdditionalSearchPath(pybullet_data.getDataPath()) # used by loadURDF
 
         # set up gravity
