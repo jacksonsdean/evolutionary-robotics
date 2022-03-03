@@ -39,7 +39,8 @@ class Simulation():
                 if step >= c.simulation_length:
                     # full simulation time has elapsed
                     break
-                time.sleep(1./c.simulation_fps) # sleep
+                if c.simulation_fps > 0:
+                    time.sleep(1./c.simulation_fps) # sleep
                 
             except KeyboardInterrupt:
                 break
