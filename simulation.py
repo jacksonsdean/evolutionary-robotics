@@ -10,9 +10,10 @@ from robot import Robot
 from world import World
 
 class Simulation():
-    def __init__(self):
+    def __init__(self, headless_mode=False):
+        self.headless_mode = headless_mode
         # create physics engine client
-        self.physicsClient = p.connect(p.DIRECT)
+        self.physicsClient = p.connect(p.DIRECT if self.headless_mode else p.GUI, )
         p.setAdditionalSearchPath(pybullet_data.getDataPath()) # used by loadURDF
 
         # set up gravity
@@ -39,7 +40,7 @@ class Simulation():
                 if step >= c.simulation_length:
                     # full simulation time has elapsed
                     break
-                if c.simulation_fps > 0:
+                if c.simulation_fps > 0 and not self.headless_mode:
                     time.sleep(1./c.simulation_fps) # sleep
                 
             except KeyboardInterrupt:

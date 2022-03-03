@@ -3,6 +3,4 @@ import constants as c
 
 hc = HillClimber(c.num_gens)
 hc.evolve()
-
-
-# for _ in range(5):
+hc.show_best()

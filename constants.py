@@ -2,7 +2,7 @@ import numpy as np
 
 gravity = 0, 0, -9.8
 
-simulation_fps = -1 # 240
+simulation_fps = 240
 simulation_length = 300
 
 frontMotorAmplitude = np.pi/4.
@@ -16,4 +16,4 @@ backMotorPhaseOffset = 0.0
 front_max_force = 100.
 back_max_force = 100.
 
-num_gens = 2
+num_gens = 50

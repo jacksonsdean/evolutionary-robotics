@@ -9,9 +9,9 @@ class Solution():
         self.weights = np.random.rand(3, 2)
         self.weights = self.weights * 2. - 1.
     
-    def evaluate(self):
+    def evaluate(self, headless=True):
         self.generate_brain()
-        os.system("python simulate.py")
+        os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'}")
         with open("fitness.txt") as f:
             self.fitness = float(f.read())
         f.close()

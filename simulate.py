@@ -5,6 +5,7 @@ if __name__ == '__main__':
     args = sys.argv[1:]
     if "--generate" in args:
         Generate()
-    sim = Simulation()
+    headless_mode = "DIRECT" in args
+    sim = Simulation(headless_mode)
     sim.run()
     sim.get_fitness()
