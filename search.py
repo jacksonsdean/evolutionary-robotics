@@ -1,6 +1,7 @@
-import os
+from hillclimber import HillClimber
 
-os.system("conda activate evo-robots")
+hc = HillClimber()
+hc.evolve()
 
-for _ in range(5):
-    os.system("python simulate.py --generate")
+
+# for _ in range(5):
