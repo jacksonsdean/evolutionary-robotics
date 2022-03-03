@@ -15,8 +15,13 @@ class HillClimber():
         self.spawn()
         self.mutate()
         self.child.evaluate()
+        self.print_fitnesses()
         self.select()
     
+    def print_fitnesses(self):
+        print("parent fitness:", self.parent.fitness, end=" | ")
+        print("child fitness:", self.child.fitness)
+
     def spawn(self):
         self.child = copy.deepcopy(self.parent)
 
