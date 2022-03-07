@@ -1,6 +1,6 @@
-from hillclimber import HillClimber
+from parallel_hillclimber import ParallelHillClimber
 import constants as c
 
-hc = HillClimber(c.num_gens)
-hc.evolve()
-hc.show_best()
+phc = ParallelHillClimber(c.num_gens, c.pop_size)
+phc.evolve()
+phc.show_best()

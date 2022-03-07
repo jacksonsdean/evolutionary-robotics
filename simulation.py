@@ -8,9 +8,11 @@ import numpy as np
 
 from robot import Robot
 from world import World
-
+import os
+import platform
 class Simulation():
-    def __init__(self, headless_mode=False):
+    def __init__(self, headless_mode=False, solution_id=0):
+        self.solution_id = solution_id
         self.headless_mode = headless_mode
         # create physics engine client
         self.physicsClient = p.connect(p.DIRECT if self.headless_mode else p.GUI, )
@@ -20,7 +22,13 @@ class Simulation():
         p.setGravity(*c.gravity)
   
         self.world = World()
-        self.robot = Robot()
+        self.robot = Robot(self.solution_id)
+        
+        if platform.system() =="Windows":
+            os.system(f"del brain{self.solution_id}.nndf")
+        else:
+            os.system(f"rm brain{self.solution_id}.nndf")
+
         
     def __del__(self):
         if p.isConnected():
@@ -29,6 +37,7 @@ class Simulation():
         
     def run(self):
         step = 0
+        print("HEADLESS:", self.headless_mode)
         while True:
             try:
                 p.stepSimulation() # step

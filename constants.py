@@ -17,3 +17,4 @@ front_max_force = 100.
 back_max_force = 100.
 
 num_gens = 50
+pop_size = 2

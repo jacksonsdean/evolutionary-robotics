@@ -1,19 +1,47 @@
+import time
 import numpy as np
 import pyrosim.pyrosim as pyrosim
-
+import platform
 import os
 
 class Solution():
-    def __init__(self):
+    def __init__(self, id):
         self.weights = np.random.rand(3, 2)
         self.weights = self.weights * 2. - 1.
+        self.set_id(id)
+    
+    def start_simulation(self, headless):
+        self.generate_brain()
+        if platform.system() == "Windows":
+            # os.system(f"conda activate evo-robots & start /B python simulate.py {'DIRECT' if headless else 'GUI'}")
+            os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id}")
+            time.sleep(1)
+        else:   
+            os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id}" + " &")
+            
+    def wait_for_simulation(self):
+        fit_file = f"fitness{self.id}.txt"
+
+        while not os.path.exists(fit_file):
+            time.sleep(0.01)
+
+        with open(fit_file) as f:
+            self.fitness = float(f.read())
+            
+        if platform.system() == "Windows":
+            os.system(f"del fitness{self.id}.txt")
+        else:
+            os.system(f"rm fitness{self.id}.txt")
+        
+        f.close()
     
     def evaluate(self, headless=True):
-        self.generate_brain()
-        os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'}")
-        with open("fitness.txt") as f:
-            self.fitness = float(f.read())
-        f.close()
+        # self.start_simulation(headless)
+        # self.wait_for_simulation()
+        ...
+
+    def set_id(self, id):
+        self.id = id
 
     def mutate(self):
         mutate_row = np.random.randint(0, 3)
@@ -26,7 +54,7 @@ class Solution():
         pyrosim.End()
         
     def generate_body(self):
-        pyrosim.Start_URDF("body.urdf")
+        pyrosim.Start_URDF(f"body{self.id}.urdf")
         pyrosim.Send_Cube(name="Torso", pos=[1.5, 0, 1.5], size=[length, width, height])
         pyrosim.Send_Joint( name = "Torso_BackLeg" , parent= "Torso" , child = "BackLeg" , type = "revolute", position = [1,0,1])
         pyrosim.Send_Cube(name="BackLeg", pos=[-.5, 0, -.5], size=[length, width, height])
@@ -35,7 +63,7 @@ class Solution():
         pyrosim.End()
 
     def generate_brain(self):
-        pyrosim.Start_NeuralNetwork("brain.nndf")
+        pyrosim.Start_NeuralNetwork(f"brain{self.id}.nndf")
         
         # Neurons:
         # -Input
@@ -58,3 +86,7 @@ class Solution():
                 pyrosim.Send_Synapse(sourceNeuronName = row, targetNeuronName = col+3, weight = self.weights[row][col])
 
         pyrosim.End()
+        
+        while not os.path.exists(f"brain{self.id}.nndf"):
+            time.sleep(0.01)
+
