@@ -34,7 +34,7 @@ class Solution():
             os.system(f"rm fitness{self.id}.txt")
         
         f.close()
-    
+
     def evaluate(self, headless=True):
         # self.start_simulation(headless)
         # self.wait_for_simulation()

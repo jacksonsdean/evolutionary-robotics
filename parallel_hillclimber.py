@@ -1,5 +1,7 @@
 from solution import Solution
 import copy
+import os
+import platform
 
 class ParallelHillClimber():
     def __init__(self, num_gens=10, pop_size=2) -> None:
@@ -11,41 +13,58 @@ class ParallelHillClimber():
         for index in range(pop_size):
             self.parents[index] = Solution(self.next_available_id)
             self.next_available_id += 1
+            
+        # remove temp files:
+        if platform.system() == "Windows":
+            os.system("del brain*.nndf")
+            os.system("del fitness*.txt")
+        else:
+            os.system("rm brain*.nndf")
+            os.system("rm fitness*.txt")
         
 
     def evolve(self):
-        # self.parent.evaluate(False)
-        # for gen in range(self.num_gens):
-            # self.run_one_generation()
-        for index in range(self.pop_size):
-            self.parents[index].start_simulation(True)
-        
-        for index in range(self.pop_size):
-            self.parents[index].wait_for_simulation()
+        self.evaluate(self.parents)
+        for gen in range(self.num_gens):
+            self.run_one_generation()
 
     def run_one_generation(self):
         self.spawn()
         self.mutate()
-        self.child.evaluate()
+        self.evaluate(self.children)
         self.print_fitnesses()
         self.select()
     
     def show_best(self):
-        # self.parent.evaluate(False)
-        ...
+        lowest = min(self.parents.keys(), key=(lambda k: self.parents[k].fitness))
+        print("Best:", lowest, self.parents[lowest].fitness)
+        self.parents[lowest].start_simulation(False)
 
     def print_fitnesses(self):
-        print("\n"+"-"*60+"\nparent fitness:", self.parent.fitness, end=" | ")
-        print("child fitness:", self.child.fitness, end="\n"+"-"*60+"\n\n")
+        print()
+        for key in self.parents.keys():
+            print("-"*60+f"\nparent {key} fitness:", self.parents[key].fitness, end=" | ")
+            print(f"child {key} fitness:", self.children[key].fitness)
+        print()
 
     def spawn(self):
-        self.child = copy.deepcopy(self.parent)
-        self.child.set_id(self.next_available_id)
-        self.next_available_id += 1
-
+        self.children = {}
+        for key in self.parents.keys():
+            self.children[key] = copy.deepcopy(self.parents[key])
+            self.children[key].set_id(self.next_available_id)
+            self.next_available_id += 1
+            
     def mutate(self):
-        self.child.mutate()
+        for key in self.children.keys():
+            self.children[key].mutate()
+
+    def evaluate(self, solutions):
+        for key in solutions.keys():
+            solutions[key].start_simulation(True)
+        for key in solutions.keys():
+            solutions[key].wait_for_simulation()
 
     def select(self):
-        if self.child.fitness < self.parent.fitness:
-            self.parent = self.child 
+        for key in self.parents.keys():
+            if self.children[key].fitness < self.parents[key].fitness:
+                self.parents[key] = self.children[key] 

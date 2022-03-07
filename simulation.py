@@ -37,7 +37,6 @@ class Simulation():
         
     def run(self):
         step = 0
-        print("HEADLESS:", self.headless_mode)
         while True:
             try:
                 p.stepSimulation() # step
