@@ -7,10 +7,12 @@ import pyrosim.pyrosim as pyrosim
 import numpy as np
 
 from robot import Robot
-from world import World
 import os
 import platform
+
+from world import World
 class Simulation():
+    world = None
     def __init__(self, headless_mode=False, solution_id=0):
         self.solution_id = solution_id
         self.headless_mode = headless_mode
@@ -21,9 +23,10 @@ class Simulation():
         # set up gravity
         p.setGravity(*c.gravity)
   
-        self.world = World()
+        if Simulation.world is None:
+            Simulation.world = World()
+            
         self.robot = Robot(self.solution_id)
-        
         if platform.system() =="Windows":
             os.system(f"del brain{self.solution_id}.nndf")
         else:
