@@ -15,7 +15,6 @@ class Solution():
         if platform.system() == "Windows":
             # os.system(f"conda activate evo-robots & start /B python simulate.py {'DIRECT' if headless else 'GUI'}")
             os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id}")
-            time.sleep(1)
         else:   
             os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id}" + " &")
             
