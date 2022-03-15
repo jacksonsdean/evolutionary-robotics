@@ -17,9 +17,11 @@ class ParallelHillClimber():
         # remove temp files:
         if platform.system() == "Windows":
             os.system("del brain*.nndf")
+            os.system("del body*.urdf")
             os.system("del fitness*.txt")
         else:
             os.system("rm brain*.nndf")
+            os.system("rm body*.urdf")
             os.system("rm fitness*.txt")
         
 
