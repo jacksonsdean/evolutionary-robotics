@@ -14,9 +14,9 @@ class Solution():
         self.generate_brain()
         if platform.system() == "Windows":
             # os.system(f"conda activate evo-robots & start /B python simulate.py {'DIRECT' if headless else 'GUI'}")
-            os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id}")
+            os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} > nul 2> nul")
         else:   
-            os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id}" + " &")
+            os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} 2&>1" + " &")
             
     def wait_for_simulation(self):
         fit_file = f"fitness{self.id}.txt"
