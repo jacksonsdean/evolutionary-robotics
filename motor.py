@@ -14,4 +14,4 @@ class Motor():
                     jointName = self.jointName,
                     controlMode = p.POSITION_CONTROL,
                     targetPosition = desiredAngle,
-                    maxForce = c.front_max_force)
+                    maxForce = c.motor_max_force)

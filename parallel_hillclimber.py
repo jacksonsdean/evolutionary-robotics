@@ -8,6 +8,7 @@ class ParallelHillClimber():
         self.parents = {}
         self.pop_size = pop_size
         self.num_gens = num_gens
+        self.gen = 0
         self.next_available_id = 0
         
         for index in range(pop_size):
@@ -27,7 +28,7 @@ class ParallelHillClimber():
 
     def evolve(self):
         self.evaluate(self.parents)
-        for gen in range(self.num_gens):
+        for self.gen in range(self.num_gens):
             self.run_one_generation()
 
     def run_one_generation(self):
@@ -37,16 +38,25 @@ class ParallelHillClimber():
         self.print_fitnesses()
         self.select()
     
-    def show_best(self):
+    def get_best(self):
         lowest = min(self.parents.keys(), key=(lambda k: self.parents[k].fitness))
+        return lowest
+    
+    def print_best(self):
+        lowest = self.get_best()
         print("Best:", lowest, self.parents[lowest].fitness)
-        self.parents[lowest].start_simulation(False)
+        
+    def show_best(self):
+        print()
+        self.print_best()
+        self.parents[self.get_best()].start_simulation(False)
 
     def print_fitnesses(self):
-        print()
+        print("Generation:", self.gen)
         for key in self.parents.keys():
-            print("-"*60+f"\nparent {key} fitness:", self.parents[key].fitness, end=" | ")
+            print(f"parent {key} fitness:", self.parents[key].fitness, end="\t\t|\t")
             print(f"child {key} fitness:", self.children[key].fitness)
+        print(f"Best in gen {self.gen}: {self.get_best()} ({self.parents[self.get_best()].fitness})")
         print()
 
     def spawn(self):

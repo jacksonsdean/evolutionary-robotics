@@ -29,8 +29,10 @@ class Simulation():
         self.robot = Robot(self.solution_id)
         if platform.system() =="Windows":
             os.system(f"del brain{self.solution_id}.nndf")
+            os.system(f"del body{self.solution_id}.urdf")
         else:
             os.system(f"rm brain{self.solution_id}.nndf")
+            os.system(f"rm body{self.solution_id}.urdf")
 
         
     def __del__(self):
