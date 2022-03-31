@@ -11,14 +11,20 @@ class Solution():
         self.weights = self.weights * 2. - 1.
         self.set_id(id)
     
-    def start_simulation(self, headless):
+    def start_simulation(self, headless, show_debug_output=False, save_as_best=False):
         self.generate_body()
         self.generate_brain()
         if platform.system() == "Windows":
-            # os.system(f"conda activate evo-robots & start /B python simulate.py {'DIRECT' if headless else 'GUI'}")
-            os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} > nul 2> nul")
+            if show_debug_output:
+                os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''}")
+            else:
+                os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''} > nul 2> nul")
+                
         else:   
-            os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} 2&>1" + " &")
+            if show_debug_output:
+                os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''}" + " &")
+            else:
+                os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''} 2&>1" + " &")
             
     def wait_for_simulation(self):
         fit_file = f"fitness{self.id}.txt"

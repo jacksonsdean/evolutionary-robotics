@@ -13,7 +13,7 @@ import platform
 from world import World
 class Simulation():
     world = None
-    def __init__(self, headless_mode=False, solution_id=0):
+    def __init__(self, headless_mode=False, solution_id=0, save_best=False):
         self.solution_id = solution_id
         self.headless_mode = headless_mode
         # create physics engine client
@@ -27,6 +27,16 @@ class Simulation():
             Simulation.world = World()
             
         self.robot = Robot(self.solution_id)
+        if save_best:
+            print("Saving best solution...")
+            if platform.system() =="Windows":
+                os.system(f"copy brain{self.solution_id}.nndf" + " best_brain.nndf")
+                os.system(f"copy body{self.solution_id}.urdf" + " best_body.urdf")
+            else:
+                os.system(f"cp brain{self.solution_id}.nndf" + " best_brain.nndf")
+                os.system(f"cp body{self.solution_id}.urdf" + " best_body.urdf")
+            time.sleep(0.5)
+            
         if platform.system() =="Windows":
             os.system(f"del brain{self.solution_id}.nndf")
             os.system(f"del body{self.solution_id}.urdf")

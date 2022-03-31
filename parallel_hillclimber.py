@@ -1,15 +1,18 @@
+import random
 from solution import Solution
 import copy
 import os
 import platform
 
 class ParallelHillClimber():
-    def __init__(self, num_gens=10, pop_size=2) -> None:
+    def __init__(self, num_gens=10, pop_size=2, epsilon=.01, debug_output=False) -> None:
         self.parents = {}
         self.pop_size = pop_size
         self.num_gens = num_gens
         self.gen = 0
         self.next_available_id = 0
+        self.epsilon = epsilon
+        self.debug_output = debug_output
         
         for index in range(pop_size):
             self.parents[index] = Solution(self.next_available_id)
@@ -49,7 +52,7 @@ class ParallelHillClimber():
     def show_best(self):
         print()
         self.print_best()
-        self.parents[self.get_best()].start_simulation(False)
+        self.parents[self.get_best()].start_simulation(False, self.debug_output, True)
 
     def print_fitnesses(self):
         print("Generation:", self.gen)
@@ -72,11 +75,16 @@ class ParallelHillClimber():
 
     def evaluate(self, solutions):
         for key in solutions.keys():
-            solutions[key].start_simulation(True)
+            solutions[key].start_simulation(True, self.debug_output)
         for key in solutions.keys():
             solutions[key].wait_for_simulation()
-
+            
     def select(self):
         for key in self.parents.keys():
-            if self.children[key].fitness < self.parents[key].fitness:
-                self.parents[key] = self.children[key] 
+            if not(self.children[key].fitness <= self.get_best()) and random.random() < self.epsilon:
+                # Backwards step
+                if self.children[key].fitness > self.parents[key].fitness:
+                    self.parents[key] = self.children[key] 
+            else:
+                if self.children[key].fitness < self.parents[key].fitness:
+                    self.parents[key] = self.children[key] 

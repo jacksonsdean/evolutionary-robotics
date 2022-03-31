@@ -50,9 +50,9 @@ class Robot():
                 self.motors[jointName].SetValue(desiredAngle * c.motor_joint_range)
     
     def get_fitness(self):
-        stateOfFirstLink = p.getLinkState(self.robotId, 0)
-        positionOfFirstLink = stateOfFirstLink[0]
-        xPos, yPos, zPos = positionOfFirstLink
+        basePositionAndOrientation = p.getBasePositionAndOrientation(self.robotId)
+        basePosition = basePositionAndOrientation[0]
+        xPos, yPos, zPos = basePosition
         with open(f"tmp{self.solution_id}.txt", "w") as f:
             f.write(str(xPos))
         
