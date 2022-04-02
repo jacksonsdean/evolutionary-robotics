@@ -26,7 +26,7 @@ def name_to_fn(name):
     fns.extend([("avg_pixel_distance_fitness", avg_pixel_distance_fitness)])
     return fns[[f[0] for f in fns].index(name)][1]
     
-def visualize_network(individual,sample_point=[.25, .25], color_mode="L", visualize_disabled=False, layout='multi', sample=False, show_weights=False, use_inp_bias=False, use_radial_distance=True):
+def visualize_network(individual,sample_point=[.25, .25], color_mode="L", visualize_disabled=False, layout='multi', sample=False, show_weights=False, use_inp_bias=False, use_radial_distance=True, save_name=None):
     if(sample):
         individual.eval(sample_point)
         
@@ -43,7 +43,8 @@ def visualize_network(individual,sample_point=[.25, .25], color_mode="L", visual
     node_labels = {}
 
     node_size = 2000
-    plt.figure(figsize=(int(1+(individual.count_layers())*1.5), 6), frameon=False)
+    # plt.figure(figsize=(int(1+(individual.count_layers())*1.5), 6), frameon=False)
+    # plt.figure(figsize=(7, 6), frameon=False)
     plt.subplots_adjust(left=0, bottom=0, right=1.25, top=1.25, wspace=0, hspace=0)
 
     for i, fn in enumerate([node.fn for node in individual.node_genome]):
@@ -76,7 +77,7 @@ def visualize_network(individual,sample_point=[.25, .25], color_mode="L", visual
     elif(layout=='spring'):
         pos=nx.spring_layout(G, scale=4)
 
-    # plt.figure(figsize=(8, 8))
+    plt.figure(figsize=(8, 8))
     # pos = nx.shell_layout(G)
     # fixed_nodes = fixed_positions.keys()
     # pos = fixed_positions
@@ -114,15 +115,20 @@ def visualize_network(individual,sample_point=[.25, .25], color_mode="L", visual
                                 style=s[0],
                                 edge_color=[s[1]]*1000,
                                 width =s[2],
-                                connectionstyle= "arc3" if use_curved else "arc3,rad=0.2"
-                                # connectionstyle= "arc3"
+                                # connectionstyle= "arc3" if use_curved else "arc3,rad=0.2"
+                                connectionstyle= "arc3"
                             )
 
     if (show_weights):
         nx.draw_networkx_edge_labels(G, pos, edge_labels, label_pos=.75)
     nx.draw_networkx_labels(G, pos, labels=node_labels)
     plt.tight_layout()
-    plt.show()
+    if save_name is not None:
+        
+        plt.savefig(save_name, format="PNG")
+        plt.close()
+    else:
+        plt.show()
 
 
     ""

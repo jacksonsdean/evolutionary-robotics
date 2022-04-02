@@ -1,3 +1,9 @@
+fitness*.txt
+tmp/
+tmp*/txt
+bodies/
+brains/ 
+
 #VS Code
 .vscode/
 

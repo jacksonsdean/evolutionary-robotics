@@ -4,92 +4,20 @@ import math
 import uuid
 import json
 import numpy as np
+import time
+import numpy as np
+import pyrosim.pyrosim as pyrosim
+import platform
+import os, os.path
+import constants as c
+from util import visualize_network
 
 from util import choose_random_function, visualize_network
-
-
-def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
-
-
-def tanh(x):
-    return np.tanh(x)
-
-
-def identity(x):
-    return x
-
-
-
-class Config:
-    def __init__(self) -> None:
-        self.fitness_function=None
-        self.total_generations=100
-        self.num_parents=10
-        self.num_children=10
-        self.do_crossover=True
-        self.use_speciation = True
-        self.use_map_elites = False
-        self.allow_recurrent = False
-        self.species_selection_ratio=.5
-        self.species_target = 6
-        self.species_threshold_delta = .25
-        self.init_species_threshold = 2.5
-        self.max_weight = 3.0
-        self.weight_threshold = 0
-        self.weight_mutation_max = 2
-        self.prob_random_restart =.001
-        self.prob_weight_reinit = 0.0
-        self.prob_reenable_connection = 0.1
-        self.species_stagnation_threshold = 20
-        self.fitness_threshold = 1
-        self.init_connection_probability = 1
-        self.within_species_elitism = 1
-        self.population_elitism = 1
-        self.activations = [tanh]
-        self.novelty_selection_ratio_within_species = 0.0
-        self.novelty_adjusted_fitness_proportion = 0.0
-        self.novelty_k = 5
-        self.novelty_archive_len = 5
-        self.curriculum = []
-        self.auto_curriculum = 0
-        self.num_workers = 4 
-        self.resize_train = None
-
-        self.prob_mutate_activation = .1 
-        self.prob_mutate_weight = .35
-        self.prob_add_connection = .1 
-        self.prob_add_node = .1
-        self.prob_remove_node = 0.0
-        self.prob_disable_connection = .3
-        
-        self.use_dynamic_mutation_rates = False
-        self.dynamic_mutation_rate_end_modifier = .1
-        self.use_multithreading = False
-        self.output_activation = tanh
-        self.save_progress_images = False
-
-        self.hidden_nodes_at_start = 300
-        self.allow_input_activation_mutation = False
-        
-        self.use_input_bias = False
-        self.num_inputs = 4 # x,y,bias,d
-        self.num_outputs = 4 
-
-        # Autoencoder novelty
-        self.autoencoder_frequency = -1
-        
-        # clustering coefficent 
-        self.clustering_fitness_ratio = 0
-
-
-
 
 class NodeType(IntEnum):
     Input = 0
     Output = 1
     Hidden = 2
-
 
 class Node:
     def __init__(self, fn, _type, _id, _layer=2) -> None:
@@ -104,7 +32,7 @@ class Node:
         self.output = 0
 
     def empty():
-        return Node(tanh, NodeType.Hidden, 0, 0)
+        return Node(c.tanh, NodeType.Hidden, 0, 0)
 
 
 class Connection:
@@ -156,31 +84,36 @@ def get_matching_connections(cxs_1, cxs_2):
 
 class Genome:
     pixel_inputs = None
-
+    current_id = 0
+    
+    def get_id():
+        output = Genome.current_id
+        Genome.current_id+=1
+        return output
+        
     def initialize(self):
         self.more_fit_parent = None  # for record-keeping
-        self.fitness_fn = self.config.fitness_function
-        self.n_hidden_nodes = self.config.hidden_nodes_at_start
-        self.n_inputs = self.config.num_inputs
-        self.n_outputs = self.config.num_outputs
-        total_node_count = self.config.num_inputs + \
-            self.config.num_outputs + self.config.hidden_nodes_at_start
-        self.max_weight = self.config.max_weight
-        self.weight_threshold = self.config.weight_threshold
-        self.use_input_bias = self.config.use_input_bias
-        self.allow_recurrent = self.config.allow_recurrent
+        self.n_hidden_nodes = c.hidden_nodes_at_start
+        self.n_inputs = c.num_sensor_neurons
+        self.n_outputs = c.num_motor_neurons
+        total_node_count = c.num_sensor_neurons + \
+            c.num_motor_neurons + c.hidden_nodes_at_start
+        self.max_weight = c.max_weight
+        self.weight_threshold = c.weight_threshold
+        self.use_input_bias = c.use_input_bias
+        self.allow_recurrent = c.allow_recurrent
 
-        for i in range(self.config.num_inputs):
+        for i in range(c.num_sensor_neurons):
             self.node_genome.append(
-                Node(choose_random_function(self.config), NodeType.Input, self.get_new_node_id(), 0))
-        for i in range(self.config.num_inputs, self.config.num_inputs + self.config.num_outputs):
+                Node(choose_random_function(c), NodeType.Input, self.get_new_node_id(), 0))
+        for i in range(c.num_sensor_neurons, c.num_sensor_neurons + c.num_motor_neurons):
             output_fn = choose_random_function(
-                self.config) if self.config.output_activation is None else self.config.output_activation
+                c) if c.output_activation is None else c.output_activation
             self.node_genome.append(
                 Node(output_fn, NodeType.Output, self.get_new_node_id(), 2))
-        for i in range(self.config.num_inputs + self.config.num_outputs, total_node_count):
+        for i in range(c.num_sensor_neurons + c.num_motor_neurons, total_node_count):
             self.node_genome.append(Node(choose_random_function(
-                self.config), NodeType.Hidden, self.get_new_node_id(), 1))
+                c), NodeType.Hidden, self.get_new_node_id(), 1))
 
         # initialize connection genome
         if self.n_hidden_nodes == 0:
@@ -190,7 +123,7 @@ class Genome:
                     new_cx = Connection(
                         input_node, output_node, self.random_weight())
                     self.connection_genome.append(new_cx)
-                    if(np.random.rand() > self.config.init_connection_probability):
+                    if(np.random.rand() > c.init_connection_probability):
                         new_cx.enabled = False
         else:
            # connect all input nodes to all hidden nodes
@@ -199,13 +132,13 @@ class Genome:
                     new_cx = Connection(
                         input_node, hidden_node, self.random_weight())
                     self.connection_genome.append(new_cx)
-                    if(np.random.rand() > self.config.init_connection_probability):
+                    if(np.random.rand() > c.init_connection_probability):
                         new_cx.enabled = False
 
            # connect all hidden nodes to all output nodes
             for hidden_node in self.hidden_nodes():
                 for output_node in self.output_nodes():
-                    if(np.random.rand() < self.config.init_connection_probability):
+                    if(np.random.rand() < c.init_connection_probability):
                         self.connection_genome.append(Connection(
                             hidden_node, output_node, self.random_weight()))
 
@@ -217,13 +150,106 @@ class Genome:
         self.image = None
         self.node_genome = []  # inputs first, then outputs, then hidden
         self.connection_genome = []
+        self.id = Genome.get_id()
+        self.initialize()
 
-        if config == None:
-            # stub
-            return
+
+    def start_simulation(self, headless, show_debug_output=False, save_as_best=False):
+        self.generate_body()
+        self.generate_brain()
+        if platform.system() == "Windows":
+            if show_debug_output:
+                os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''}")
+            else:
+                os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''} > nul 2> nul")
+                
+        else:   
+            if show_debug_output:
+                os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''}" + " &")
+            else:
+                os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''} 2&>1" + " &")
+            
+    def wait_for_simulation(self):
+        fit_file = f"fitness{self.id}.txt"
+
+        while not os.path.exists(fit_file):
+            time.sleep(0.01)
+
+        with open(fit_file) as f:
+            self.fitness = float(f.read())
+            
+        if platform.system() == "Windows":
+            os.system(f"del fitness{self.id}.txt")
         else:
-            self.config = config
-            self.initialize()
+            os.system(f"rm fitness{self.id}.txt")
+        
+        f.close()
+
+    def set_id(self, id):
+        self.id = id
+
+    def generate_body(self):
+        pyrosim.Start_URDF(f"bodies/body{self.id}.urdf")
+        pyrosim.Send_Cube(name="Torso", pos=[0, 0, 1], size=[1, 1, 1])
+        pyrosim.Send_Joint( name = "Torso_BackLeg" , parent= "Torso" , child = "BackLeg" , type = "revolute", position = [0, -0.5, 1.0], jointAxis = "1 0 0")
+        pyrosim.Send_Cube(name="BackLeg", pos=[0.0, -0.5, 0.0], size=[.2, 1., .2])
+        pyrosim.Send_Joint( name = "Torso_FrontLeg" , parent= "Torso" , child = "FrontLeg" , type = "revolute", position = [0.0, 0.5, 1.0], jointAxis = "1 0 0")
+        pyrosim.Send_Cube(name="FrontLeg", pos=[0.0, 0.5, 0], size=[.2, 1., .2])
+        pyrosim.Send_Cube(name="LeftLeg", pos=[-0.5, 0.0, 0.0], size=[1.0, 0.2, 0.2])
+        pyrosim.Send_Joint( name = "Torso_LeftLeg" , parent= "Torso" , child = "LeftLeg" , type = "revolute", position = [-0.5, 0, 1.], jointAxis = "0 1 0")
+        pyrosim.Send_Cube(name="RightLeg", pos=[0.5, 0.0, 0.0], size=[1.0, 0.2, 0.2])
+        pyrosim.Send_Joint( name = "Torso_RightLeg" , parent= "Torso" , child = "RightLeg" , type = "revolute", position = [0.5, 0, 1.], jointAxis = "0 1 0")
+        pyrosim.Send_Cube(name="FrontLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.])
+        pyrosim.Send_Joint( name = "FrontLeg_FrontLowerLeg" , parent= "FrontLeg" , child = "FrontLowerLeg" , type = "revolute", position = [0,1,0], jointAxis = "1 0 0")
+        pyrosim.Send_Cube(name="BackLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.])
+        pyrosim.Send_Joint( name = "BackLeg_BackLowerLeg" , parent= "BackLeg" , child = "BackLowerLeg" , type = "revolute", position = [0,-1,0], jointAxis = "1 0 0")
+        pyrosim.Send_Cube(name="LeftLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.])
+        pyrosim.Send_Joint( name = "LeftLeg_LeftLowerLeg" , parent= "LeftLeg" , child = "LeftLowerLeg" , type = "revolute", position = [-1,0,0], jointAxis = "0 1 0")
+        pyrosim.Send_Cube(name="RightLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.])
+        pyrosim.Send_Joint( name = "RightLeg_RightLowerLeg" , parent= "RightLeg" , child = "RightLowerLeg" , type = "revolute", position = [1,0,0], jointAxis = "0 1 0")
+        pyrosim.End()
+
+    def generate_brain(self):
+        pyrosim.Start_NeuralNetwork(f"brains/brain{self.id}.nndf")
+        
+        # Neurons:
+        # -Input
+        n = 0
+        pyrosim.Send_Sensor_Neuron(name = n , linkName = "FrontLowerLeg"); n+=1
+        pyrosim.Send_Sensor_Neuron(name = n , linkName = "BackLowerLeg"); n+=1
+        pyrosim.Send_Sensor_Neuron(name = n , linkName = "LeftLowerLeg"); n+=1
+        pyrosim.Send_Sensor_Neuron(name = n , linkName = "RightLowerLeg"); n+=1
+
+        # -Hidden
+        for neuron in self.hidden_nodes():
+            pyrosim.Send_Hidden_Neuron(name = neuron.id); 
+            
+        # -Output
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_BackLeg"); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_FrontLeg"); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_LeftLeg"); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_RightLeg"); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "FrontLeg_FrontLowerLeg"); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "BackLeg_BackLowerLeg"); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "LeftLeg_LeftLowerLeg"); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "RightLeg_RightLowerLeg"); n+=1
+
+        # Synapses:
+        # fully connected:
+        for synapse in self.connection_genome:
+                pyrosim.Send_Synapse(sourceNeuronName = synapse.fromNode.id, targetNeuronName = synapse.toNode.id, weight = synapse.weight)
+
+        pyrosim.End()
+        
+        while not os.path.exists(f"brains/brain{self.id}.nndf"):
+            time.sleep(0.01)
+            
+        if False:
+            num = len([n for n in os.listdir('tmp') if os.path.isfile(n)])
+            os.system(f"copy brains/brain{self.id}.nndf tmp\\{self.id}.nndf")
+            visualize_network(self, sample=True, sample_point=[0.1, -0.1, .25, -.25], use_radial_distance=False, save_name=f"tmp/{self.id}_{num}.png", show_weights=False)
+
+
 
     def random_weight(self):
         return np.random.uniform(-self.max_weight, self.max_weight)
@@ -262,27 +288,27 @@ class Genome:
             if c.enabled:
                 yield c
 
-    def mutate_activations(self, prob_mutate_activation):
+    def mutate_activations(self):
         eligible_nodes = list(self.hidden_nodes())
-        if(self.config.output_activation is None):
+        if(c.output_activation is None):
             eligible_nodes.extend(self.output_nodes())
-        if self.config.allow_input_activation_mutation:
+        if c.allow_input_activation_mutation:
             eligible_nodes.extend(self.input_nodes())
         for node in eligible_nodes:
-            if(np.random.uniform(0, 1) < prob_mutate_activation):
-                node.fn = choose_random_function(self.config)
+            if(np.random.uniform(0, 1) < c.prob_mutate_activation):
+                node.fn = choose_random_function(c)
 
     def mutate_weights(self):
         """ Each connection weight is perturbed with a fixed probability by
             adding a floating point number chosen from a uniform distribution of positive and negative values """
-        weight_mutation_max = self.config.weight_mutation_max
-        weight_mutation_probability = self.config.prob_mutate_weight
+        weight_mutation_max = c.weight_mutation_max
+        weight_mutation_probability = c.prob_mutate_weight
         
         for cx in self.connection_genome:
             if(np.random.uniform(0, 1) < weight_mutation_probability):
                 cx.weight += np.random.uniform(-weight_mutation_max,
                                                weight_mutation_max)
-            elif(np.random.uniform(0, 1) < self.config.prob_weight_reinit):
+            elif(np.random.uniform(0, 1) < c.prob_weight_reinit):
                 cx.weight = self.random_weight()
 
         self.clamp_weights()  # TODO NOT SURE
@@ -291,10 +317,10 @@ class Genome:
         """ Each connection weight is perturbed with a fixed probability by
             adding a floating point number chosen from a uniform distribution of positive and negative values """
         for cx in self.connection_genome:
-            if(np.random.uniform(0, 1) < self.config.prob_mutate_weight):
-                cx.weight += np.random.uniform(-self.config.weight_mutation_max,
-                                               self.config.weight_mutation_max,)
-            elif(np.random.uniform(0, 1) < self.config.prob_weight_reinit):
+            if(np.random.uniform(0, 1) < c.prob_mutate_weight):
+                cx.weight += np.random.uniform(-c.weight_mutation_max,
+                                               c.weight_mutation_max,)
+            elif(np.random.uniform(0, 1) < c.prob_weight_reinit):
                 cx.weight = self.random_weight()
 
         self.clamp_weights()  # TODO NOT SURE
@@ -308,8 +334,8 @@ class Genome:
             print(f"ERROR in mutation: {e}")
 
     def add_connection(self):
-        chance_to_reenable = self.config.prob_reenable_connection
-        allow_recurrent = self.config.allow_recurrent
+        chance_to_reenable = c.prob_reenable_connection
+        allow_recurrent = c.allow_recurrent
         for i in range(20):  # try 20 times
             [fromNode, toNode] = np.random.choice(
                 self.node_genome, 2, replace=False)
@@ -358,7 +384,7 @@ class Genome:
         if(len(eligible_cxs) < 1):
             return
         old = np.random.choice(eligible_cxs)
-        new_node = Node(choose_random_function(self.config),
+        new_node = Node(choose_random_function(c),
                         NodeType.Hidden, self.get_new_node_id())
         self.node_genome.append(new_node)  # add a new node between two nodes
         old.enabled = False  # disable old connection
@@ -561,7 +587,7 @@ class Genome:
             x_vals = np.linspace(-.5, .5, res_w)
             y_vals = np.linspace(-.5, .5, res_h)
             Genome.pixel_inputs = np.zeros(
-                (res_h, res_w, self.config.num_inputs), dtype=np.float32)
+                (res_h, res_w, c.num_sensor_neurons), dtype=np.float32)
             for y in range(res_h):
                 for x in range(res_w):
                     this_pixel = [y_vals[y], x_vals[x]]  # coordinates
@@ -573,7 +599,7 @@ class Genome:
             # initialize outputs to 0:
             self.node_genome[i].outputs = np.zeros((res_h, res_w))
 
-        for i in range(self.config.num_inputs):
+        for i in range(c.num_sensor_neurons):
             # inputs are first N nodes
             self.node_genome[i].sum_inputs = Genome.pixel_inputs[:, :, i]
             self.node_genome[i].outputs = self.node_genome[i].fn(
@@ -622,9 +648,9 @@ class Genome:
     def reset_activations(self):
         for node in self.node_genome:
             node.outputs = np.zeros(
-                (self.config.train_image.shape[0], self.config.train_image.shape[1]))
+                (c.train_image.shape[0], c.train_image.shape[1]))
             node.sum_inputs = np.zeros(
-                (self.config.train_image.shape[0], self.config.train_image.shape[1]))
+                (c.train_image.shape[0], c.train_image.shape[1]))
 
     def save(self, filename):
         json_nodes = [(node.fn.__name__, node.type)
@@ -632,20 +658,20 @@ class Genome:
         json_cxs = [(self.node_genome.index(cx.fromNode), self.node_genome.index(
             cx.toNode), cx.weight, cx.enabled) for cx in self.connection_genome]
         print(json_cxs)
-        json_config = json.loads(self.config.to_json())
+        json_config = json.loads(c.to_json())
         with open(filename, 'w') as f:
             json.dump({'nodes': json_nodes, 'cxs': json_cxs,
                       "config": json_config}, f)
             f.close()
 
-        self.config.from_json(json_config)
+        c.from_json(json_config)
 
 
 def crossover(parent1, parent2):
     [fit_parent, less_fit_parent] = sorted(
         [parent1, parent2], key=lambda x: x.fitness, reverse=True)
     # child = copy.deepcopy(fit_parent)
-    child = Genome(fit_parent.config)
+    child = Genome()
     child.species_id = fit_parent.species_id
     # disjoint/excess genes are inherited from more fit parent
     child.node_genome = copy.deepcopy(fit_parent.node_genome)
@@ -688,7 +714,7 @@ def crossover(parent1, parent2):
 
 
 if __name__ == "__main__":
-    network = Genome(Config())
+    network = Genome()
     for i in range(2):
         network.add_node()
         network.add_node()
