@@ -90,8 +90,17 @@ class Genome:
         output = Genome.current_id
         Genome.current_id+=1
         return output
-        
-    def initialize(self):
+       
+    def __init__(self) -> None:
+        self.fitness = -math.inf
+        self.novelty = -math.inf
+        self.adjusted_fitness = -math.inf
+        self.species_id = -1
+        self.image = None
+        self.node_genome = []  # inputs first, then outputs, then hidden
+        self.connection_genome = []
+        self.id = Genome.get_id()
+
         self.more_fit_parent = None  # for record-keeping
         self.n_hidden_nodes = c.hidden_nodes_at_start
         self.n_inputs = c.num_sensor_neurons
@@ -142,17 +151,6 @@ class Genome:
                         self.connection_genome.append(Connection(
                             hidden_node, output_node, self.random_weight()))
 
-    def __init__(self, config=None) -> None:
-        self.fitness = -math.inf
-        self.novelty = -math.inf
-        self.adjusted_fitness = -math.inf
-        self.species_id = -1
-        self.image = None
-        self.node_genome = []  # inputs first, then outputs, then hidden
-        self.connection_genome = []
-        self.id = Genome.get_id()
-        self.initialize()
-
 
     def start_simulation(self, headless, show_debug_output=False, save_as_best=False):
         self.generate_body()
@@ -172,24 +170,31 @@ class Genome:
     def wait_for_simulation(self):
         fit_file = f"fitness{self.id}.txt"
 
-        while not os.path.exists(fit_file):
+        while not os.access(fit_file, os.F_OK):
             time.sleep(0.01)
+        try:
+            with open(fit_file) as f:
+                self.fitness = float(f.read())
+            f.close()
+        except PermissionError as e:
+            time.sleep(1)
+            with open(fit_file) as f:
+                self.fitness = float(f.read())
+            f.close()
 
-        with open(fit_file) as f:
-            self.fitness = float(f.read())
+        time.sleep(0.1)
             
         if platform.system() == "Windows":
             os.system(f"del fitness{self.id}.txt")
         else:
             os.system(f"rm fitness{self.id}.txt")
         
-        f.close()
 
     def set_id(self, id):
         self.id = id
 
     def generate_body(self):
-        pyrosim.Start_URDF(f"bodies/body{self.id}.urdf")
+        pyrosim.Start_URDF(f"body{self.id}.urdf")
         pyrosim.Send_Cube(name="Torso", pos=[0, 0, 1], size=[1, 1, 1])
         pyrosim.Send_Joint( name = "Torso_BackLeg" , parent= "Torso" , child = "BackLeg" , type = "revolute", position = [0, -0.5, 1.0], jointAxis = "1 0 0")
         pyrosim.Send_Cube(name="BackLeg", pos=[0.0, -0.5, 0.0], size=[.2, 1., .2])
@@ -210,7 +215,7 @@ class Genome:
         pyrosim.End()
 
     def generate_brain(self):
-        pyrosim.Start_NeuralNetwork(f"brains/brain{self.id}.nndf")
+        pyrosim.Start_NeuralNetwork(f"brain{self.id}.nndf")
         
         # Neurons:
         # -Input
@@ -241,12 +246,12 @@ class Genome:
 
         pyrosim.End()
         
-        while not os.path.exists(f"brains/brain{self.id}.nndf"):
+        while not os.path.exists(f"brain{self.id}.nndf"):
             time.sleep(0.01)
             
         if False:
             num = len([n for n in os.listdir('tmp') if os.path.isfile(n)])
-            os.system(f"copy brains/brain{self.id}.nndf tmp\\{self.id}.nndf")
+            os.system(f"copy brain{self.id}.nndf tmp\\{self.id}.nndf")
             visualize_network(self, sample=True, sample_point=[0.1, -0.1, .25, -.25], use_radial_distance=False, save_name=f"tmp/{self.id}_{num}.png", show_weights=False)
 
 
@@ -270,6 +275,9 @@ class Genome:
                 assert self.adjusted_fitness < math.inf, f"adjusted fitness was -inf: fit: {self.fitness} n_in_species: {num_in_species}"
             except AssertionError as e:
                 print(e)
+        else:
+            self.adjusted_fitness = self.fitness
+            print("ERROR: num_in_species was 0")
 
     def eval_genetic_novelty(self, archive, k):
         """Find the average distance from this Network's genome to k nearest neighbors."""

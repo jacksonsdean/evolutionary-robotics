@@ -30,19 +30,19 @@ class Simulation():
         if save_best:
             print("Saving best solution...")
             if platform.system() =="Windows":
-                os.system(f"copy brains/brain{self.solution_id}.nndf" + " best_brain.nndf")
-                os.system(f"copy bodies/body{self.solution_id}.urdf" + " best_body.urdf")
+                os.system(f"copy brain{self.solution_id}.nndf" + " best_brain.nndf")
+                os.system(f"copy body{self.solution_id}.urdf" + " best_body.urdf")
             else:
-                os.system(f"cp brains/brain{self.solution_id}.nndf" + " best_brain.nndf")
-                os.system(f"cp bodies/body{self.solution_id}.urdf" + " best_body.urdf")
+                os.system(f"cp brain{self.solution_id}.nndf" + " best_brain.nndf")
+                os.system(f"cp body{self.solution_id}.urdf" + " best_body.urdf")
             time.sleep(0.5)
             
         if platform.system() =="Windows":
-            os.system(f"del brains/brain{self.solution_id}.nndf")
-            os.system(f"del bodies/body{self.solution_id}.urdf")
+            os.system(f"del brain{self.solution_id}.nndf")
+            os.system(f"del body{self.solution_id}.urdf")
         else:
-            os.system(f"rm brains/brain{self.solution_id}.nndf")
-            os.system(f"rm bodies/body/body{self.solution_id}.urdf")
+            os.system(f"rm brain{self.solution_id}.nndf")
+            os.system(f"rm body{self.solution_id}.urdf")
 
         
     def __del__(self):

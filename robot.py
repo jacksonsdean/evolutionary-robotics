@@ -1,4 +1,5 @@
 import os
+import time
 import pybullet as p
 import pyrosim.pyrosim as pyrosim
 import numpy as np
@@ -12,7 +13,7 @@ class Robot():
     def __init__(self, solution_id):
         self.solution_id = solution_id
         # load robot
-        self.robotId = p.loadURDF(f"bodies/body{solution_id}.urdf")
+        self.robotId = p.loadURDF(f"body{solution_id}.urdf")
 
         pyrosim.Prepare_To_Simulate(self.robotId)
         self.PrepareSensors()
@@ -26,7 +27,7 @@ class Robot():
             self.sensors[linkName] = Sensor(linkName)
     
     def PrepareBrain(self):
-        self.nn = NEURAL_NETWORK(f"brains/brain{self.solution_id}.nndf")
+        self.nn = NEURAL_NETWORK(f"brain{self.solution_id}.nndf")
 
     def PrepareMotors(self):
         # prepare motors
@@ -56,8 +57,8 @@ class Robot():
         with open(f"tmp{self.solution_id}.txt", "w") as f:
             fitness = -1.0 * xPos 
             f.write(str(fitness))
-        
         f.close()
+        time.sleep(.1)
         if platform.system() == "Windows":
             os.rename("tmp"+str(self.solution_id)+".txt" , "fitness"+str(self.solution_id)+".txt")
         else:

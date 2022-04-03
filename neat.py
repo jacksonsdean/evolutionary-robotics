@@ -4,6 +4,7 @@ import numpy as np
 from tqdm import trange
 from neat_genome import Connection, Genome, crossover
 from util import choose_random_function, get_avg_number_of_connections, get_avg_number_of_hidden_nodes, get_max_number_of_connections
+from species import *
 import copy 
 
 import random
@@ -14,7 +15,6 @@ import constants as c
 
 class NEAT():
     def __init__(self, debug_output=False) -> None:
-        self.parents = {}
         self.gen = 0
         self.next_available_id = 0
         self.debug_output = debug_output
@@ -37,13 +37,15 @@ class NEAT():
         self.solution_fitness = 0
         # remove temp files:
         if platform.system() == "Windows":
-            os.system("del brains/brain*.nndf")
-            os.system("del bodies/body*.urdf")
+            os.system("del brain*.nndf")
+            os.system("del body*.urdf")
             os.system("del fitness*.txt")
+            os.system("del tmp*.txt")
         else:
-            os.system("rm brains/brain*.nndf")
-            os.system("rm bodies/body*.urdf")
+            os.system("rm brain*.nndf")
+            os.system("rm body*.urdf")
             os.system("rm fitness*.txt")
+            os.system("rm tmp*.txt")
     
     
     def get_mutation_rates(self):
@@ -67,7 +69,7 @@ class NEAT():
             ind.start_simulation(True, self.debug_output)
         for ind in self.population:
             ind.wait_for_simulation()
-                
+
         for i, g in enumerate(self.population):
             self.population[i].update_with_fitness(g.fitness, count_members_of_species(self.population, self.population[i].species_id))
         
@@ -87,9 +89,26 @@ class NEAT():
                 prop = c.novelty_adjusted_fitness_proportion
                 self.population[i].adjusted_fitness = (1-prop) * adj_fit  + prop * adj_novelty 
                 
-    
+        self.print_fitnesses()
+
+    def print_fitnesses(self):
+        print("Generation:", self.gen)
+        for individual in self.population:
+            print(f"Individual {individual.id} (species: {individual.species_id}) fitness:",individual.fitness)
+        print(f"Best in gen {self.gen}: {self.get_best().id} ({self.get_best().fitness})")
+        print(f"Average fitness: {np.mean([i.fitness for i in self.population])}")
+        print(f"Average adjusted fitness: {np.mean([i.adjusted_fitness for i in self.population])}")
+        num_species = count_number_of_species(self.population)
+        print(f"Number of species: {num_species} | threshold: {self.species_threshold}")
+        print(f"Best species: {sorted(self.all_species, key=lambda x: x.avg_fitness, reverse=True)[0].id}")
+        print(f"Diversity (std, mean, max): {calculate_diversity_full(self.population, self.all_species)}")
+        print()
+
+
     def neat_selection_and_reproduction(self):
         new_children = []
+        # for i in self.population:
+            # print("Individual:", i.id, "adjusted fitness:", i.adjusted_fitness)
         global_average_fitness = np.mean([i.adjusted_fitness for i in self.population])
         for sp in self.all_species:
             sp.population_count = count_members_of_species(self.population, sp.id) 
@@ -137,10 +156,6 @@ class NEAT():
                     child = crossover(parent1, parent2)
                 else:
                     child = copy.deepcopy(parent1)    
-                    # child = genome(parent1.c)
-                    # child.species_id = parent1.species_id
-                    # child.node_genome = copy.deepcopy(parent1.node_genome)
-                    # child.connection_genome = copy.deepcopy(parent1.connection_genome)
 
                 mutate(child, Genome, self.get_mutation_rates())
                 new_children.extend([child]) # add children to the new_children list
@@ -154,15 +169,21 @@ class NEAT():
         if c.use_speciation:
             assign_species(self.all_species, self.population, self.species_threshold, Species)
 
-        # get population fitness
-        self.update_fitnesses_and_novelty()
-        
-        self.population = sorted(self.population, key=lambda x: x.fitness, reverse=True) # sort by fitness
-        self.solution = self.population[0]
+        # Run NEAT
         for self.gen in range(c.num_gens):
             self.run_one_generation()
 
     def run_one_generation(self):
+        # update all ids:
+        for ind in self.population:
+            ind.set_id(Genome.get_id() + 1000*self.gen)
+        #------------#
+        # assessment # //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        #------------#
+        self.update_fitnesses_and_novelty()
+        self.population = sorted(self.population, key=lambda x: x.fitness, reverse=True) # sort by fitness
+        self.solution = self.population[0]
+
         # dynamic mutation rates
         mutation_rates = self.get_mutation_rates()
 
@@ -229,144 +250,18 @@ class NEAT():
         self.species_champs_over_time.append(champs) 
     
     def get_best(self):
-        lowest = min(self.parents.keys(), key=(lambda k: self.parents[k].fitness))
+        lowest = max(self.population, key=(lambda k: k.fitness))
         return lowest
     
     def print_best(self):
-        lowest = self.get_best()
-        print("Best:", lowest, self.parents[lowest].fitness)
+        best = self.get_best()
+        print("Best:", best, best.fitness)
         
     def show_best(self):
         print()
         self.print_best()
-        self.parents[self.get_best()].start_simulation(False, self.debug_output, True)
+        self.get_best().start_simulation(False, self.debug_output, True)
 
-    def print_fitnesses(self):
-        print("Generation:", self.gen)
-        for individual in self.parents:
-            print(f"individual {individual.id} fitness:", individual.fitness, end="\t\t|\t")
-        print(f"Best in gen {self.gen}: {self.get_best()} ({self.parents[self.get_best()].fitness})")
-        print()
-
-
-class Species:
-    def __init__(self, _id) -> None:
-        self.id = _id
-        self.avg_adjusted_fitness = -math.inf
-        self.avg_fitness = -math.inf
-        self.allowed_offspring = 0
-        self.population_count = 0
-        self.last_fitness= self.avg_adjusted_fitness
-        self.last_improvement = 0
-        self.current_champ = None
-    
-    def update(self, global_adjusted_fitness, members, gen, stagnation_threshold, total_pop):
-        self.avg_adjusted_fitness = np.mean([i.adjusted_fitness for i in members])
-        self.avg_fitness =  np.mean([i.fitness for i in members])
-        if(self.avg_fitness > self.last_fitness):
-            self.last_improvement = gen
-        self.last_fitness = self.avg_fitness
-
-        # Every species is assigned a potentially different number of offspring in proportion to the sum of ad-
-        # justed fitnesses of its member organisms. Species then reproduce by first eliminating
-        # the lowest performing members from the population. The entire population is then
-        # replaced by the offspring of the remaining organisms in each species.
-
-        if(gen- self.last_improvement>= stagnation_threshold):
-            self.allowed_offspring = 0
-        else:
-            try:
-                # nk = (Fk/Ftot)*P 
-                self.allowed_offspring = int(round(self.population_count * (self.avg_adjusted_fitness / global_adjusted_fitness)))
-                if self.allowed_offspring < 0: self.allowed_offspring = 0
-            except ArithmeticError:
-                print(f"error while calc allowed_offspring: pop:{self.population_count} fit:{self.avg_adjusted_fitness} glob: {global_adjusted_fitness}")
-            except ValueError:
-                print(f"error while calc allowed_offspring: pop:{self.population_count} fit:{self.avg_adjusted_fitness} glob: {global_adjusted_fitness}")
-
-
-
-def get_adjusted_fitness_of_species(population, species):
-    return np.mean([i.adjusted_fitness for i in population if i.species_id == species])
-def get_fitness_of_species(population, species):
-    return np.mean([i.fitness for i in population if i.species_id == species])
-def count_members_of_species(population, species):
-    return len(get_members_of_species(population, species))
-def get_members_of_species(population, species):
-    return [ind for ind in population if ind.species_id == species]
-def count_number_of_species(population):
-    species = []
-    for ind in population:
-        if(ind.species_id not in species):
-            species.append(ind.species_id)
-    return len(species)
-
-def get_current_species_champs(population, all_species):
-    for sp in all_species:
-        members = get_members_of_species(population, sp.id)
-        sp.population_count = len(members)
-        if(sp.population_count==0): continue
-        members= sorted(members, key=lambda x: x.fitness, reverse=True)
-        sp.current_champ = members[0]
-    return [sp.current_champ for sp in all_species if (sp.population_count>0 and sp.current_champ is not None)]
-
-
-def assign_species(all_species, population, threshold, SpeciesClass):
-     # The Genome Loop:
-    for g in population:
-        # – Take next genome g from P
-        placed = False
-        # – The Species Loop:
-        for s in all_species:
-            species_pop = get_members_of_species(population, s.id)
-            s.population_count = len(species_pop)
-            if(s.population_count<1): continue
-            # ·get next species s from S
-            if(g.species_comparision(np.random.choice(species_pop, 1)[0], threshold)):
-                # ·If g is compatible with s, add g to s
-                g.species_id = s.id
-                placed = True
-                break
-        if(not placed):
-            # ∗If all species in S have been checked, create new species and place g in it
-            new_id = len(all_species)
-            all_species.append(SpeciesClass(new_id))
-            g.species_id = new_id
-
-def normalize_species_offspring(all_species, c):
-    # Normalize the number of allowed offspring per species so that the total is close to pop_size
-    total_offspring = np.sum([s.allowed_offspring for s in all_species])
-    
-    target_children = c.pop_size
-    target_children -= c.population_elitism # first children will be most fit from last gen 
-    
-    if(total_offspring == 0): total_offspring = 1 # TODO FIXME (total extinction)
-
-    norm = c.pop_size / total_offspring
-    
-    for sp in all_species:
-        try:
-            sp.allowed_offspring = int(round(sp.allowed_offspring * norm))
-        except ValueError as e:
-            print(f"unexpected value during species offspring normalization, ignoring: {e} offspring: {sp.allowed_offspring} norm:{norm}")
-            continue
-
-    return norm
-
-def normalize_species_offspring_exact(all_species, pop_size):
-    # Jackson's method (always exact pop_size)
-    # if there are not enough offspring, assigns extras to top (multiple) species,
-    # if there are too many, takes away from worst (multiple) species
-    total_offspring = np.sum([s.allowed_offspring for s in all_species])
-    adj = 1 if total_offspring<pop_size else -1
-    sorted_species = sorted(all_species, key=lambda x: x.avg_adjusted_fitness, reverse=(total_offspring<pop_size))
-    while(total_offspring!=pop_size):
-        for s in sorted_species:
-            if(s.population_count == 0 or s.allowed_offspring == 0): continue
-            s.allowed_offspring+=adj
-            total_offspring+=adj
-            print("adj=", adj)
-            if(total_offspring==pop_size): break
 
 
 
@@ -384,7 +279,7 @@ def classic_selection_and_reproduction(c, population, all_species, generation_nu
             child = copy.deepcopy(parent1)
 
         # mutation
-        mutate(child, genome, mutation_rates)
+        mutate(child, Genome, mutation_rates)
 
         new_children.extend([child]) # add children to the new_children list
 
@@ -417,7 +312,7 @@ def tournament_selection(population, c, use_adjusted_fitness=False, override_no_
     return new_population  
 
 
-def calculate_diversity(population,all_species):
+def calculate_diversity(population, all_species):
     # Compares 1 representative from every species against each other
     reps = []
     for species in all_species:
@@ -468,8 +363,7 @@ def update_solution_archive(solution_archive, genome, max_archive_length, novelt
 def mutate(child, genome, rates):
     prob_mutate_activation, prob_mutate_weight, prob_add_connection, prob_add_node, prob_remove_node, prob_disable_connection, weight_mutation_max, prob_reenable_connection = rates
     
-    child.image = None # image will be different after mutation
-    child.fitness, child.adjusted_fitness = -math.inf, -math.inf # new fitnesses after mutation
+    # child.fitness, child.adjusted_fitness = -math.inf, -math.inf # new fitnesses after mutation
 
     if(np.random.uniform(0,1) < c.prob_random_restart):
         child = genome()

@@ -51,7 +51,7 @@ class Solution():
         self.weights[mutate_row, mutate_col] = np.random.rand() * 2. - 1.
 
     def generate_body(self):
-        pyrosim.Start_URDF(f"bodies/body{self.id}.urdf")
+        pyrosim.Start_URDF(f"body{self.id}.urdf")
         pyrosim.Send_Cube(name="Torso", pos=[0, 0, 1], size=[1, 1, 1])
         pyrosim.Send_Joint( name = "Torso_BackLeg" , parent= "Torso" , child = "BackLeg" , type = "revolute", position = [0, -0.5, 1.0], jointAxis = "1 0 0")
         pyrosim.Send_Cube(name="BackLeg", pos=[0.0, -0.5, 0.0], size=[.2, 1., .2])
@@ -72,7 +72,7 @@ class Solution():
         pyrosim.End()
 
     def generate_brain(self):
-        pyrosim.Start_NeuralNetwork(f"brains/brain{self.id}.nndf")
+        pyrosim.Start_NeuralNetwork(f"brain{self.id}.nndf")
         
         # Neurons:
         # -Input
@@ -109,6 +109,6 @@ class Solution():
 
         pyrosim.End()
         
-        while not os.path.exists(f"brains/brain{self.id}.nndf"):
+        while not os.path.exists(f"brain{self.id}.nndf"):
             time.sleep(0.01)
 
