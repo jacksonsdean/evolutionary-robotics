@@ -151,6 +151,9 @@ class Genome:
                         self.connection_genome.append(Connection(
                             hidden_node, output_node, self.random_weight()))
 
+        for i in range(c.hidden_nodes_at_start):
+            # TODO
+            self.add_node()
 
     def start_simulation(self, headless, show_debug_output=False, save_as_best=False):
         self.generate_body()
