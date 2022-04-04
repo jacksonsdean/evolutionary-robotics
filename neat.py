@@ -1,10 +1,11 @@
 import math
 import os
 import time
+from matplotlib import pyplot as plt
 import numpy as np
 from tqdm import trange
 from neat_genome import Connection, Genome, crossover
-from util import choose_random_function, get_avg_number_of_connections, get_avg_number_of_hidden_nodes, get_max_number_of_connections, visualize_network
+from util import choose_random_function, get_avg_number_of_connections, get_avg_number_of_hidden_nodes, get_max_number_of_connections, get_max_number_of_hidden_nodes, visualize_network
 from species import *
 import copy 
 
@@ -101,8 +102,10 @@ class NEAT():
         print(f"Average adjusted fitness: {np.mean([i.adjusted_fitness for i in self.population])}")
         num_species = count_number_of_species(self.population)
         print(f"Number of species: {num_species} | threshold: {self.species_threshold}")
-        print(f"Best species: {sorted(self.all_species, key=lambda x: x.avg_fitness, reverse=True)[0].id}")
+        print(f"Best species (avg. fitness): {sorted(self.all_species, key=lambda x: x.avg_fitness if x.population_count > 0 else 0, reverse=True)[0].id}")
         print(f"Diversity (std, mean, max): {calculate_diversity_full(self.population, self.all_species)}")
+        print(f"Avg. Connections: {get_avg_number_of_connections(self.population)} | Max Connections: {get_max_number_of_connections(self.population)}")
+        print(f"Avg. Hidden Nodes: {get_avg_number_of_hidden_nodes(self.population)} | Max Nodes: {get_max_number_of_hidden_nodes(self.population)}")
         print()
 
 
@@ -177,7 +180,7 @@ class NEAT():
     def run_one_generation(self):
         # update all ids:
         for ind in self.population:
-            ind.set_id(Genome.get_id() + 1000*self.gen)
+            ind.set_id(Genome.get_id())
         #------------#
         # assessment # //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
         #------------#
@@ -185,6 +188,9 @@ class NEAT():
         self.population = sorted(self.population, key=lambda x: x.fitness, reverse=True) # sort by fitness
         self.solution = self.population[0]
 
+        if self.gen ==0:
+            self.show_best()
+            
         # dynamic mutation rates
         mutation_rates = self.get_mutation_rates()
 
@@ -249,6 +255,8 @@ class NEAT():
         self.species_threshold_over_time[self.gen:] = self.species_threshold
         champs = get_current_species_champs(self.population, self.all_species)
         self.species_champs_over_time.append(champs) 
+        
+        self.save_best_network_image()
     
     def get_best(self):
         lowest = max(self.population, key=(lambda k: k.fitness))
@@ -262,8 +270,11 @@ class NEAT():
         print()
         self.print_best()
         self.get_best().start_simulation(False, self.debug_output, True)
-        visualize_network(self.get_best(), sample=True, save_name=f"best_{time.time()}.png")
+        self.save_best_network_image()
 
+    def save_best_network_image(self):
+        best = self.get_best()
+        visualize_network(self.get_best(), sample=True, save_name=f"best/{time.time()}_{self.gen}_{best.id}.png", extra_text="Generation: " + str(self.gen) + " fitness:" + str(best.fitness))
 
 
 def classic_selection_and_reproduction(c, population, all_species, generation_num, mutation_rates):

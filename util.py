@@ -26,7 +26,7 @@ def name_to_fn(name):
     fns.extend([("avg_pixel_distance_fitness", avg_pixel_distance_fitness)])
     return fns[[f[0] for f in fns].index(name)][1]
     
-def visualize_network(individual,sample_point=[.25, .25, .25, .25], color_mode="L", visualize_disabled=False, layout='multi', sample=False, show_weights=False, use_inp_bias=False, use_radial_distance=True, save_name=None):
+def visualize_network(individual,sample_point=[.25, .25, .25, .25], color_mode="L", visualize_disabled=False, layout='multi', sample=False, show_weights=False, use_inp_bias=False, use_radial_distance=True, save_name=None, extra_text=None):
     if(sample):
         individual.eval(sample_point)
         
@@ -118,7 +118,11 @@ def visualize_network(individual,sample_point=[.25, .25, .25, .25], color_mode="
                                 # connectionstyle= "arc3" if use_curved else "arc3,rad=0.2"
                                 connectionstyle= "arc3"
                             )
-
+    
+    if extra_text is not None:
+        plt.text(0.5,0.05, extra_text, horizontalalignment='center', verticalalignment='center', transform=plt.gcf().transFigure)
+        
+    
     if (show_weights):
         nx.draw_networkx_edge_labels(G, pos, edge_labels, label_pos=.75)
     nx.draw_networkx_labels(G, pos, labels=node_labels)
@@ -186,6 +190,13 @@ def get_best_solution_from_all_runs(results):
     return best, run_index
 
 
+def get_max_number_of_hidden_nodes(population):
+    max = 0
+    for g in population:
+        if len(list(g.hidden_nodes()))> max:
+            max = len(list(g.hidden_nodes()))
+    return max
+
 def get_avg_number_of_hidden_nodes(population):
     count = 0
     for g in population:
@@ -199,6 +210,7 @@ def get_max_number_of_connections(population):
         if(count > max_count):
             max_count = count
     return max_count
+
 def get_min_number_of_connections(population):
     min_count = math.inf
     for g in population:

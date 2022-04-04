@@ -151,7 +151,7 @@ class Genome:
                         self.connection_genome.append(Connection(
                             hidden_node, output_node, self.random_weight()))
 
-        for i in range(c.hidden_nodes_at_start):
+        for i in range(c.hidden_nodes_at_start-1):
             # TODO
             self.add_node()
 
@@ -704,12 +704,18 @@ def crossover(parent1, parent2):
         new_from = copy.deepcopy(matching1[match_index].fromNode if np.random.rand(
         ) < .5 else matching2[match_index].fromNode)
         child_cx.fromNode = new_from
-        child.node_genome[new_from.id] = new_from
+        if new_from.id<len(child.node_genome)-1:
+            child.node_genome[new_from.id] = new_from
+        else:
+            continue # TODO
 
         new_to = copy.deepcopy(matching1[match_index].toNode if np.random.rand(
         ) < .5 else matching2[match_index].toNode)
         child_cx.toNode = new_to
-        child.node_genome[new_to.id] = new_to
+        if new_to.id<len(child.node_genome)-1:
+            child.node_genome[new_to.id] = new_to
+        else:
+            continue # TODO
 
         if(not matching1[match_index].enabled or not matching2[match_index].enabled):
             if(np.random.rand() < 0.75):  # from Stanley/Miikulainen 2007
