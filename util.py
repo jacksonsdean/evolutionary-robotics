@@ -30,7 +30,7 @@ def visualize_network(individual,sample_point=[.25, .25, .25, .25], color_mode="
     if(sample):
         individual.eval(sample_point)
         
-    nodes = individual.node_genome
+    # nodes = individual.node_genome
     connections = individual.connection_genome
 
     max_weight = c.max_weight
@@ -56,6 +56,7 @@ def visualize_network(individual,sample_point=[.25, .25, .25, .25], color_mode="
         G.add_node(node, color=function_colors[node.fn.__name__], shape='d', layer=(node.layer))
         node_labels[node] = f"{node.id}\n{i}:\n{node.fn.__name__}\n"+(f"{node.output:.3f}" if node.output!=None else "")
         fixed_positions[node] = (-4,((i+1)*2)/len(individual.input_nodes()))
+        
     for node in individual.hidden_nodes():
         G.add_node(node, color=function_colors[node.fn.__name__], shape='o', layer=(node.layer))
         node_labels[node] = f"{node.id}\n{node.fn.__name__}\n"+(f"{node.output:.3f}" if node.output!=None else "" )
@@ -63,9 +64,8 @@ def visualize_network(individual,sample_point=[.25, .25, .25, .25], color_mode="
     for i, node in enumerate(individual.output_nodes()):
         title = i
         G.add_node(node, color=function_colors[node.fn.__name__], shape='s', layer=(node.layer))
-        node_labels[node] = f"{node.id}\n{title}:\n"+(f"{node.output:.3f}")
+        node_labels[node] = f"Motor\n{title}:\n"+(f"{node.output:.3f}")
         fixed_positions[node] = (4, ((i+1)*2)/len(individual.output_nodes()))
-
     pos = {}
     # shells = [[node for node in individual.input_nodes()], [node for node in individual.hidden_nodes()], [node for node in individual.output_nodes()]]
     # pos=nx.shell_layout(G, shells, scale=2)
@@ -86,25 +86,28 @@ def visualize_network(individual,sample_point=[.25, .25, .25, .25], color_mode="
     #     pos[f] = (p[0]*20, p[1]*20)
     shapes = set((node[1]["shape"] for node in G.nodes(data=True)))
     for shape in shapes:
-        nodes = [sNode[0] for sNode in filter(
+        this_nodes = [sNode[0] for sNode in filter(
             lambda x: x[1]["shape"] == shape, G.nodes(data=True))]
-        colors = [nx.get_node_attributes(G, 'color')[cNode] for cNode in nodes]
+        colors = [nx.get_node_attributes(G, 'color')[cNode] for cNode in this_nodes]
         nx.draw_networkx_nodes(G, pos, node_size=node_size, node_color=colors,
-                            label=node_labels, node_shape=shape, nodelist=nodes)
+                            label=node_labels, node_shape=shape, nodelist=this_nodes)
 
     edge_labels = {}
     for cx in connections:
         if(not visualize_disabled and (not cx.enabled or np.isclose(cx.weight, 0))): continue
         style = ('-', 'k',  .5+abs(cx.weight)/max_weight) if cx.enabled else ('--', 'grey', .5+ abs(cx.weight)/max_weight)
         if(cx.enabled and cx.weight<0): style  = ('-', 'r', .5+abs(cx.weight)/max_weight)
-
-        G.add_edge(cx.fromNode, cx.toNode, weight=f"{cx.weight:.4f}", pos=pos, style=style)
+        if cx.fromNode in G.nodes and cx.toNode in G.nodes:
+            G.add_edge(cx.fromNode, cx.toNode, weight=f"{cx.weight:.4f}", pos=pos, style=style)
+        else:
+            print("Connection not in graph:", cx.fromNode.id, "->", cx.toNode.id)
         edge_labels[(cx.fromNode, cx.toNode)] = f"{cx.weight:.3f}"
 
 
     edge_colors = nx.get_edge_attributes(G,'color').values()
     edge_styles = shapes = set((s[2] for s in G.edges(data='style')))
     use_curved = show_weights or individual.count_layers()<3
+
     for s in edge_styles:
         edges = [e for e in filter(
             lambda x: x[2] == s, G.edges(data='style'))]

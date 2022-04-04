@@ -80,7 +80,19 @@ def get_matching_connections(cxs_1, cxs_2):
     return sorted([c1 for c1 in cxs_1 if c1.innovation in [c2.innovation for c2 in cxs_2]], key=lambda x: x.innovation),\
         sorted([c2 for c2 in cxs_2 if c2.innovation in [
                c1.innovation for c1 in cxs_1]], key=lambda x: x.innovation)
+            
+    # TODO delete:
+    # return sorted([c1 for c1 in cxs_1 if (c1.innovation in [c2.innovation for c2 in cxs_2] and c1.fromNode.id in [c2.fromNode.id for c2 in cxs_2] and c1.toNode.id in [c2.toNode.id for c2 in cxs_2])], key=lambda x: x.innovation),\
+        # sorted([c2 for c2 in cxs_2 if c2.innovation in [
+            #    c1.innovation for c1 in cxs_1]], key=lambda x: x.innovation)
 
+
+def find_node_with_id(nodes, id):
+    for node in nodes:
+        if node.id == id:
+            return node
+    return None
+    
 
 class Genome:
     pixel_inputs = None
@@ -695,38 +707,47 @@ def crossover(parent1, parent2):
         fit_parent.connection_genome, less_fit_parent.connection_genome)
     for match_index in range(len(matching1)):
         # Matching genes are inherited randomly
+        inherit_from_more_fit = np.random.rand() < .5 
+        
         child_cx = child.connection_genome[[x.innovation for x in child.connection_genome].index(
             matching1[match_index].innovation)]
         child_cx.weight = \
-            matching1[match_index].weight if np.random.rand(
-            ) < .5 else matching2[match_index].weight
+            matching1[match_index].weight if inherit_from_more_fit else matching2[match_index].weight
 
-        new_from = copy.deepcopy(matching1[match_index].fromNode if np.random.rand(
-        ) < .5 else matching2[match_index].fromNode)
+        new_from = copy.deepcopy(matching1[match_index].fromNode if inherit_from_more_fit else matching2[match_index].fromNode)
         child_cx.fromNode = new_from
-        if new_from.id<len(child.node_genome)-1:
-            child.node_genome[new_from.id] = new_from
-        else:
-            continue # TODO
+        # if new_from.id<len(child.node_genome):
+        existing = find_node_with_id(child.node_genome, new_from.id)
+        index_existing = child.node_genome.index(existing)
+        child.node_genome[index_existing] = new_from
+        # else:
+            # print("********ERR:new from id", new_from.id, "len:", len(child.node_genome))
+            # continue # TODO
 
-        new_to = copy.deepcopy(matching1[match_index].toNode if np.random.rand(
-        ) < .5 else matching2[match_index].toNode)
+        new_to = copy.deepcopy(matching1[match_index].toNode if inherit_from_more_fit else matching2[match_index].toNode)
         child_cx.toNode = new_to
-        if new_to.id<len(child.node_genome)-1:
-            child.node_genome[new_to.id] = new_to
-        else:
-            continue # TODO
+        # if new_to.id<len(child.node_genome):
+        existing = find_node_with_id(child.node_genome, new_to.id)
+        index_existing = child.node_genome.index(existing)
+        child.node_genome[index_existing] = new_to
+        # else:
+            # print("********ERR: new to id", new_to.id, "len:", len(child.node_genome))
+            # continue # TODO
 
         if(not matching1[match_index].enabled or not matching2[match_index].enabled):
             if(np.random.rand() < 0.75):  # from Stanley/Miikulainen 2007
                 child.connection_genome[match_index].enabled = False
 
     for cx in child.connection_genome:
+        cx.fromNode = find_node_with_id(child.node_genome, cx.fromNode.id)
+        cx.toNode = find_node_with_id(child.node_genome, cx.toNode.id)
+        assert cx.fromNode in child.node_genome, f"{child.id}: {cx.fromNode.id} {child.node_genome[cx.fromNode.id].id}"
+        assert cx.toNode in child.node_genome, f"{child.id}: {cx.toNode.id} {child.node_genome[cx.toNode.id].id}"
         # TODO this shouldn't be necessary
-        cx.fromNode = child.node_genome[cx.fromNode.id]
-        cx.toNode = child.node_genome[cx.toNode.id]
+        
     child.update_node_layers()
-    child.disable_invalid_connections()
+    # child.disable_invalid_connections()
+    
     return child
 
 

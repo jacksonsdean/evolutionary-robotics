@@ -6,6 +6,8 @@ from pyrosim.linksdf  import LINK_SDF
 
 from pyrosim.linkurdf import LINK_URDF
 
+from pyrosim.staticsdf       import STATIC_SDF
+
 from pyrosim.model import MODEL
 
 from pyrosim.sdf   import SDF
@@ -106,7 +108,7 @@ def Prepare_To_Simulate(bodyID):
 
     Prepare_Joint_Dictionary(bodyID)
 
-def Send_Cube(name="default",pos=[0,0,0],size=[1,1,1]):
+def Send_Cube(name="default",pos=[0,0,0],size=[1,1,1], static=False, color_name="Cyan", color_rgba=[0,1,1,1], mass=1.0):
 
     global availableLinkIndex
 
@@ -114,13 +116,13 @@ def Send_Cube(name="default",pos=[0,0,0],size=[1,1,1]):
 
     if filetype == SDF_FILETYPE:
 
-        Start_Model(name,pos)
-
-        link = LINK_SDF(name,pos,size)
+        Start_Model(name,pos,static)
+        
+        link = LINK_SDF(name,pos,size, static, color_name, color_rgba)
 
         links.append(link)
     else:
-        link = LINK_URDF(name,pos,size)
+        link = LINK_URDF(name,pos,size, static, mass, color_name, color_rgba)
 
         links.append(link)
 
@@ -243,10 +245,14 @@ def Start_URDF(filename):
 
     links = []
 
-def Start_Model(modelName,pos):
+def Start_Model(modelName,pos,static):
 
     global model 
 
     model = MODEL(modelName,pos)
 
     model.Save_Start_Tag(f)
+
+    if static:
+        s = STATIC_SDF()
+        s.Save(f)

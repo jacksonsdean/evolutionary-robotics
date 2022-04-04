@@ -6,8 +6,13 @@ x, y, z = 0, 0, 0.5
 length, width, height = 1, 1, 1
 
 def Create_World():
-    pyrosim.Start_SDF("world.sdf")
-    pyrosim.End()
+    for x in range(-2, -25,-1):
+        pyrosim.Start_URDF(f"world/cube_{x}.urdf")
+        y = random.random()
+        z_size = random.random() * .25 + .01
+        pyrosim.Send_Cube(name=f"Cube{x}", pos=[x, y, z_size/2.], size=[1, 600, z_size], static=True, color_name="dark_gray" if x % 2 == 0 else "gray", color_rgba= [0.7, 0.7, 0.7, 1.0] if x % 2 == 0 else [1, 1, 1, 1.0], mass=0.0)
+        pyrosim.End()
+        
     
 def Generate_Body():
     pyrosim.Start_URDF("body.urdf")

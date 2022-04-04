@@ -91,7 +91,6 @@ class NEAT():
                 prop = c.novelty_adjusted_fitness_proportion
                 self.population[i].adjusted_fitness = (1-prop) * adj_fit  + prop * adj_novelty 
                 
-        self.print_fitnesses()
 
     def print_fitnesses(self):
         print("Generation:", self.gen)
@@ -176,6 +175,7 @@ class NEAT():
         # Run NEAT
         for self.gen in range(c.num_gens):
             self.run_one_generation()
+            
 
     def run_one_generation(self):
         # update all ids:
@@ -187,9 +187,10 @@ class NEAT():
         self.update_fitnesses_and_novelty()
         self.population = sorted(self.population, key=lambda x: x.fitness, reverse=True) # sort by fitness
         self.solution = self.population[0]
+        self.print_fitnesses()
 
-        if self.gen ==0:
-            self.show_best()
+        # if self.gen == 0:
+            # self.show_best()
             
         # dynamic mutation rates
         mutation_rates = self.get_mutation_rates()
@@ -274,7 +275,7 @@ class NEAT():
 
     def save_best_network_image(self):
         best = self.get_best()
-        visualize_network(self.get_best(), sample=True, save_name=f"best/{time.time()}_{self.gen}_{best.id}.png", extra_text="Generation: " + str(self.gen) + " fitness:" + str(best.fitness))
+        visualize_network(self.get_best(), sample=True, save_name=f"best/{time.time()}_{self.gen}_{best.id}.png", extra_text="Generation: " + str(self.gen) + " fit: " + str(best.fitness) + " species: " + str(best.species_id))
 
 
 def classic_selection_and_reproduction(c, population, all_species, generation_num, mutation_rates):
@@ -375,7 +376,7 @@ def update_solution_archive(solution_archive, genome, max_archive_length, novelt
 def mutate(child, genome, rates):
     prob_mutate_activation, prob_mutate_weight, prob_add_connection, prob_add_node, prob_remove_node, prob_disable_connection, weight_mutation_max, prob_reenable_connection = rates
     
-    # child.fitness, child.adjusted_fitness = -math.inf, -math.inf # new fitnesses after mutation
+    child.fitness, child.adjusted_fitness = -math.inf, -math.inf # new fitnesses after mutation
 
     if(np.random.uniform(0,1) < c.prob_random_restart):
         child = genome()

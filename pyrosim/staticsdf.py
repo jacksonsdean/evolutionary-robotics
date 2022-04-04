@@ -1,16 +1,11 @@
 from pyrosim.commonFunctions import Save_Whitespace
-from pyrosim.material import MATERIAL
 
-class VISUAL_SDF: 
+class STATIC_SDF: 
 
-    def __init__(self,geometry, color_name, color_rgba):
-
-        self.geometry = geometry 
-
-        self.material = MATERIAL(color_name, color_rgba)
-        
+    def __init__(self):
         self.depth = 3
         
+        self.static = "<static>true</static>"
         
 
     def Save(self,f):
@@ -27,17 +22,11 @@ class VISUAL_SDF:
 
         Save_Whitespace(self.depth,f)
 
-        f.write('<visual>\n')
 
     def Save_Elements(self,f):
 
-        self.geometry.Save(f)
-        
-        self.material.Save(f)
-        
+        f.write(self.static + '\n')
 
     def Save_End_Tag(self,f):
 
         Save_Whitespace(self.depth,f)
-
-        f.write('</visual>\n')

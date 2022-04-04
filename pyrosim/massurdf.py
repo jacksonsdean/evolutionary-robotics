@@ -2,9 +2,9 @@ from pyrosim.commonFunctions import Save_Whitespace
 
 class MASS_URDF: 
 
-    def __init__(self):
+    def __init__(self, mass):
 
-        self.string =  '<mass value="1" />'
+        self.string =  f'<mass value="{mass}" />'
 
         self.depth = 3
 

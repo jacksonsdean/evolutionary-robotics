@@ -18,19 +18,17 @@ gravity = 0, 0, -9.8
 simulation_fps = 240
 simulation_length = 2000
 
-motor_max_force = 50.
-motor_joint_range = 0.25
+motor_max_force = 60.
+motor_joint_range = 0.35
 
-num_gens = 10
-pop_size = 20
+num_gens = 20
+pop_size = 10
 
 num_motor_neurons = 8
 num_sensor_neurons = 4
 
 hidden_nodes_at_start = 0
 init_connection_probability = .35
-
-show_debug = False
 
 
 do_crossover = True

@@ -3,23 +3,23 @@ from pyrosim.commonFunctions import Save_Whitespace
 
 class INERTIA_SDF: 
 
-    def __init__(self):
+    def __init__(self, static=False):
 
         self.depth = 4 
 
         self.string1 = '<inertia>'
 
-        self.string2 = '    <ixx>0.083</ixx>'
+        self.string2 = '    <ixx>0.083</ixx>' if not static else '<ixx>0.0</ixx>'
 
         self.string3 = '    <ixy>0.0</ixy>'
 
         self.string4 = '    <ixz>0.0</ixz>'
 
-        self.string5 = '    <iyy>0.083</iyy>'
+        self.string5 = '    <iyy>0.083</iyy>' if not static else '<iyy>0.0</iyy>'
 
         self.string6 = '    <iyz>0.0</iyz>'
 
-        self.string7 = '    <izz>0.083</izz>'
+        self.string7 = '    <izz>0.083</izz>'  if not static else '<izz>0.0</izz>'
 
         self.string8 = '</inertia>'
 
