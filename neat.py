@@ -255,7 +255,7 @@ class NEAT():
     
     def print_best(self):
         best = self.get_best()
-        print("Best:", best, best.fitness)
+        print("Best:", best.id, best.fitness)
         
     def show_best(self):
         print()
