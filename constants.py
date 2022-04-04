@@ -21,8 +21,8 @@ simulation_length = 2000
 motor_max_force = 50.
 motor_joint_range = 0.25
 
-num_gens = 20
-pop_size = 20
+num_gens = 1
+pop_size = 1
 
 num_motor_neurons = 8
 num_sensor_neurons = 4
@@ -37,7 +37,7 @@ use_speciation = True
 use_map_elites = False
 allow_recurrent = False
 species_selection_ratio=.5
-species_target = 3
+species_target = 20
 species_threshold_delta = .1
 init_species_threshold = .75
 max_weight = 3.0

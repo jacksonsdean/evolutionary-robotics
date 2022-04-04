@@ -1,9 +1,10 @@
 import math
 import os
+import time
 import numpy as np
 from tqdm import trange
 from neat_genome import Connection, Genome, crossover
-from util import choose_random_function, get_avg_number_of_connections, get_avg_number_of_hidden_nodes, get_max_number_of_connections
+from util import choose_random_function, get_avg_number_of_connections, get_avg_number_of_hidden_nodes, get_max_number_of_connections, visualize_network
 from species import *
 import copy 
 
@@ -261,7 +262,7 @@ class NEAT():
         print()
         self.print_best()
         self.get_best().start_simulation(False, self.debug_output, True)
-
+        visualize_network(self.get_best(), sample=True, save_name=f"best_{time.time()}.png")
 
 
 
