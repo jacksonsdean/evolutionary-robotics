@@ -1,0 +1,24 @@
+<robot name = "robot">
+    <link name="Cube-6">
+        <inertial>
+            <origin xyz="-6 0.6352575739483584 0.12711094731777692" rpy="0 0 0"/>
+            <mass value="0.0" />
+            <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <origin xyz="-6 0.6352575739483584 0.12711094731777692" rpy="0 0 0"/>
+            <geometry>
+                <box size="1 600 0.25422189463555384" />
+            </geometry>
+            <material name="dark_gray">
+                <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="-6 0.6352575739483584 0.12711094731777692" rpy="0 0 0"/>
+            <geometry>
+                <box size="1 600 0.25422189463555384" />
+            </geometry>
+        </collision>
+    </link>
+</robot>

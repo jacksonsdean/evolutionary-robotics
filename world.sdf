@@ -1,2 +1,784 @@
 <sdf>
+    <model name="Cube-2">
+        <pose>-2 0.29270619952918 0.03560203975104556 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-2">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.07120407950209112</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.07120407950209112</size>
+                   </box>
+                </geometry>
+            <material name="dark_gray">
+                <color rgba="0.3 0.3 0.3 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-3">
+        <pose>-3 0.6579827728740723 0.1365906464070025 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-3">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.273181292814005</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.273181292814005</size>
+                   </box>
+                </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-4">
+        <pose>-4 0.6759154461547006 0.14602818225264616 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-4">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.2920563645052923</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.2920563645052923</size>
+                   </box>
+                </geometry>
+            <material name="dark_gray">
+                <color rgba="0.3 0.3 0.3 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-5">
+        <pose>-5 0.4657554656345497 0.12874981467641589 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-5">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.25749962935283177</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.25749962935283177</size>
+                   </box>
+                </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-6">
+        <pose>-6 0.62472963620162 0.15742880227925524 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-6">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.3148576045585105</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.3148576045585105</size>
+                   </box>
+                </geometry>
+            <material name="dark_gray">
+                <color rgba="0.3 0.3 0.3 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-7">
+        <pose>-7 0.34835172789597024 0.14350160425973393 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-7">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.28700320851946787</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.28700320851946787</size>
+                   </box>
+                </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-8">
+        <pose>-8 0.6760783335148612 0.061441201241944896 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-8">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.12288240248388979</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.12288240248388979</size>
+                   </box>
+                </geometry>
+            <material name="dark_gray">
+                <color rgba="0.3 0.3 0.3 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-9">
+        <pose>-9 0.8988710207110978 0.04061003091412881 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-9">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.08122006182825763</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.08122006182825763</size>
+                   </box>
+                </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-10">
+        <pose>-10 0.42841241563154786 0.0840805875088175 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-10">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.168161175017635</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.168161175017635</size>
+                   </box>
+                </geometry>
+            <material name="dark_gray">
+                <color rgba="0.3 0.3 0.3 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-11">
+        <pose>-11 0.21138810527447893 0.09728729886574679 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-11">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.19457459773149358</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.19457459773149358</size>
+                   </box>
+                </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-12">
+        <pose>-12 0.25198680157954 0.15357646327858934 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-12">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.3071529265571787</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.3071529265571787</size>
+                   </box>
+                </geometry>
+            <material name="dark_gray">
+                <color rgba="0.3 0.3 0.3 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-13">
+        <pose>-13 0.08936582636062251 0.10456625370945602 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-13">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.20913250741891204</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.20913250741891204</size>
+                   </box>
+                </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-14">
+        <pose>-14 0.4031794470667245 0.014433919464762577 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-14">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.028867838929525155</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.028867838929525155</size>
+                   </box>
+                </geometry>
+            <material name="dark_gray">
+                <color rgba="0.3 0.3 0.3 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-15">
+        <pose>-15 0.731495987452724 0.14411477190881328 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-15">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.28822954381762655</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.28822954381762655</size>
+                   </box>
+                </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-16">
+        <pose>-16 0.6279816179676075 0.01618828879699757 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-16">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.03237657759399514</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.03237657759399514</size>
+                   </box>
+                </geometry>
+            <material name="dark_gray">
+                <color rgba="0.3 0.3 0.3 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-17">
+        <pose>-17 0.6349492285672793 0.14292222321107534 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-17">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.2858444464221507</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.2858444464221507</size>
+                   </box>
+                </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-18">
+        <pose>-18 0.4341529550598635 0.01545607936794125 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-18">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.0309121587358825</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.0309121587358825</size>
+                   </box>
+                </geometry>
+            <material name="dark_gray">
+                <color rgba="0.3 0.3 0.3 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-19">
+        <pose>-19 0.1332375798409936 0.12455874088642024 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-19">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.2491174817728405</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.2491174817728405</size>
+                   </box>
+                </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-20">
+        <pose>-20 0.15676635274180606 0.08120002883209662 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-20">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.16240005766419324</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.16240005766419324</size>
+                   </box>
+                </geometry>
+            <material name="dark_gray">
+                <color rgba="0.3 0.3 0.3 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-21">
+        <pose>-21 0.1726056179836023 0.059005589697257006 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-21">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.11801117939451401</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.11801117939451401</size>
+                   </box>
+                </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-22">
+        <pose>-22 0.6984121080656177 0.01239061562792429 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-22">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.02478123125584858</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.02478123125584858</size>
+                   </box>
+                </geometry>
+            <material name="dark_gray">
+                <color rgba="0.3 0.3 0.3 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-23">
+        <pose>-23 0.5118916056497215 0.04982212069185868 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-23">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.09964424138371736</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.09964424138371736</size>
+                   </box>
+                </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
+    <model name="Cube-24">
+        <pose>-24 0.6872708228564882 0.16481675572418214 0 0 0 </pose>
+            <static>true</static>
+                    <link name="Cube-24">
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                <ixx>0.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                <iyy>0.0</iyy>
+                    <iyz>0.0</iyz>
+                <izz>0.0</izz>
+                </inertia>
+            </inertial>
+            <collision>
+                <geometry>
+                   <box>
+                      <size>1 30 0.3296335114483643</size>
+                   </box>
+                </geometry>
+            </collision>
+            <visual>
+                <geometry>
+                   <box>
+                      <size>1 30 0.3296335114483643</size>
+                   </box>
+                </geometry>
+            <material name="dark_gray">
+                <color rgba="0.3 0.3 0.3 1.0"/>
+            </material>
+            </visual>
+        </link>
+    </model>
 </sdf>

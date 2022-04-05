@@ -212,7 +212,7 @@ class NEAT():
         #------------#
         # assessment #
         #------------#
-        self.update_fitnesses_and_novelty()
+        self.update_fitnesses_and_novelty() # run sim
 
         #-----------#
         # selection #

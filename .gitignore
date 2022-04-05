@@ -3,6 +3,9 @@ tmp/
 tmp*/txt
 bodies/
 brains/ 
+best/
+tmp*.txt
+best_*.png
 
 #VS Code
 .vscode/

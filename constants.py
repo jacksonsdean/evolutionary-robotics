@@ -30,15 +30,16 @@ num_sensor_neurons = 4
 hidden_nodes_at_start = 0
 init_connection_probability = .35
 
+species_target = 15
+species_selection_ratio= .5
+species_threshold_delta = .1
+init_species_threshold = .75
+
 
 do_crossover = True
 use_speciation = True
 use_map_elites = False
 allow_recurrent = False
-species_selection_ratio=.5
-species_target = 4
-species_threshold_delta = .1
-init_species_threshold = .75
 max_weight = 3.0
 weight_threshold = 0
 weight_mutation_max = 2

@@ -12,8 +12,19 @@ if __name__ == '__main__':
         solution_id = args[i+1]
     if "--best" in args:
         save_as_best = True
+    if "--brain" in args:
+        i = args.index("--brain")
+        brain_path = args[i+1]
+    else:
+        brain_path = None
+    if "--body" in args:
+        i = args.index("--body")
+        body_path = args[i+1]
+        
+    else:
+        body_path = None
     headless_mode = "DIRECT" in args
-    sim = Simulation(headless_mode, solution_id, save_as_best)
+    sim = Simulation(headless_mode, solution_id, save_as_best, brain_path, body_path)
     print("Running simulation with id:", solution_id)
     sim.run()
     sim.get_fitness()

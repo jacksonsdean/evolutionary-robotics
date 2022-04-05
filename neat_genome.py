@@ -210,22 +210,22 @@ class Genome:
 
     def generate_body(self):
         pyrosim.Start_URDF(f"body{self.id}.urdf")
-        pyrosim.Send_Cube(name="Torso", pos=[0, 0, 1], size=[1, 1, 1])
+        pyrosim.Send_Cube(name="Torso", pos=[0, 0, 1], size=[1, 1, 1], mass=10.0)
         pyrosim.Send_Joint( name = "Torso_BackLeg" , parent= "Torso" , child = "BackLeg" , type = "revolute", position = [0, -0.5, 1.0], jointAxis = "1 0 0")
-        pyrosim.Send_Cube(name="BackLeg", pos=[0.0, -0.5, 0.0], size=[.2, 1., .2])
+        pyrosim.Send_Cube(name="BackLeg", pos=[0.0, -0.5, 0.0], size=[.2, 1., .2], mass=1.0)
         pyrosim.Send_Joint( name = "Torso_FrontLeg" , parent= "Torso" , child = "FrontLeg" , type = "revolute", position = [0.0, 0.5, 1.0], jointAxis = "1 0 0")
-        pyrosim.Send_Cube(name="FrontLeg", pos=[0.0, 0.5, 0], size=[.2, 1., .2])
-        pyrosim.Send_Cube(name="LeftLeg", pos=[-0.5, 0.0, 0.0], size=[1.0, 0.2, 0.2])
+        pyrosim.Send_Cube(name="FrontLeg", pos=[0.0, 0.5, 0], size=[.2, 1., .2], mass=1.0)
+        pyrosim.Send_Cube(name="LeftLeg", pos=[-0.5, 0.0, 0.0], size=[1.0, 0.2, 0.2], mass=1.0)
         pyrosim.Send_Joint( name = "Torso_LeftLeg" , parent= "Torso" , child = "LeftLeg" , type = "revolute", position = [-0.5, 0, 1.], jointAxis = "0 1 0")
-        pyrosim.Send_Cube(name="RightLeg", pos=[0.5, 0.0, 0.0], size=[1.0, 0.2, 0.2])
+        pyrosim.Send_Cube(name="RightLeg", pos=[0.5, 0.0, 0.0], size=[1.0, 0.2, 0.2], mass=1.0)
         pyrosim.Send_Joint( name = "Torso_RightLeg" , parent= "Torso" , child = "RightLeg" , type = "revolute", position = [0.5, 0, 1.], jointAxis = "0 1 0")
-        pyrosim.Send_Cube(name="FrontLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.])
+        pyrosim.Send_Cube(name="FrontLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.], mass=1.0)
         pyrosim.Send_Joint( name = "FrontLeg_FrontLowerLeg" , parent= "FrontLeg" , child = "FrontLowerLeg" , type = "revolute", position = [0,1,0], jointAxis = "1 0 0")
-        pyrosim.Send_Cube(name="BackLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.])
+        pyrosim.Send_Cube(name="BackLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.], mass=1.0)
         pyrosim.Send_Joint( name = "BackLeg_BackLowerLeg" , parent= "BackLeg" , child = "BackLowerLeg" , type = "revolute", position = [0,-1,0], jointAxis = "1 0 0")
-        pyrosim.Send_Cube(name="LeftLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.])
+        pyrosim.Send_Cube(name="LeftLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.], mass=1.0)
         pyrosim.Send_Joint( name = "LeftLeg_LeftLowerLeg" , parent= "LeftLeg" , child = "LeftLowerLeg" , type = "revolute", position = [-1,0,0], jointAxis = "0 1 0")
-        pyrosim.Send_Cube(name="RightLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.])
+        pyrosim.Send_Cube(name="RightLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.], mass=1.0)
         pyrosim.Send_Joint( name = "RightLeg_RightLowerLeg" , parent= "RightLeg" , child = "RightLowerLeg" , type = "revolute", position = [1,0,0], jointAxis = "0 1 0")
         pyrosim.End()
 
@@ -402,33 +402,37 @@ class Genome:
             self.connection_genome.remove(cx)
 
     def add_node(self):
-        eligible_cxs = [
-            cx for cx in self.connection_genome if not cx.is_recurrent]
-        if(len(eligible_cxs) < 1):
-            return
-        old = np.random.choice(eligible_cxs)
-        new_node = Node(choose_random_function(c),
-                        NodeType.Hidden, self.get_new_node_id())
-        self.node_genome.append(new_node)  # add a new node between two nodes
-        old.enabled = False  # disable old connection
+        try:
+            eligible_cxs = [
+                cx for cx in self.connection_genome if not cx.is_recurrent]
+            if(len(eligible_cxs) < 1):
+                return
+            old = np.random.choice(eligible_cxs)
+            new_node = Node(choose_random_function(c),
+                            NodeType.Hidden, self.get_new_node_id())
+            self.node_genome.append(new_node)  # add a new node between two nodes
+            old.enabled = False  # disable old connection
 
-        # The connection between the first node in the chain and the new node is given a weight of one
-        # and the connection between the new node and the last node in the chain is given the same weight as the connection being split
+            # The connection between the first node in the chain and the new node is given a weight of one
+            # and the connection between the new node and the last node in the chain is given the same weight as the connection being split
 
-        self.connection_genome.append(Connection(
-            self.node_genome[old.fromNode.id], self.node_genome[new_node.id],   self.random_weight()))
+            self.connection_genome.append(Connection(
+                self.node_genome[old.fromNode.id], self.node_genome[new_node.id],   self.random_weight()))
 
-        # TODO shouldn't be necessary
-        self.connection_genome[-1].fromNode = self.node_genome[old.fromNode.id]
-        self.connection_genome[-1].toNode = self.node_genome[new_node.id]
-        self.connection_genome.append(Connection(
-            self.node_genome[new_node.id],     self.node_genome[old.toNode.id], old.weight))
+            # TODO shouldn't be necessary
+            self.connection_genome[-1].fromNode = self.node_genome[old.fromNode.id]
+            self.connection_genome[-1].toNode = self.node_genome[new_node.id]
+            self.connection_genome.append(Connection(
+                self.node_genome[new_node.id],     self.node_genome[old.toNode.id], old.weight))
 
-        self.connection_genome[-1].fromNode = self.node_genome[new_node.id]
-        self.connection_genome[-1].toNode = self.node_genome[old.toNode.id]
+            self.connection_genome[-1].fromNode = self.node_genome[new_node.id]
+            self.connection_genome[-1].toNode = self.node_genome[old.toNode.id]
 
-        self.update_node_layers()
-        # self.disable_invalid_connections() # TODO broken af
+            self.update_node_layers()
+            # self.disable_invalid_connections() # TODO broken af
+        except Exception as e:
+            print(f"ERROR in add_node: {e}")
+            return # TODO
 
     def remove_node(self):
         # This is a bit of a buggy mess

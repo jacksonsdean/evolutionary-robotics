@@ -10,10 +10,13 @@ from pyrosim.neuralNetwork import NEURAL_NETWORK
 import platform
 
 class Robot():
-    def __init__(self, solution_id):
+    def __init__(self, solution_id,brain_path=None, body_path=None):
         self.solution_id = solution_id
+        self.brain_path = brain_path
+        
+        print("*********", body_path)
         # load robot
-        self.robotId = p.loadURDF(f"body{solution_id}.urdf")
+        self.robotId = p.loadURDF(f"body{solution_id}.urdf" if body_path is None else body_path)
 
         pyrosim.Prepare_To_Simulate(self.robotId)
         self.PrepareSensors()
@@ -27,7 +30,7 @@ class Robot():
             self.sensors[linkName] = Sensor(linkName)
     
     def PrepareBrain(self):
-        self.nn = NEURAL_NETWORK(f"brain{self.solution_id}.nndf")
+        self.nn = NEURAL_NETWORK(f"brain{self.solution_id}.nndf" if self.brain_path is None else self.brain_path)
 
     def PrepareMotors(self):
         # prepare motors
