@@ -17,6 +17,8 @@ class NEURON:
         self.Search_For_Link_Name(line)
 
         self.Search_For_Joint_Name(line)
+        
+        self.Search_For_BodyID(line)
 
         self.Set_Value(0.0)
 
@@ -27,6 +29,10 @@ class NEURON:
     def Get_Joint_Name(self):
 
         return self.jointName
+
+    def Get_BodyID(self):
+
+        return self.bodyID
 
     def Get_Link_Name(self):
 
@@ -42,7 +48,7 @@ class NEURON:
 
     def Is_Sensor_Neuron(self):
 
-        return self.type == c.SENSOR_NEURON
+        return self.type == c.TOUCH_SENSOR_NEURON or self.type == c.PROPRIOCEPTIVE_SENSOR_NEURON
 
     def Is_Hidden_Neuron(self):
 
@@ -67,7 +73,13 @@ class NEURON:
         self.value = value
 
     def Update_Sensor_Neuron(self):
-        val = pyrosim.Get_Touch_Sensor_Value_For_Link(self.Get_Link_Name())
+        if self.type == c.TOUCH_SENSOR_NEURON:
+            val = pyrosim.Get_Touch_Sensor_Value_For_Link(self.Get_Link_Name())
+        elif self.type == c.PROPRIOCEPTIVE_SENSOR_NEURON:
+            if self.Get_BodyID() == 0:
+                raise Exception("Proprioceptive sensor neuron has no bodyID")
+            val = pyrosim.Get_Rotational_Sensor_Value_For_Joint(self.Get_Joint_Name(), self.Get_BodyID())
+            
         self.Set_Value(val)
 
     def Update_Hidden_Or_Motor_Neuron(self, neurons, synapses):
@@ -93,9 +105,13 @@ class NEURON:
 
     def Determine_Type(self,line):
 
-        if "sensor" in line:
+        if "touch_sensor" in line:
 
-            self.type = c.SENSOR_NEURON
+            self.type = c.TOUCH_SENSOR_NEURON
+
+        elif "proprioceptive_sensor" in line:
+
+            self.type = c.PROPRIOCEPTIVE_SENSOR_NEURON
 
         elif "motor" in line:
 
@@ -132,6 +148,14 @@ class NEURON:
             splitLine = line.split('"')
 
             self.linkName = splitLine[5]
+
+    def Search_For_BodyID(self,line):
+
+        if "bodyID" in line:
+
+            splitLine = line.split('"')
+
+            self.bodyID = int(splitLine[7])
 
     def Threshold(self):
 

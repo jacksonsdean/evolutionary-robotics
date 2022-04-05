@@ -4,7 +4,7 @@ import pybullet as p
 import pyrosim.pyrosim as pyrosim
 import numpy as np
 import constants as c
-from sensor import Sensor
+from sensor import Sensor, TorqueSensor
 from motor import Motor
 from pyrosim.neuralNetwork import NEURAL_NETWORK
 import platform
@@ -28,6 +28,9 @@ class Robot():
         self.sensors = {}
         for linkName in pyrosim.linkNamesToIndices:
             self.sensors[linkName] = Sensor(linkName)
+        for jointName in pyrosim.jointNamesToIndices:
+            self.sensors[jointName] = TorqueSensor(jointName, self.robotId)
+            p.enableJointForceTorqueSensor(self.robotId, pyrosim.jointNamesToIndices[jointName])
     
     def PrepareBrain(self):
         self.nn = NEURAL_NETWORK(f"brain{self.solution_id}.nndf" if self.brain_path is None else self.brain_path)

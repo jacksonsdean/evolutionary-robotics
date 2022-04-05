@@ -27,12 +27,12 @@ pop_size = 10
 use_obstacles = False
 
 num_motor_neurons = 12
-num_sensor_neurons = 4
+num_sensor_neurons = 8
 
 hidden_nodes_at_start = 0
 init_connection_probability = .35
 
-species_target = 15
+species_target = 3
 species_selection_ratio= .5
 species_threshold_delta = .1
 init_species_threshold = .75

@@ -26,7 +26,7 @@ def name_to_fn(name):
     fns.extend([("avg_pixel_distance_fitness", avg_pixel_distance_fitness)])
     return fns[[f[0] for f in fns].index(name)][1]
     
-def visualize_network(individual,sample_point=[.25, .25, .25, .25], color_mode="L", visualize_disabled=False, layout='multi', sample=False, show_weights=False, use_inp_bias=False, use_radial_distance=True, save_name=None, extra_text=None):
+def visualize_network(individual,sample_point=[.25]*c.num_sensor_neurons, color_mode="L", visualize_disabled=False, layout='multi', sample=False, show_weights=False, use_inp_bias=False, use_radial_distance=True, save_name=None, extra_text=None):
     if(sample):
         individual.eval(sample_point)
         

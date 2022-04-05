@@ -62,6 +62,18 @@ def Get_Touch_Sensor_Value_For_Link(linkName):
 
     return touchValue
 
+def Get_Rotational_Sensor_Value_For_Joint(jointName, bodyID):
+
+    torque = 0
+
+    desiredJointIndex = jointNamesToIndices[jointName]
+    
+    print("desiredJointIndex = ", desiredJointIndex, " jointName = ", jointName, "bodyID = ", bodyID)
+
+    torque = p.getJointState(bodyID, desiredJointIndex)[3]
+    
+    return torque
+
 def Prepare_Link_Dictionary(bodyID):
 
     global linkNamesToIndices
@@ -107,6 +119,7 @@ def Prepare_To_Simulate(bodyID):
     Prepare_Link_Dictionary(bodyID)
 
     Prepare_Joint_Dictionary(bodyID)
+    
 
 def Send_Cube(name="default",pos=[0,0,0],size=[1,1,1], static=False, color_name="Cyan", color_rgba=[0,1,1,1], mass=1.0):
 
@@ -146,9 +159,13 @@ def Send_Motor_Neuron(name,jointName):
 
     f.write('    <neuron name = "' + str(name) + '" type = "motor"  jointName = "' + jointName + '" />\n')
 
-def Send_Sensor_Neuron(name,linkName):
+def Send_Touch_Sensor_Neuron(name,linkName):
 
-    f.write('    <neuron name = "' + str(name) + '" type = "sensor" linkName = "' + linkName + '" />\n')
+    f.write('    <neuron name = "' + str(name) + '" type = "touch_sensor" linkName = "' + linkName + '" />\n')
+    
+def Send_Torque_Sensor_Neuron(name, jointName, bodyID):
+
+    f.write('    <neuron name = "' + str(name) + '" type = "proprioceptive_sensor" jointName = "' + jointName + '" bodyID = "' + str(bodyID) + '"  />\n')
     
 def Send_Hidden_Neuron(name):
 
