@@ -356,7 +356,7 @@ class Genome:
         except Exception as e:  # TODO no
             print(f"ERROR in mutation: {e}")
 
-    def add_connection(self):
+    def add_connection(self):   
         chance_to_reenable = c.prob_reenable_connection
         allow_recurrent = c.allow_recurrent
         for i in range(20):  # try 20 times
