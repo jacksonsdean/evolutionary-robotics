@@ -11,6 +11,7 @@ import platform
 import os, os.path
 import constants as c
 from util import visualize_network
+import pybullet as p
 
 from util import choose_random_function, visualize_network
 
@@ -112,6 +113,7 @@ class Genome:
         self.node_genome = []  # inputs first, then outputs, then hidden
         self.connection_genome = []
         self.id = Genome.get_id()
+        self.bodyID = -1
 
         self.more_fit_parent = None  # for record-keeping
         self.n_hidden_nodes = c.hidden_nodes_at_start
@@ -249,10 +251,11 @@ class Genome:
         pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "RightLowerLeg"); n+=1
         pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "RightLowerLeg"); n+=1
             
-        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_BackLegRot", bodyID=1); n+=1
-        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_FrontLegRot", bodyID=1); n+=1
-        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_LeftLegRot", bodyID=1); n+=1
-        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_RightLegRot", bodyID=1); n+=1
+        bodyID = 24 if c.use_obstacles else 1
+        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_BackLegRot", bodyID=bodyID); n+=1
+        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_FrontLegRot", bodyID=bodyID); n+=1
+        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_LeftLegRot", bodyID=bodyID); n+=1
+        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_RightLegRot", bodyID=bodyID); n+=1
 
         # -Hidden
         for neuron in self.hidden_nodes():

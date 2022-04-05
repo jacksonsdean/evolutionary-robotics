@@ -24,7 +24,7 @@ motor_joint_range = 0.35
 num_gens = 10
 pop_size = 10
 
-use_obstacles = False
+use_obstacles = True
 
 num_motor_neurons = 12
 num_sensor_neurons = 8

@@ -90,23 +90,39 @@ class NEAT():
                 adj_novelty =  self.population[i].novelty / global_novelty
                 prop = c.novelty_adjusted_fitness_proportion
                 self.population[i].adjusted_fitness = (1-prop) * adj_fit  + prop * adj_novelty 
-                
+        
+        
+        for sp in self.all_species:
+            sp.avg_fitness = np.mean([i.fitness for i in get_members_of_species(self.population, sp.id)] if count_members_of_species(self.population, sp.id)>0 else [-1000000])
+            sp.avg_adj_fitness = np.mean([i.adjusted_fitness for i in get_members_of_species(self.population, sp.id)] if count_members_of_species(self.population, sp.id)>0 else [-1000000])
+        global_average_fitness = np.mean([i.adjusted_fitness for i in self.population])
+        for sp in self.all_species:
+            sp.population_count = count_members_of_species(self.population, sp.id) 
+            if(sp.population_count<=0): sp.allowed_offspring = 0; continue
+            members = get_members_of_species(self.population, sp.id)
+            sp.update(global_average_fitness, members, self.gen, c.species_stagnation_threshold, c.pop_size)
+
 
     def print_fitnesses(self):
         print("Generation:", self.gen)
         for individual in self.population:
-            print(f"Individual {individual.id} (species: {individual.species_id}) fitness:",individual.fitness)
-        print(f"Best in gen {self.gen}: {self.get_best().id} ({self.get_best().fitness})")
+            print(f"Individual {individual.id} (species: {individual.species_id}) fitness: {individual.fitness:.4f}")
+        print(f"Best in gen {self.gen}: {self.get_best().id} ({self.get_best().fitness:.4f})")
         print(f"Average fitness: {np.mean([i.fitness for i in self.population])}")
-        print(f"Average adjusted fitness: {np.mean([i.adjusted_fitness for i in self.population])}")
+        print(f"Average adjusted fitness: {np.mean([i.adjusted_fitness for i in self.population]):.4f}")
         num_species = count_number_of_species(self.population)
-        print(f"Number of species: {num_species} | threshold: {self.species_threshold}")
-        print(f"Best species (avg. fitness): {sorted(self.all_species, key=lambda x: x.avg_fitness if x.population_count > 0 else 0, reverse=True)[0].id}")
         print(f"Diversity (std, mean, max): {calculate_diversity_full(self.population, self.all_species)}")
-        print(f"Avg. Connections: {get_avg_number_of_connections(self.population)} | Max Connections: {get_max_number_of_connections(self.population)}")
-        print(f"Avg. Hidden Nodes: {get_avg_number_of_hidden_nodes(self.population)} | Max Nodes: {get_max_number_of_hidden_nodes(self.population)}")
-        print()
+        print(f"Avg. Connections: {get_avg_number_of_connections(self.population):.2f} | Max Connections: {get_max_number_of_connections(self.population)}")
+        print(f"Avg. Hidden Nodes: {get_avg_number_of_hidden_nodes(self.population):.2f} | Max Nodes: {get_max_number_of_hidden_nodes(self.population)}")
+        
+        print("--Species:")
+        print(f"Number of species: {num_species} | threshold: {self.species_threshold:.2f}")
+        print(f"Best species (avg. fitness): {sorted(self.all_species, key=lambda x: x.avg_fitness if x.population_count > 0 else -1000000000, reverse=True)[0].id}")
+        for species in self.all_species:
+            if species.population_count > 0:
+                print(f"Species {species.id:03d} (size: {species.population_count}) staf: {self.gen-species.last_improvement} avg fit: {species.avg_fitness:.4f} | adj fit: {species.avg_adjusted_fitness:.4f} | offsping: {species.allowed_offspring}")
 
+        print()
 
     def neat_selection_and_reproduction(self):
         new_children = []
@@ -203,7 +219,10 @@ class NEAT():
 
         if(c.use_speciation):
             new_children.extend(self.neat_selection_and_reproduction())
-            assign_species(self.all_species, new_children, self.species_threshold, Species) # assign new species ids
+            assign_species(self.all_species, self.population, self.species_threshold, Species) # assign new species ids
+            
+           
+
         else:
             new_children.extend(classic_selection_and_reproduction(c, self.population, self.all_species, self.gen, mutation_rates))
 
@@ -221,6 +240,18 @@ class NEAT():
         else: self.population += new_children # combine parents with new children (the + in mu+lambda)
 
         self.population = sorted(self.population, key=lambda individual: individual.fitness, reverse=True) # sort the full population by each individual's fitness (from highers to lowest)
+
+         # TODO NOT SURE:
+        assign_species(self.all_species, self.population, self.species_threshold, Species) # assign new species ids
+        
+        # global_average_fitness = np.mean([i.adjusted_fitness for i in self.population])
+        # for sp in self.all_species:
+            # sp.avg_fitness = np.mean([i.fitness for i in get_members_of_species(self.population, sp.id)] if count_members_of_species(self.population, sp.id)>0 else [-1000000])
+            # sp.population_count = count_members_of_species(self.population, sp.id) 
+            # if(sp.population_count<=0): sp.allowed_offspring = 0; continue
+            # members = get_members_of_species(self.population, sp.id)
+            # sp.update(global_average_fitness, members, self.gen, c.species_stagnation_threshold, c.pop_size)
+            
 
         if(not c.use_speciation):
             self.population = tournament_selection(self.population, c, False) # tournament selection (novelty and fitness)

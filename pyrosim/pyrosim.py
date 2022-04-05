@@ -68,8 +68,6 @@ def Get_Rotational_Sensor_Value_For_Joint(jointName, bodyID):
 
     desiredJointIndex = jointNamesToIndices[jointName]
     
-    print("desiredJointIndex = ", desiredJointIndex, " jointName = ", jointName, "bodyID = ", bodyID)
-
     torque = p.getJointState(bodyID, desiredJointIndex)[3]
     
     return torque

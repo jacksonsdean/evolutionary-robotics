@@ -61,7 +61,7 @@ class Robot():
         basePosition = basePositionAndOrientation[0]
         xPos, yPos, zPos = basePosition
         with open(f"tmp{self.solution_id}.txt", "w") as f:
-            fitness = -1.0 * xPos 
+            fitness = -1.0 * xPos if xPos < 0 else 0.0
             f.write(str(fitness))
         f.close()
         time.sleep(.1)
