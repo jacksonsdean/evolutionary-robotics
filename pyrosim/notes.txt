@@ -1,0 +1,5 @@
+Changes:
+    * added weight to torso (now 10 units)
+    * added obstacles
+    * added proprioceptive sensors (TODO)
+    * added 1 extra DOF to each leg (rotation around normal with torso at top leg joint)
