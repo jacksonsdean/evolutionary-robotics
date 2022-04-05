@@ -1,6 +1,7 @@
 import sys
 from simulation import Simulation
 from generate import Generate
+import constants as c
 if __name__ == '__main__':
     args = sys.argv[1:]
     solution_id = 0
@@ -20,6 +21,10 @@ if __name__ == '__main__':
     if "--body" in args:
         i = args.index("--body")
         body_path = args[i+1]
+        
+    if "--length" in args:
+        i = args.index("--length")
+        c.simulation_length = int(args[i+1])
         
     else:
         body_path = None
