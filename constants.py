@@ -21,10 +21,12 @@ simulation_length = 2000
 motor_max_force = 60.
 motor_joint_range = 0.35
 
-num_gens = 20
+num_gens = 10
 pop_size = 10
 
-num_motor_neurons = 8
+use_obstacles = False
+
+num_motor_neurons = 12
 num_sensor_neurons = 4
 
 hidden_nodes_at_start = 0

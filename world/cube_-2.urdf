@@ -1,23 +1,23 @@
 <robot name = "robot">
     <link name="Cube-2">
         <inertial>
-            <origin xyz="-2 0.2833675725233563 0.03676062823098299" rpy="0 0 0"/>
+            <origin xyz="-2 0.5107692666728652 0.09885997518912724" rpy="0 0 0"/>
             <mass value="0.0" />
             <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
         </inertial>
         <visual>
-            <origin xyz="-2 0.2833675725233563 0.03676062823098299" rpy="0 0 0"/>
+            <origin xyz="-2 0.5107692666728652 0.09885997518912724" rpy="0 0 0"/>
             <geometry>
-                <box size="1 600 0.07352125646196599" />
+                <box size="1 600 0.1977199503782545" />
             </geometry>
             <material name="dark_gray">
                 <color rgba="0.7 0.7 0.7 1.0"/>
             </material>
         </visual>
         <collision>
-            <origin xyz="-2 0.2833675725233563 0.03676062823098299" rpy="0 0 0"/>
+            <origin xyz="-2 0.5107692666728652 0.09885997518912724" rpy="0 0 0"/>
             <geometry>
-                <box size="1 600 0.07352125646196599" />
+                <box size="1 600 0.1977199503782545" />
             </geometry>
         </collision>
     </link>
