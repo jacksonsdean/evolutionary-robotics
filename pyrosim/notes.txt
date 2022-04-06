@@ -4,3 +4,4 @@ Changes:
     * added proprioceptive sensors (TODO)
     * added 1 extra DOF to each leg (rotation around normal with torso at top leg joint)
     * made fitness 0 for negative motion
+    * allowed recurrent connections
