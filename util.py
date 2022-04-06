@@ -54,8 +54,8 @@ def visualize_network(individual,sample_point=[.25]*c.num_sensor_neurons, color_
     fixed_positions={}
     for i, node in enumerate(individual.input_nodes()):
         G.add_node(node, color=function_colors[node.fn.__name__], shape='d', layer=(node.layer))
-        node_labels[node] = f"{node.id}\n{i}:\n{node.fn.__name__}\n"+(f"{node.output:.3f}" if node.output!=None else "")
-        fixed_positions[node] = (-4,((i+1)*2)/len(individual.input_nodes()))
+        node_labels[node] = f"Sensor {i}:\n{node.fn.__name__}\n"+(f"{node.output:.3f}" if node.output!=None else "")
+        fixed_positions[node] = (-4,((i+1)*2.)/len(individual.input_nodes()))
         
     for node in individual.hidden_nodes():
         G.add_node(node, color=function_colors[node.fn.__name__], shape='o', layer=(node.layer))
@@ -72,14 +72,14 @@ def visualize_network(individual,sample_point=[.25]*c.num_sensor_neurons, color_
     # pos=nx.shell_layout(G, scale=2)
     # pos=nx.spectral_layout(G, scale=2)
     # pos=graphviz_layout(G, prog='neato') # neato, dot, twopi, circo, fdp, nop, wc, acyclic, gvpr, gvcolor, ccomps, sccmap, tred, sfdp, unflatten.
+    fixed_nodes = fixed_positions.keys()
     if(layout=='multi'):
-        pos=nx.multipartite_layout(G, scale=4, subset_key='layer')
+        pos=nx.multipartite_layout(G, scale=4,subset_key='layer')
     elif(layout=='spring'):
         pos=nx.spring_layout(G, scale=4)
 
-    plt.figure(figsize=(8, 8))
+    plt.figure(figsize=(10, 10))
     # pos = nx.shell_layout(G)
-    # fixed_nodes = fixed_positions.keys()
     # pos = fixed_positions
     # pos = nx.spring_layout(G, pos=pos, fixed=fixed_nodes,k=.1,  scale = 2, iterations=2000)
     # for f, p in fixed_positions.items():
@@ -131,11 +131,11 @@ def visualize_network(individual,sample_point=[.25]*c.num_sensor_neurons, color_
     nx.draw_networkx_labels(G, pos, labels=node_labels)
     plt.tight_layout()
     if save_name is not None:
-        
         plt.savefig(save_name, format="PNG")
         plt.close()
     else:
         plt.show()
+        plt.close()
 
 
     ""

@@ -39,15 +39,15 @@ class NEAT():
         self.solution_fitness = 0
         # remove temp files:
         if platform.system() == "Windows":
-            os.system("del brain*.nndf")
-            os.system("del body*.urdf")
-            os.system("del fitness*.txt")
-            os.system("del tmp*.txt")
+            os.system("del brain*.nndf > nul 2> nul")
+            os.system("del body*.urdf > nul 2> nul")
+            os.system("del fitness*.txt > nul 2> nul")
+            os.system("del tmp*.txt > nul 2> nul")
         else:
-            os.system("rm brain*.nndf")
-            os.system("rm body*.urdf")
-            os.system("rm fitness*.txt")
-            os.system("rm tmp*.txt")
+            os.system("rm brain*.nndf > /dev/null 2> /dev/null")
+            os.system("rm body*.urdf > /dev/null 2> /dev/null")
+            os.system("rm fitness*.txt > /dev/null 2> /dev/null")
+            os.system("rm tmp*.txt > /dev/null 2> /dev/null")
     
     
     def get_mutation_rates(self):
@@ -102,24 +102,41 @@ class NEAT():
             members = get_members_of_species(self.population, sp.id)
             sp.update(global_average_fitness, members, self.gen, c.species_stagnation_threshold, c.pop_size)
 
-
-    def print_fitnesses(self):
-        print("Generation:", self.gen)
-        print(f"   *Best: {self.get_best().id} ({self.get_best().fitness:.4f})")
-        for individual in self.population:
-            print(f"   Individual {individual.id} (species: {individual.species_id}) fitness: {individual.fitness:.4f}")
-        print(f"   Average fitness: {np.mean([i.fitness for i in self.population]):.7f} | adjusted: {np.mean([i.adjusted_fitness for i in self.population]):.7f}")
-        num_species = count_number_of_species(self.population)
-        div = calculate_diversity_full(self.population, self.all_species)
-        print(f"   Diversity: std: {div[0]:.3f} | avg: {div[1]:.3f} | max: {div[2]:.3f}")
-        print(f"   Connections: avg. {get_avg_number_of_connections(self.population):.2f} max. {get_max_number_of_connections(self.population)}  | H. Nodes: avg. {get_avg_number_of_hidden_nodes(self.population):.2f} max: {get_max_number_of_hidden_nodes(self.population)}")
+    def show_fitness_curve(self):
+        plt.close()
+        plt.plot(self.fitness_over_time, label="Highest fitness")
+        plt.title("Fitness over time")
+        plt.ylabel("Fitness")
+        plt.xlabel("Generation")
+        plt.legend()
+        plt.show()
         
-        print(" |-> Species:")
-        print(f"   Number of species: {num_species} | threshold: {self.species_threshold:.2f}")
-        print(f"   Best species (avg. fitness): {sorted(self.all_species, key=lambda x: x.avg_fitness if x.population_count > 0 else -1000000000, reverse=True)[0].id}")
+    def show_diversity_curve(self):
+        plt.close()
+        plt.plot(self.diversity_over_time, label="Diversity")
+        plt.title("Diversity over time")
+        plt.ylabel("Fitness")
+        plt.xlabel("Generation")
+        plt.legend()
+        plt.show()
+        
+    def print_fitnesses(self):
+        div = calculate_diversity_full(self.population, self.all_species)
+        num_species = count_number_of_species(self.population)
+        print("Generation", self.gen, "="*100)
+        print(f" |-Best: {self.get_best().id} ({self.get_best().fitness:.4f})")
+        print(f" |  Average fitness: {np.mean([i.fitness for i in self.population]):.7f} | adjusted: {np.mean([i.adjusted_fitness for i in self.population]):.7f}")
+        print(f" |  Diversity: std: {div[0]:.3f} | avg: {div[1]:.3f} | max: {div[2]:.3f}")
+        print(f" |  Connections: avg. {get_avg_number_of_connections(self.population):.2f} max. {get_max_number_of_connections(self.population)}  | H. Nodes: avg. {get_avg_number_of_hidden_nodes(self.population):.2f} max: {get_max_number_of_hidden_nodes(self.population)}")
+        for individual in self.population:
+            print(f" |     Individual {individual.id} (species: {individual.species_id}) fitness: {individual.fitness:.4f}")
+        
+        print(" |-Species:")
+        print(f" |  Number of species: {num_species} | threshold: {self.species_threshold:.2f}")
+        print(f" |  Best species (avg. fitness): {sorted(self.all_species, key=lambda x: x.avg_fitness if x.population_count > 0 else -1000000000, reverse=True)[0].id}")
         for species in self.all_species:
             if species.population_count > 0:
-                print(f"   Species {species.id:03d} (size: {species.population_count}) stag: {self.gen-species.last_improvement} avg fit: {species.avg_fitness:.4f} | adj fit: {species.avg_adjusted_fitness:.4f} | offsping: {species.allowed_offspring}")
+                print(f" |    Species {species.id:03d} (size: {species.population_count}) stag: {self.gen-species.last_improvement} avg fit: {species.avg_fitness:.4f} | adj fit: {species.avg_adjusted_fitness:.4f} | offsping: {species.allowed_offspring}")
 
         print()
 

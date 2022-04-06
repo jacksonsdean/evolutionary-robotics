@@ -16,7 +16,7 @@ def identity(x):
 gravity = 0, 0, -9.8
 
 simulation_fps = 240
-simulation_length = 2000
+simulation_length = 300
 
 motor_max_force = 60.
 motor_joint_range = 0.35
@@ -24,7 +24,7 @@ motor_joint_range = 0.35
 num_gens = 10
 pop_size = 10
 
-use_obstacles = True
+use_obstacles = False
 max_obstacle_height = 0.10
 
 num_motor_neurons = 12  
@@ -42,12 +42,12 @@ init_species_threshold = .75
 do_crossover = True
 use_speciation = True
 use_map_elites = False
-allow_recurrent = False
-max_weight = 3.0
+allow_recurrent = True
+max_weight = 10.0
 weight_threshold = 0
-weight_mutation_max = 2
+weight_mutation_max = 2.
 prob_random_restart =.001
-prob_weight_reinit = 0.0
+prob_weight_reinit = 0.01
 prob_reenable_connection = 0.1
 species_stagnation_threshold = 20
 fitness_threshold = 1e10
@@ -63,7 +63,7 @@ auto_curriculum = 0
 num_workers = 4 
 
 prob_mutate_activation = .1 
-prob_mutate_weight = .8
+prob_mutate_weight = .2
 prob_add_connection = .35
 prob_add_node = .4
 prob_remove_node = 0.35
@@ -78,8 +78,6 @@ save_progress_images = False
 allow_input_activation_mutation = False
 
 use_input_bias = False
-num_sensor_neurons = 4 # x,y,bias,d
-num_motor_neurons = 8
 
 # Autoencoder novelty
 autoencoder_frequency = -1

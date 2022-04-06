@@ -14,7 +14,6 @@ class Robot():
         self.solution_id = solution_id
         self.brain_path = brain_path
         
-        print("*********", body_path)
         # load robot
         self.robotId = p.loadURDF(f"body{solution_id}.urdf" if body_path is None else body_path)
 
