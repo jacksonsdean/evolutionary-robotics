@@ -6,6 +6,7 @@ brains/
 best/
 tmp*.txt
 best_*.png
+cube_*.urdf
 
 #VS Code
 .vscode/
