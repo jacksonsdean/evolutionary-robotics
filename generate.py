@@ -1,16 +1,20 @@
 import random
 import pyrosim.pyrosim as pyrosim
 
-
-x, y, z = 0, 0, 0.5
-length, width, height = 1, 1, 1
+import constants as c
 
 def Create_World():
-    for x in range(-2, -25,-1):
+    for x in range(25, -25,-1):
         pyrosim.Start_URDF(f"world/cube_{x}.urdf")
         y = random.random()
-        z_size = random.random() * .25 + .01
-        pyrosim.Send_Cube(name=f"Cube{x}", pos=[x, y, z_size/2.], size=[1, 600, z_size], static=True, color_name="dark_gray" if x % 2 == 0 else "gray", color_rgba= [0.7, 0.7, 0.7, 1.0] if x % 2 == 0 else [1, 1, 1, 1.0], mass=0.0)
+        z_size = random.random() * c.max_obstacle_height + .01
+        pyrosim.Send_Cube(name=f"Cube{x}", pos=[x, y, z_size/2.], size=[.5, 600, z_size], static=True, color_name="dark_gray" if x % 2 == 0 else "gray", color_rgba= [0.7, 0.7, 0.7, 1.0] if x % 2 == 0 else [1, 1, 1, 1.0], mass=0.0)
+        pyrosim.End()
+    for y in range(25, -25,-1):
+        pyrosim.Start_URDF(f"world/cube_y{y}.urdf")
+        x = random.random()
+        z_size = random.random() * c.max_obstacle_height + .01
+        pyrosim.Send_Cube(name=f"Cube{x}", pos=[x, y, z_size/2.], size=[600, .5, z_size], static=True, color_name="dark_gray" if y % 2 == 0 else "gray", color_rgba= [0.7, 0.7, 0.7, 1.0] if y % 2 == 0 else [1, 1, 1, 1.0], mass=0.0)
         pyrosim.End()
         
     

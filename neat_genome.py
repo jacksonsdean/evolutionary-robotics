@@ -251,7 +251,7 @@ class Genome:
         pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "RightLowerLeg"); n+=1
         pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "RightLowerLeg"); n+=1
             
-        bodyID = 24 if c.use_obstacles else 1
+        bodyID = 101 if c.use_obstacles else 1
         pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_BackLegRot", bodyID=bodyID); n+=1
         pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_FrontLegRot", bodyID=bodyID); n+=1
         pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_LeftLegRot", bodyID=bodyID); n+=1

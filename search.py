@@ -23,6 +23,9 @@ if args.generate:
     os.system("python generate.py")
 
 
-phc = NEAT(args.debug)
-phc.evolve()
-phc.show_best()
+neat = NEAT(args.debug)
+try:
+    neat.evolve()
+except KeyboardInterrupt:
+    print("Stopping early...")
+neat.show_best()

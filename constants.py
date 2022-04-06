@@ -25,8 +25,9 @@ num_gens = 10
 pop_size = 10
 
 use_obstacles = True
+max_obstacle_height = 0.10
 
-num_motor_neurons = 12
+num_motor_neurons = 12  
 num_sensor_neurons = 8
 
 hidden_nodes_at_start = 0
@@ -65,7 +66,7 @@ prob_mutate_activation = .1
 prob_mutate_weight = .8
 prob_add_connection = .35
 prob_add_node = .4
-prob_remove_node = 0.1
+prob_remove_node = 0.35
 prob_disable_connection = .3
 
 use_dynamic_mutation_rates = False
