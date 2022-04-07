@@ -22,7 +22,7 @@ class NodeType(IntEnum):
     CPG = 3
 
 class Node:
-    current_id = 0
+    current_id = c.num_sensor_neurons + c.num_motor_neurons
     def __init__(self, fn, _type, _id, _layer=2) -> None:
         self.fn = fn
         self.uuid = uuid.uuid1()
@@ -110,7 +110,6 @@ class Genome:
         return output
        
     def __init__(self) -> None:
-        Node.current_id = 0 # reset node id counter
         self.fitness = -math.inf
         self.novelty = -math.inf
         self.adjusted_fitness = -math.inf
@@ -134,7 +133,7 @@ class Genome:
 
         for i in range(c.num_sensor_neurons):
             self.node_genome.append(
-                Node(choose_random_function(c), NodeType.Input, self.get_new_node_id(), 0))
+                Node(choose_random_function(c), NodeType.Input, i, 0))
         
         if c.use_cpg:
            self.node_genome[-1].type = NodeType.CPG
@@ -143,7 +142,8 @@ class Genome:
             output_fn = choose_random_function(
                 c) if c.output_activation is None else c.output_activation
             self.node_genome.append(
-                Node(output_fn, NodeType.Output, self.get_new_node_id(), 2))
+                Node(output_fn, NodeType.Output, len(self.node_genome), 2))
+            
         for i in range(c.num_sensor_neurons + c.num_motor_neurons, total_node_count):
             self.node_genome.append(Node(choose_random_function(
                 c), NodeType.Hidden, self.get_new_node_id(), 1))
@@ -452,9 +452,9 @@ class Genome:
             # and the connection between the new node and the last node in the chain is given the same weight as the connection being split
 
             self.connection_genome.append(Connection(
-                old.fromNode, new_node,   self.random_weight()))
+                find_node_with_id(self.node_genome, old.fromNode.id), self.node_genome[-1],   self.random_weight()))
             self.connection_genome.append(Connection(
-                new_node, old.toNode, self.random_weight()))
+               self.node_genome[-1], find_node_with_id(self.node_genome, old.toNode.id), self.random_weight()))
 
             # TODO shouldn't be necessary
             # self.connection_genome[-1].fromNode = find_node_with_id(self.node_genome, old.fromNode.id)

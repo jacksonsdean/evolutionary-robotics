@@ -4,7 +4,7 @@ import time
 from matplotlib import pyplot as plt
 import numpy as np
 from tqdm import trange
-from neat_genome import Connection, Genome, crossover
+from neat_genome import Connection, Genome, crossover,Node
 from util import choose_random_function, get_avg_number_of_connections, get_avg_number_of_hidden_nodes, get_max_number_of_connections, get_max_number_of_hidden_nodes, visualize_network
 from species import *
 import copy 
@@ -21,6 +21,8 @@ class NEAT():
         self.next_available_id = 0
         self.debug_output = debug_output
         self.all_species = []
+        # Node.current_id =  c.num_sensor_neurons + c.num_motor_neurons # reset node id counter
+        
         
         self.diversity_over_time = np.zeros(c.num_gens,dtype=float)
         self.species_over_time = np.zeros(c.num_gens,dtype=np.float)

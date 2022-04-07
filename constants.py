@@ -15,11 +15,11 @@ def identity(x):
 
 gravity = 0, 0, -9.8
 
-simulation_fps = 60
+simulation_fps = 240
 simulation_length = 2000
 
 motor_max_force = 60.
-motor_joint_range = .25
+motor_joint_range = .35
 
 num_gens = 10
 pop_size = 10
@@ -29,12 +29,13 @@ torso_weight = 3.0
 use_obstacles = False
 max_obstacle_height = 0.10
 
-num_motor_neurons = 12  
-num_sensor_neurons = 9
 use_cpg = True
+num_motor_neurons = 12  
+num_sensor_neurons = 8 
+if use_cpg:num_sensor_neurons+=1
 
 
-hidden_nodes_at_start = 10
+hidden_nodes_at_start = 0
 init_connection_probability = .35
 
 species_target = 3
