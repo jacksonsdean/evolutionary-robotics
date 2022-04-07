@@ -2,6 +2,7 @@ import math
 from numpy import sin
 
 import pybullet
+from activations import string_to_fn, tanh
 
 import pyrosim.pyrosim as pyrosim
 
@@ -21,6 +22,8 @@ class NEURON:
         self.Search_For_Joint_Name(line)
         
         self.Search_For_BodyID(line)
+        
+        self.Search_For_Activation(line)
 
         self.Set_Value(0.0)
 
@@ -168,8 +171,19 @@ class NEURON:
 
             splitLine = line.split('"')
 
-            self.bodyID = int(splitLine[7])
+            self.bodyID = int(splitLine[splitLine.index( ' bodyID=')+1])
+            
+    def Search_For_Activation(self,line):
+
+        if "activation" in line:
+
+            splitLine = line.split('"')
+
+            self.activation = splitLine[splitLine.index(' activation=')+1]
+            self.activation = string_to_fn(self.activation)
+        else:
+            self.activation = tanh
 
     def Threshold(self):
 
-        self.value = math.tanh(self.value)
+        self.value =self.activation(self.value)

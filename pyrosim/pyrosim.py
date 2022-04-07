@@ -1,4 +1,5 @@
 import pybullet as p
+from activations import fn_to_string
 
 from pyrosim.nndf import NNDF
 
@@ -153,25 +154,25 @@ def Send_Joint(name,parent,child,type,position,jointAxis = "0 1 0"):
 
     joint.Save(f, jointAxis)
 
-def Send_Motor_Neuron(name,jointName):
+def Send_Motor_Neuron(name,jointName, activation):
+    activation = fn_to_string(activation)
+    f.write('    <neuron name = "' + str(name) + '" type = "motor"  jointName = "' + jointName + '" activation="'+str(activation)+ '" />\n')
 
-    f.write('    <neuron name = "' + str(name) + '" type = "motor"  jointName = "' + jointName + '" />\n')
-
-def Send_Touch_Sensor_Neuron(name,linkName):
-
-    f.write('    <neuron name = "' + str(name) + '" type = "touch_sensor" linkName = "' + linkName + '" />\n')
+def Send_Touch_Sensor_Neuron(name,linkName, activation):
+    activation = fn_to_string(activation)
+    f.write('    <neuron name = "' + str(name) + '" type = "touch_sensor" linkName = "' + linkName + '" activation="'+str(activation) +'" />\n')
     
-def Send_Torque_Sensor_Neuron(name, jointName, bodyID):
-
-    f.write('    <neuron name = "' + str(name) + '" type = "proprioceptive_sensor" jointName = "' + jointName + '" bodyID = "' + str(bodyID) + '"  />\n')
+def Send_Torque_Sensor_Neuron(name, jointName, bodyID, activation):
+    activation = fn_to_string(activation)
+    f.write('    <neuron name = "' + str(name) + '" type = "proprioceptive_sensor" jointName = "' + jointName + '" bodyID="' + str(bodyID) + '" activation="'+str(activation) +'"  />\n')
     
-def Send_CPG(name):
-
-    f.write('    <neuron name = "' + str(name) + '" type = "cpg"' + '"  />\n')
+def Send_CPG(name, activation):
+    activation = fn_to_string(activation)
+    f.write('    <neuron name = "' + str(name) + '" type = "cpg"' + '" activation="'+str(activation) + '"  />\n')
     
-def Send_Hidden_Neuron(name):
-
-    f.write('    <neuron name = "' + str(name) + '" type = "hidden"" />\n')
+def Send_Hidden_Neuron(name, activation):
+    activation = fn_to_string(activation)
+    f.write('    <neuron name = "' + str(name) + '" type = "hidden""'+'" activation="'+str(activation)+ '"/>\n')
 
 def Send_Synapse( sourceNeuronName , targetNeuronName , weight ):
 

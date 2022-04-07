@@ -1,17 +1,4 @@
-
-import numpy as np
-
-
-def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
-
-
-def tanh(x):
-    return np.tanh(x)
-
-
-def identity(x):
-    return x
+from activations import *
 
 gravity = 0, 0, -9.8
 
@@ -29,7 +16,7 @@ torso_weight = 3.0
 use_obstacles = False
 max_obstacle_height = 0.10
 
-use_cpg = False
+use_cpg = True
 num_motor_neurons = 12  
 num_sensor_neurons = 8 
 if use_cpg:num_sensor_neurons+=1
@@ -58,13 +45,12 @@ species_stagnation_threshold = 20
 fitness_threshold = 1e10
 within_species_elitism = 0
 population_elitism = 1
-activations = [tanh]
+# activations = tanh
+activations = [tanh, sin, cos, identity, sigmoid, step, gaussian]
 novelty_selection_ratio_within_species = 0.0
 novelty_adjusted_fitness_proportion = 0.0
 novelty_k = 5
 novelty_archive_len = 5
-curriculum = []
-auto_curriculum = 0
 num_workers = 4 
 
 prob_mutate_activation = .1 

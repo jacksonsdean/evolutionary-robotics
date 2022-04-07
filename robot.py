@@ -59,8 +59,11 @@ class Robot():
         basePositionAndOrientation = p.getBasePositionAndOrientation(self.robotId)
         basePosition = basePositionAndOrientation[0]
         xPos, yPos, zPos = basePosition
+        x = -1.0 * xPos if xPos < 0 else 0.0
+        y =  1.0 * yPos if yPos > 0 else 0.0
+        combined_x_y_pos = (x + y) / 2.0
         with open(f"tmp{self.solution_id}.txt", "w") as f:
-            fitness = -1.0 * xPos if xPos < 0 else 0.0
+            fitness = combined_x_y_pos
             f.write(str(fitness))
         f.close()
         time.sleep(.1)

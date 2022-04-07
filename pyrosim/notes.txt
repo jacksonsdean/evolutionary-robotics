@@ -6,3 +6,5 @@ Changes:
     * made fitness 0 for negative motion
     * allowed recurrent connections
     * added cpg
+    * allowed many different activation functions
+    * changed fitness function to be x and y distance from center

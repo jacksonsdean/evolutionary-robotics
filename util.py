@@ -14,8 +14,8 @@ import zlib
 
 import constants as c
     
-def choose_random_function(config):
-    return random.choice(config.activations)
+def choose_random_function():
+    return random.choice(c.activations)
 
 
 def name_to_fn(name):
@@ -57,7 +57,7 @@ def visualize_network(individual,sample_point=[.25]*c.num_sensor_neurons, color_
     for i, node in enumerate(inputs):
         G.add_node(node, color=function_colors[node.fn.__name__], shape='d', layer=(node.layer))
         if node.type == 0:
-            node_labels[node] = f"Sensor {i}:\n{node.fn.__name__}\n"+(f"{node.output:.3f}" if node.output!=None else "")
+            node_labels[node] = f"S{i}:\n{node.fn.__name__}\n"+(f"{node.output:.3f}" if node.output!=None else "")
         else:
             node_labels[node] = f"CPG"
             
@@ -70,7 +70,7 @@ def visualize_network(individual,sample_point=[.25]*c.num_sensor_neurons, color_
     for i, node in enumerate(individual.output_nodes()):
         title = i
         G.add_node(node, color=function_colors[node.fn.__name__], shape='s', layer=(node.layer))
-        node_labels[node] = f"Motor\n{title}:\n"+(f"{node.output:.3f}")
+        node_labels[node] = f"M{title}:\n{node.fn.__name__}\n"+(f"{node.output:.3f}")
         fixed_positions[node] = (4, ((i+1)*2)/len(individual.output_nodes()))
     pos = {}
     # shells = [[node for node in individual.input_nodes()], [node for node in individual.hidden_nodes()], [node for node in individual.output_nodes()]]

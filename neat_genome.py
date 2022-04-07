@@ -23,6 +23,7 @@ class NodeType(IntEnum):
 
 class Node:
     current_id = c.num_sensor_neurons + c.num_motor_neurons
+    
     def __init__(self, fn, _type, _id, _layer=2) -> None:
         self.fn = fn
         self.uuid = uuid.uuid1()
@@ -133,7 +134,7 @@ class Genome:
 
         for i in range(c.num_sensor_neurons):
             self.node_genome.append(
-                Node(choose_random_function(c), NodeType.Input, i, 0))
+                Node(choose_random_function(), NodeType.Input, i, 0))
         
         if c.use_cpg:
            self.node_genome[-1].type = NodeType.CPG
@@ -252,40 +253,39 @@ class Genome:
         # Neurons:
         # -Input
         n = 0
-        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "FrontLowerLeg"); n+=1
-        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "BackLowerLeg"); n+=1
-        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "LeftLowerLeg"); n+=1
-        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "RightLowerLeg"); n+=1
-        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "RightLowerLeg"); n+=1
+        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "FrontLowerLeg", activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "BackLowerLeg", activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "LeftLowerLeg", activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "RightLowerLeg", activation=self.node_genome[n].fn); n+=1
             
         bodyID = 101 if c.use_obstacles else 1
-        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_BackLegRot", bodyID=bodyID); n+=1
-        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_FrontLegRot", bodyID=bodyID); n+=1
-        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_LeftLegRot", bodyID=bodyID); n+=1
-        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_RightLegRot", bodyID=bodyID); n+=1
+        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_BackLegRot", bodyID=bodyID, activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_FrontLegRot", bodyID=bodyID, activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_LeftLegRot", bodyID=bodyID, activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_RightLegRot", bodyID=bodyID, activation=self.node_genome[n].fn); n+=1
 
         if c.use_cpg:
-            pyrosim.Send_CPG(name = n ); n+=1
+            pyrosim.Send_CPG(name = n, activation=self.node_genome[n].fn ); n+=1
             
 
 
         # -Hidden
         for neuron in self.hidden_nodes():
-            pyrosim.Send_Hidden_Neuron(name = neuron.id); 
+            pyrosim.Send_Hidden_Neuron(name = neuron.id, activation=neuron.fn)
             
         # -Output
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_BackLegRot"); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "BackLegRot_BackLeg"); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_FrontLegRot"); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "FrontLegRot_FrontLeg"); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_LeftLegRot"); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "LeftLegRot_LeftLeg"); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_RightLegRot"); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "RightLegRot_RightLeg"); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "FrontLeg_FrontLowerLeg"); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "BackLeg_BackLowerLeg"); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "LeftLeg_LeftLowerLeg"); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "RightLeg_RightLowerLeg"); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_BackLegRot", activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "BackLegRot_BackLeg", activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_FrontLegRot", activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "FrontLegRot_FrontLeg", activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_LeftLegRot", activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "LeftLegRot_LeftLeg", activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_RightLegRot", activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "RightLegRot_RightLeg", activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "FrontLeg_FrontLowerLeg", activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "BackLeg_BackLowerLeg", activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "LeftLeg_LeftLowerLeg", activation=self.node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "RightLeg_RightLowerLeg", activation=self.node_genome[n].fn); n+=1
 
 
         # Synapses:
@@ -354,7 +354,7 @@ class Genome:
             eligible_nodes.extend(self.input_nodes())
         for node in eligible_nodes:
             if(np.random.uniform(0, 1) < c.prob_mutate_activation):
-                node.fn = choose_random_function(c)
+                node.fn = choose_random_function()
 
     def mutate_weights(self):
         """ Each connection weight is perturbed with a fixed probability by
@@ -443,7 +443,7 @@ class Genome:
             if(len(eligible_cxs) < 1):
                 return
             old = np.random.choice(eligible_cxs)
-            new_node = Node(choose_random_function(c),
+            new_node = Node(choose_random_function(),
                             NodeType.Hidden, self.get_new_node_id())
             self.node_genome.append(new_node)  # add a new node between two nodes
             old.enabled = False  # disable old connection

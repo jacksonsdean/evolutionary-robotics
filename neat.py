@@ -135,9 +135,9 @@ class NEAT():
         
         print(" |-Species:")
         thresh_symbol = '='
-        if self.species_threshold_over_time[self.gen-2]<self.species_threshold and self.species_threshold_over_time[self.gen-2]!=0:
+        if c.num_gens>1 and self.species_threshold_over_time[self.gen-2]<self.species_threshold and self.species_threshold_over_time[self.gen-2]!=0:
             thresh_symbol = '▲' 
-        if self.species_threshold_over_time[self.gen-2]>self.species_threshold:
+        if c.num_gens>1 and self.species_threshold_over_time[self.gen-2]>self.species_threshold:
             thresh_symbol = '▼'
         print(f" |  Count: {num_species} / {c.species_target} | threshold: {self.species_threshold:.2f} {thresh_symbol}") 
         print(f" |  Best species (avg. fitness): {sorted(self.all_species, key=lambda x: x.avg_fitness if x.population_count > 0 else -1000000000, reverse=True)[0].id}")
