@@ -44,6 +44,8 @@ class NEURAL_NETWORK:
         for neuronName in sorted(self.neurons.keys()):
             if self.neurons[neuronName].Is_Sensor_Neuron():
                 self.neurons[neuronName].Update_Sensor_Neuron()
+            elif self.neurons[neuronName].Is_CPG_Neuron():
+                self.neurons[neuronName].Update_CPG_Neuron(step)
             else:
                 self.neurons[neuronName].Update_Hidden_Or_Motor_Neuron(self.neurons, self.synapses)
 

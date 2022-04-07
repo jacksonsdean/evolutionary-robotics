@@ -74,7 +74,8 @@ def assign_species(all_species, population, threshold, SpeciesClass):
             s.population_count = len(species_pop)
             if(s.population_count<1): continue
             # ·get next species s from S
-            if(g.species_comparision(np.random.choice(species_pop, 1)[0], threshold)):
+            # if(g.species_comparision(np.random.choice(species_pop, 1)[0], threshold)):
+            if(g.species_comparision(species_pop[0], threshold)):
                 # ·If g is compatible with s, add g to s
                 g.species_id = s.id
                 placed = True

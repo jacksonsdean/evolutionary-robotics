@@ -129,15 +129,21 @@ class NEAT():
         print(f" |  Diversity: std: {div[0]:.3f} | avg: {div[1]:.3f} | max: {div[2]:.3f}")
         print(f" |  Connections: avg. {get_avg_number_of_connections(self.population):.2f} max. {get_max_number_of_connections(self.population)}  | H. Nodes: avg. {get_avg_number_of_hidden_nodes(self.population):.2f} max: {get_max_number_of_hidden_nodes(self.population)}")
         for individual in self.population:
-            print(f" |     Individual {individual.id} (species: {individual.species_id}) fitness: {individual.fitness:.4f}")
+            print(f" |     Individual {individual.id} ({len(individual.hidden_nodes())}, {len(list(individual.enabled_connections())), np.count_nonzero([cx.is_recurrent for cx in individual.enabled_connections()] )}) s: {individual.species_id} fit: {individual.fitness:.4f}")
         
         print(" |-Species:")
-        print(f" |  Number of species: {num_species} | threshold: {self.species_threshold:.2f}")
+        thresh_symbol = '='
+        if self.species_threshold_over_time[self.gen-2]<self.species_threshold and self.species_threshold_over_time[self.gen-2]!=0:
+            thresh_symbol = '▲' 
+        if self.species_threshold_over_time[self.gen-2]>self.species_threshold:
+            thresh_symbol = '▼'
+        print(f" |  Count: {num_species} / {c.species_target} | threshold: {self.species_threshold:.2f} {thresh_symbol}") 
         print(f" |  Best species (avg. fitness): {sorted(self.all_species, key=lambda x: x.avg_fitness if x.population_count > 0 else -1000000000, reverse=True)[0].id}")
         for species in self.all_species:
             if species.population_count > 0:
-                print(f" |    Species {species.id:03d} (size: {species.population_count}) stag: {self.gen-species.last_improvement} avg fit: {species.avg_fitness:.4f} | adj fit: {species.avg_adjusted_fitness:.4f} | offsping: {species.allowed_offspring}")
+                print(f" |    Species {species.id:03d} |> stag: {self.gen-species.last_improvement} | fit: {species.avg_fitness:.4f} | adj: {species.avg_adjusted_fitness:.4f} | pop: {species.population_count} | offspring: {species.allowed_offspring if species.allowed_offspring > 0 else 'X'}")
 
+        print(f" "+ str(self.gen), f"{self.get_best().fitness:.4f}")
         print()
 
     def neat_selection_and_reproduction(self):

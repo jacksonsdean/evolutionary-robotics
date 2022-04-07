@@ -15,22 +15,26 @@ def identity(x):
 
 gravity = 0, 0, -9.8
 
-simulation_fps = 240
-simulation_length = 300
+simulation_fps = 60
+simulation_length = 2000
 
 motor_max_force = 60.
-motor_joint_range = 0.35
+motor_joint_range = .25
 
 num_gens = 10
 pop_size = 10
+
+torso_weight = 3.0
 
 use_obstacles = False
 max_obstacle_height = 0.10
 
 num_motor_neurons = 12  
-num_sensor_neurons = 8
+num_sensor_neurons = 9
+use_cpg = True
 
-hidden_nodes_at_start = 0
+
+hidden_nodes_at_start = 10
 init_connection_probability = .35
 
 species_target = 3
@@ -43,15 +47,15 @@ do_crossover = True
 use_speciation = True
 use_map_elites = False
 allow_recurrent = True
-max_weight = 10.0
+max_weight = 1.0
 weight_threshold = 0
-weight_mutation_max = 2.
+weight_mutation_max = .5
 prob_random_restart =.001
 prob_weight_reinit = 0.01
 prob_reenable_connection = 0.1
 species_stagnation_threshold = 20
 fitness_threshold = 1e10
-within_species_elitism = 1
+within_species_elitism = 0
 population_elitism = 1
 activations = [tanh]
 novelty_selection_ratio_within_species = 0.0

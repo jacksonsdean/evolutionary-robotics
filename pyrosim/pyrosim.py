@@ -165,6 +165,10 @@ def Send_Torque_Sensor_Neuron(name, jointName, bodyID):
 
     f.write('    <neuron name = "' + str(name) + '" type = "proprioceptive_sensor" jointName = "' + jointName + '" bodyID = "' + str(bodyID) + '"  />\n')
     
+def Send_CPG(name):
+
+    f.write('    <neuron name = "' + str(name) + '" type = "cpg"' + '"  />\n')
+    
 def Send_Hidden_Neuron(name):
 
     f.write('    <neuron name = "' + str(name) + '" type = "hidden"" />\n')

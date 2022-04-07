@@ -1,4 +1,5 @@
 import math
+from numpy import sin
 
 import pybullet
 
@@ -49,6 +50,10 @@ class NEURON:
     def Is_Sensor_Neuron(self):
 
         return self.type == c.TOUCH_SENSOR_NEURON or self.type == c.PROPRIOCEPTIVE_SENSOR_NEURON
+    
+    def Is_CPG_Neuron(self):
+
+        return self.type == c.CPG_NEURON
 
     def Is_Hidden_Neuron(self):
 
@@ -81,6 +86,9 @@ class NEURON:
             val = pyrosim.Get_Rotational_Sensor_Value_For_Joint(self.Get_Joint_Name(), self.Get_BodyID())
             
         self.Set_Value(val)
+        
+    def Update_CPG_Neuron(self, step):
+        self.Set_Value(sin(step))
 
     def Update_Hidden_Or_Motor_Neuron(self, neurons, synapses):
         for pre_post_neurons, synapse in synapses.items():
@@ -112,6 +120,10 @@ class NEURON:
         elif "proprioceptive_sensor" in line:
 
             self.type = c.PROPRIOCEPTIVE_SENSOR_NEURON
+            
+        elif "cpg" in line:
+
+            self.type = c.CPG_NEURON
 
         elif "motor" in line:
 

@@ -19,8 +19,10 @@ class NodeType(IntEnum):
     Input = 0
     Output = 1
     Hidden = 2
+    CPG = 3
 
 class Node:
+    current_id = 0
     def __init__(self, fn, _type, _id, _layer=2) -> None:
         self.fn = fn
         self.uuid = uuid.uuid1()
@@ -34,7 +36,10 @@ class Node:
 
     def empty():
         return Node(c.tanh, NodeType.Hidden, 0, 0)
-
+    
+    def next_id():
+        Node.current_id+=1
+        return Node.current_id
 
 class Connection:
     # connection            e.g.  2->5,  1->4
@@ -105,6 +110,7 @@ class Genome:
         return output
        
     def __init__(self) -> None:
+        Node.current_id = 0 # reset node id counter
         self.fitness = -math.inf
         self.novelty = -math.inf
         self.adjusted_fitness = -math.inf
@@ -129,6 +135,10 @@ class Genome:
         for i in range(c.num_sensor_neurons):
             self.node_genome.append(
                 Node(choose_random_function(c), NodeType.Input, self.get_new_node_id(), 0))
+        
+        if c.use_cpg:
+           self.node_genome[-1].type = NodeType.CPG
+        
         for i in range(c.num_sensor_neurons, c.num_sensor_neurons + c.num_motor_neurons):
             output_fn = choose_random_function(
                 c) if c.output_activation is None else c.output_activation
@@ -165,9 +175,6 @@ class Genome:
                         self.connection_genome.append(Connection(
                             hidden_node, output_node, self.random_weight()))
 
-        for i in range(c.hidden_nodes_at_start-1):
-            # TODO
-            self.add_node()
 
     def start_simulation(self, headless, show_debug_output=False, save_as_best=False):
         self.generate_body()
@@ -212,7 +219,7 @@ class Genome:
 
     def generate_body(self):
         pyrosim.Start_URDF(f"body{self.id}.urdf")
-        pyrosim.Send_Cube(name="Torso", pos=[0, 0, 1], size=[1, 1, 1], mass=10.0)
+        pyrosim.Send_Cube(name="Torso", pos=[0, 0, 1], size=[1, 1, 1], mass=c.torso_weight)
         pyrosim.Send_Joint( name = "Torso_BackLegRot" , parent= "Torso" , child = "BackLegRot" , type = "revolute", position = [0, -0.5, 1.0], jointAxis = "0 1 0")
         pyrosim.Send_Joint( name = "BackLegRot_BackLeg" , parent= "BackLegRot" , child = "BackLeg" , type = "revolute", position = [0, 0, 0], jointAxis = "1 0 0")
         pyrosim.Send_Cube(name="BackLegRot", pos=[0.0, -0.5, 0.0], size=[0,0,0], mass=0.0)
@@ -257,6 +264,11 @@ class Genome:
         pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_LeftLegRot", bodyID=bodyID); n+=1
         pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_RightLegRot", bodyID=bodyID); n+=1
 
+        if c.use_cpg:
+            pyrosim.Send_CPG(name = n ); n+=1
+            
+
+
         # -Hidden
         for neuron in self.hidden_nodes():
             pyrosim.Send_Hidden_Neuron(name = neuron.id); 
@@ -297,10 +309,11 @@ class Genome:
         return np.random.uniform(-self.max_weight, self.max_weight)
 
     def get_new_node_id(self):
-        new_id = 0
-        while len(self.node_genome) > 0 and new_id in [node.id for node in self.node_genome]:
-            new_id += 1
-        return new_id
+        # new_id = 0
+        # while len(self.node_genome) > 0 and new_id in [node.id for node in self.node_genome]:
+        #     new_id += 1
+        # return new_id
+        return Node.next_id()
 
     def update_with_fitness(self, fit, num_in_species):
         self.fitness = fit
@@ -439,16 +452,18 @@ class Genome:
             # and the connection between the new node and the last node in the chain is given the same weight as the connection being split
 
             self.connection_genome.append(Connection(
-                self.node_genome[old.fromNode.id], self.node_genome[new_node.id],   self.random_weight()))
+                old.fromNode, new_node,   self.random_weight()))
+            self.connection_genome.append(Connection(
+                new_node, old.toNode, self.random_weight()))
 
             # TODO shouldn't be necessary
-            self.connection_genome[-1].fromNode = self.node_genome[old.fromNode.id]
-            self.connection_genome[-1].toNode = self.node_genome[new_node.id]
-            self.connection_genome.append(Connection(
-                self.node_genome[new_node.id],     self.node_genome[old.toNode.id], old.weight))
+            # self.connection_genome[-1].fromNode = find_node_with_id(self.node_genome, old.fromNode.id)
+            # self.connection_genome[-1].toNode = new_node
+            # self.connection_genome.append(Connection(
+                # self.node_genome[new_node.id],     find_node_with_id(self.node_genome, old.toNode.id), old.weight))
 
-            self.connection_genome[-1].fromNode = self.node_genome[new_node.id]
-            self.connection_genome[-1].toNode = self.node_genome[old.toNode.id]
+            # self.connection_genome[-1].fromNode = find_node_with_id(self.node_genome, new_node.id)
+            # self.connection_genome[-1].toNode = find_node_with_id(self.node_genome, old.toNode.id)
 
             self.update_node_layers()
             # self.disable_invalid_connections() # TODO broken af
