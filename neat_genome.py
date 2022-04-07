@@ -290,7 +290,7 @@ class Genome:
 
         # Synapses:
         # fully connected:
-        for synapse in self.connection_genome:
+        for synapse in self.enabled_connections():
                 pyrosim.Send_Synapse(sourceNeuronName = synapse.fromNode.id, targetNeuronName = synapse.toNode.id, weight = synapse.weight)
 
         pyrosim.End()

@@ -29,7 +29,7 @@ torso_weight = 3.0
 use_obstacles = False
 max_obstacle_height = 0.10
 
-use_cpg = True
+use_cpg = False
 num_motor_neurons = 12  
 num_sensor_neurons = 8 
 if use_cpg:num_sensor_neurons+=1
