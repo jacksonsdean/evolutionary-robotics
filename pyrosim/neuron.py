@@ -92,7 +92,7 @@ class NEURON:
         self.Set_Value(val)
         
     def Update_CPG_Neuron(self, step):
-        self.Set_Value(sin(step/const.simulation_fps))
+        self.Set_Value(sin(step))
 
     def Update_Hidden_Or_Motor_Neuron(self, neurons, synapses):
         for pre_post_neurons, synapse in synapses.items():

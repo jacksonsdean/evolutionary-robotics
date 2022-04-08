@@ -48,7 +48,7 @@ class Connection:
     # where innovation number is the same for all of same connection
     # i.e. 2->5 and 2->5 have same innovation number, regardless of Network
     # innovations = []
-    current_innovation = 0
+    current_innovation = -1
 
     def get_innovation():
         Connection.current_innovation += 1
@@ -140,14 +140,12 @@ class Genome:
            self.node_genome[-1].type = NodeType.CPG
         
         for i in range(c.num_sensor_neurons, c.num_sensor_neurons + c.num_motor_neurons):
-            output_fn = choose_random_function(
-                c) if c.output_activation is None else c.output_activation
+            output_fn = choose_random_function() if c.output_activation is None else c.output_activation
             self.node_genome.append(
                 Node(output_fn, NodeType.Output, len(self.node_genome), 2))
             
         for i in range(c.num_sensor_neurons + c.num_motor_neurons, total_node_count):
-            self.node_genome.append(Node(choose_random_function(
-                c), NodeType.Hidden, self.get_new_node_id(), 1))
+            self.node_genome.append(Node(choose_random_function(), NodeType.Hidden, self.get_new_node_id(), 1))
 
         # initialize connection genome
         if self.n_hidden_nodes == 0:
@@ -266,8 +264,6 @@ class Genome:
 
         if c.use_cpg:
             pyrosim.Send_CPG(name = n, activation=self.node_genome[n].fn ); n+=1
-            
-
 
         # -Hidden
         for neuron in self.hidden_nodes():
@@ -311,7 +307,7 @@ class Genome:
     def get_new_node_id(self):
         # new_id = 0
         # while len(self.node_genome) > 0 and new_id in [node.id for node in self.node_genome]:
-        #     new_id += 1
+            # new_id += 1
         # return new_id
         return Node.next_id()
 
@@ -436,41 +432,70 @@ class Genome:
         for cx in to_remove:
             self.connection_genome.remove(cx)
 
+    # def add_node(self):
+    #     try:
+    #         eligible_cxs = [
+    #             cx for cx in self.connection_genome if not cx.is_recurrent]
+    #         if(len(eligible_cxs) < 1):
+    #             return
+    #         old = np.random.choice(eligible_cxs)
+    #         new_node = Node(choose_random_function(),
+    #                         NodeType.Hidden, self.get_new_node_id())
+    #         self.node_genome.append(new_node)  # add a new node between two nodes
+    #         old.enabled = False  # disable old connection
+
+    #         # The connection between the first node in the chain and the new node is given a weight of one
+    #         # and the connection between the new node and the last node in the chain is given the same weight as the connection being split
+
+    #         self.connection_genome.append(Connection(
+    #             find_node_with_id(self.node_genome, old.fromNode.id), self.node_genome[-1],   self.random_weight()))
+    #         # self.connection_genome.append(Connection(
+    #         #    self.node_genome[-1], find_node_with_id(self.node_genome, old.toNode.id), self.random_weight()))
+
+    #         # TODO shouldn't be necessary
+    #         self.connection_genome[-1].fromNode = find_node_with_id(self.node_genome, old.fromNode.id)
+    #         self.connection_genome[-1].toNode = new_node
+    #         self.connection_genome.append(Connection(
+    #             self.node_genome[new_node.id],     find_node_with_id(self.node_genome, old.toNode.id), old.weight))
+
+    #         self.connection_genome[-1].fromNode = find_node_with_id(self.node_genome, new_node.id)
+    #         self.connection_genome[-1].toNode = find_node_with_id(self.node_genome, old.toNode.id)
+
+    #         self.update_node_layers()
+    #         # self.disable_invalid_connections() # TODO broken af
+    #     except Exception as e:
+    #         print(f"ERROR in add_node: {e}")
+    #         return # TODO
     def add_node(self):
-        try:
-            eligible_cxs = [
-                cx for cx in self.connection_genome if not cx.is_recurrent]
-            if(len(eligible_cxs) < 1):
-                return
-            old = np.random.choice(eligible_cxs)
-            new_node = Node(choose_random_function(),
-                            NodeType.Hidden, self.get_new_node_id())
-            self.node_genome.append(new_node)  # add a new node between two nodes
-            old.enabled = False  # disable old connection
+        eligible_cxs = [
+            cx for cx in self.connection_genome if not cx.is_recurrent]
+        if(len(eligible_cxs) < 1):
+            return
+        old = np.random.choice(eligible_cxs)
+        new_node = Node(choose_random_function(),
+                        NodeType.Hidden, self.get_new_node_id())
+        self.node_genome.append(new_node)  # add a new node between two nodes
+        old.enabled = False  # disable old connection
 
-            # The connection between the first node in the chain and the new node is given a weight of one
-            # and the connection between the new node and the last node in the chain is given the same weight as the connection being split
+        # The connection between the first node in the chain and the new node is given a weight of one
+        # and the connection between the new node and the last node in the chain is given the same weight as the connection being split
 
-            self.connection_genome.append(Connection(
+        # self.connection_genome.append(Connection(
+            # self.node_genome[old.fromNode.id], self.node_genome[new_node.id],   self.random_weight()))
+        self.connection_genome.append(Connection(
                 find_node_with_id(self.node_genome, old.fromNode.id), self.node_genome[-1],   self.random_weight()))
-            self.connection_genome.append(Connection(
-               self.node_genome[-1], find_node_with_id(self.node_genome, old.toNode.id), self.random_weight()))
 
-            # TODO shouldn't be necessary
-            # self.connection_genome[-1].fromNode = find_node_with_id(self.node_genome, old.fromNode.id)
-            # self.connection_genome[-1].toNode = new_node
-            # self.connection_genome.append(Connection(
-                # self.node_genome[new_node.id],     find_node_with_id(self.node_genome, old.toNode.id), old.weight))
+        # TODO shouldn't be necessary
+        self.connection_genome[-1].fromNode = find_node_with_id(self.node_genome, old.fromNode.id)
+        self.connection_genome[-1].toNode = find_node_with_id(self.node_genome, new_node.id)
+        self.connection_genome.append(Connection(
+            find_node_with_id(self.node_genome, new_node.id),     find_node_with_id(self.node_genome,old.toNode.id), old.weight))
 
-            # self.connection_genome[-1].fromNode = find_node_with_id(self.node_genome, new_node.id)
-            # self.connection_genome[-1].toNode = find_node_with_id(self.node_genome, old.toNode.id)
+        self.connection_genome[-1].fromNode = find_node_with_id(self.node_genome, new_node.id)
+        self.connection_genome[-1].toNode = find_node_with_id(self.node_genome, old.toNode.id)
 
-            self.update_node_layers()
-            # self.disable_invalid_connections() # TODO broken af
-        except Exception as e:
-            print(f"ERROR in add_node: {e}")
-            return # TODO
-
+        self.update_node_layers()
+        self.disable_invalid_connections()
     def remove_node(self):
         # This is a bit of a buggy mess
         hidden = self.hidden_nodes()

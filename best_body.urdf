@@ -2,7 +2,7 @@
     <link name="Torso">
         <inertial>
             <origin xyz="0 0 1" rpy="0 0 0"/>
-            <mass value="10.0" />
+            <mass value="10" />
             <inertia ixx="100" ixy="0" ixz="0" iyy="100" iyz="0" izz="100" />
         </inertial>
         <visual>
@@ -21,13 +21,42 @@
             </geometry>
         </collision>
     </link>
-    <joint name="Torso_BackLeg" type="revolute">
+    <joint name="Torso_BackLegRot" type="revolute">
        <parent link="Torso"/>
-       <child  link="BackLeg"/>
+       <child  link="BackLegRot"/>
        <origin rpy="0 0 0" xyz="0 -0.5 1.0" />
+     <axis xyz="0 1 0"/>
+       <limit effort="0.0" lower="-3.14159" upper="3.14159" velocity="0.0"/>
+    </joint>
+    <joint name="BackLegRot_BackLeg" type="revolute">
+       <parent link="BackLegRot"/>
+       <child  link="BackLeg"/>
+       <origin rpy="0 0 0" xyz="0 0 0" />
      <axis xyz="1 0 0"/>
        <limit effort="0.0" lower="-3.14159" upper="3.14159" velocity="0.0"/>
     </joint>
+    <link name="BackLegRot">
+        <inertial>
+            <origin xyz="0.0 -0.5 0.0" rpy="0 0 0"/>
+            <mass value="0.0" />
+            <inertia ixx="100" ixy="0" ixz="0" iyy="100" iyz="0" izz="100" />
+        </inertial>
+        <visual>
+            <origin xyz="0.0 -0.5 0.0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0 0 0" />
+            </geometry>
+            <material name="Cyan">
+                <color rgba="0 1 1 1"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.0 -0.5 0.0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0 0 0" />
+            </geometry>
+        </collision>
+    </link>
     <link name="BackLeg">
         <inertial>
             <origin xyz="0.0 -0.5 0.0" rpy="0 0 0"/>
@@ -50,13 +79,42 @@
             </geometry>
         </collision>
     </link>
-    <joint name="Torso_FrontLeg" type="revolute">
+    <joint name="Torso_FrontLegRot" type="revolute">
        <parent link="Torso"/>
-       <child  link="FrontLeg"/>
+       <child  link="FrontLegRot"/>
        <origin rpy="0 0 0" xyz="0.0 0.5 1.0" />
      <axis xyz="1 0 0"/>
        <limit effort="0.0" lower="-3.14159" upper="3.14159" velocity="0.0"/>
     </joint>
+    <joint name="FrontLegRot_FrontLeg" type="revolute">
+       <parent link="FrontLegRot"/>
+       <child  link="FrontLeg"/>
+       <origin rpy="0 0 0" xyz="0.0 0.0 0.0" />
+     <axis xyz="0 1 0"/>
+       <limit effort="0.0" lower="-3.14159" upper="3.14159" velocity="0.0"/>
+    </joint>
+    <link name="FrontLegRot">
+        <inertial>
+            <origin xyz="0.0 0.5 0" rpy="0 0 0"/>
+            <mass value="0.0" />
+            <inertia ixx="100" ixy="0" ixz="0" iyy="100" iyz="0" izz="100" />
+        </inertial>
+        <visual>
+            <origin xyz="0.0 0.5 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0 0 0" />
+            </geometry>
+            <material name="Cyan">
+                <color rgba="0 1 1 1"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.0 0.5 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0 0 0" />
+            </geometry>
+        </collision>
+    </link>
     <link name="FrontLeg">
         <inertial>
             <origin xyz="0.0 0.5 0" rpy="0 0 0"/>
@@ -101,13 +159,64 @@
             </geometry>
         </collision>
     </link>
-    <joint name="Torso_LeftLeg" type="revolute">
+    <link name="LeftLegRot">
+        <inertial>
+            <origin xyz="-0.5 0.0 0.0" rpy="0 0 0"/>
+            <mass value="0.0" />
+            <inertia ixx="100" ixy="0" ixz="0" iyy="100" iyz="0" izz="100" />
+        </inertial>
+        <visual>
+            <origin xyz="-0.5 0.0 0.0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0 0 0" />
+            </geometry>
+            <material name="Cyan">
+                <color rgba="0 1 1 1"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="-0.5 0.0 0.0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0 0 0" />
+            </geometry>
+        </collision>
+    </link>
+    <joint name="Torso_LeftLegRot" type="revolute">
        <parent link="Torso"/>
-       <child  link="LeftLeg"/>
+       <child  link="LeftLegRot"/>
        <origin rpy="0 0 0" xyz="-0.5 0 1.0" />
+     <axis xyz="1 0 0"/>
+       <limit effort="0.0" lower="-3.14159" upper="3.14159" velocity="0.0"/>
+    </joint>
+    <joint name="LeftLegRot_LeftLeg" type="revolute">
+       <parent link="LeftLegRot"/>
+       <child  link="LeftLeg"/>
+       <origin rpy="0 0 0" xyz="0 0 0" />
      <axis xyz="0 1 0"/>
        <limit effort="0.0" lower="-3.14159" upper="3.14159" velocity="0.0"/>
     </joint>
+    <link name="RightLegRot">
+        <inertial>
+            <origin xyz="0.5 0.0 0.0" rpy="0 0 0"/>
+            <mass value="0.0" />
+            <inertia ixx="100" ixy="0" ixz="0" iyy="100" iyz="0" izz="100" />
+        </inertial>
+        <visual>
+            <origin xyz="0.5 0.0 0.0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0 0 0" />
+            </geometry>
+            <material name="Cyan">
+                <color rgba="0 1 1 1"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.5 0.0 0.0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0 0 0" />
+            </geometry>
+        </collision>
+    </link>
     <link name="RightLeg">
         <inertial>
             <origin xyz="0.5 0.0 0.0" rpy="0 0 0"/>
@@ -130,10 +239,17 @@
             </geometry>
         </collision>
     </link>
-    <joint name="Torso_RightLeg" type="revolute">
+    <joint name="Torso_RightLegRot" type="revolute">
        <parent link="Torso"/>
-       <child  link="RightLeg"/>
+       <child  link="RightLegRot"/>
        <origin rpy="0 0 0" xyz="0.5 0 1.0" />
+     <axis xyz="1 0 0"/>
+       <limit effort="0.0" lower="-3.14159" upper="3.14159" velocity="0.0"/>
+    </joint>
+    <joint name="RightLegRot_RightLeg" type="revolute">
+       <parent link="RightLegRot"/>
+       <child  link="RightLeg"/>
+       <origin rpy="0 0 0" xyz="0 0 0" />
      <axis xyz="0 1 0"/>
        <limit effort="0.0" lower="-3.14159" upper="3.14159" velocity="0.0"/>
     </joint>

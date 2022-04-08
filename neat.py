@@ -21,7 +21,7 @@ class NEAT():
         self.next_available_id = 0
         self.debug_output = debug_output
         self.all_species = []
-        # Node.current_id =  c.num_sensor_neurons + c.num_motor_neurons # reset node id counter
+        Node.current_id =  c.num_sensor_neurons + c.num_motor_neurons # reset node id counter
         
         
         self.diversity_over_time = np.zeros(c.num_gens,dtype=float)
@@ -69,11 +69,16 @@ class NEAT():
             return  c.prob_mutate_activation, c.prob_mutate_weight, c.prob_add_connection, c.prob_add_node, c.prob_remove_node, c.prob_disable_connection, c.weight_mutation_max, c.prob_reenable_connection
 
     def update_fitnesses_and_novelty(self):
-        for ind in self.population:
-            ind.start_simulation(True, self.debug_output)
-        for ind in self.population:
-            ind.wait_for_simulation()
-
+        pbar = trange(len(self.population))
+        for i in pbar:
+            pbar.set_description_str("Creating simulations for gen " + str(self.gen) + ": ")
+            self.population[i].start_simulation(True, self.debug_output)
+            
+        pbar = trange(len(self.population))
+        for i in pbar:
+            pbar.set_description_str("Simulating gen " + str(self.gen) + ": ")
+            self.population[i].wait_for_simulation()
+            
         for i, g in enumerate(self.population):
             self.population[i].update_with_fitness(g.fitness, count_members_of_species(self.population, self.population[i].species_id))
         
@@ -252,16 +257,17 @@ class NEAT():
 
         num_species = count_number_of_species(new_children)
 
-        #------------#
-        # assessment #
-        #------------#
-        self.update_fitnesses_and_novelty() # run sim
+        # #------------#
+        # # assessment #
+        # #------------#
+        # self.update_fitnesses_and_novelty() # run sim
 
         #-----------#
         # selection #
         #-----------#
         if(c.use_speciation): self.population = new_children # replace parents with new children (mu, lambda)
         else: self.population += new_children # combine parents with new children (the + in mu+lambda)
+       
 
         self.population = sorted(self.population, key=lambda individual: individual.fitness, reverse=True) # sort the full population by each individual's fitness (from highers to lowest)
 

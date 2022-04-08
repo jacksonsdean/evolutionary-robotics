@@ -27,6 +27,8 @@ class Simulation():
             Simulation.world = World()
         self.robot = Robot(self.solution_id, brain_path, body_path)
         
+        self.camera_lock = True
+        
         if save_best:
             print("Saving best solution...")
             if platform.system() =="Windows":
@@ -58,6 +60,21 @@ class Simulation():
                 self.robot.Sense(step) # update sensors
                 self.robot.Think(step) # update neurons
                 self.robot.Act(step) # update motors
+                
+                # check if c button pressed
+                if not self.headless_mode:
+                    events = p.getKeyboardEvents()
+                    if 99 in events.keys() and events[99] == p.KEY_WAS_RELEASED:
+                        self.camera_lock = not self.camera_lock
+                        
+                yaw = p.getDebugVisualizerCamera()[8]
+                pitch = p.getDebugVisualizerCamera()[9]
+                dist = p.getDebugVisualizerCamera()[10]
+                
+                if self.camera_lock:
+                    p.resetDebugVisualizerCamera( cameraDistance=dist, cameraYaw=yaw, cameraPitch=pitch, cameraTargetPosition=p.getBasePositionAndOrientation(self.robot.robotId)[0])
+                
+                step += 1
                 
                 step+=1
                 if step >= c.simulation_length:

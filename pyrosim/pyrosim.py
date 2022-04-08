@@ -168,11 +168,11 @@ def Send_Torque_Sensor_Neuron(name, jointName, bodyID, activation):
     
 def Send_CPG(name, activation):
     activation = fn_to_string(activation)
-    f.write('    <neuron name = "' + str(name) + '" type = "cpg"' + '" activation="'+str(activation) + '"  />\n')
+    f.write('    <neuron name = "' + str(name) + '" type = "cpg"' + ' activation="'+str(activation) + '"  />\n')
     
 def Send_Hidden_Neuron(name, activation):
     activation = fn_to_string(activation)
-    f.write('    <neuron name = "' + str(name) + '" type = "hidden""'+'" activation="'+str(activation)+ '"/>\n')
+    f.write('    <neuron name = "' + str(name) + '" type = "hidden"'+' activation="'+str(activation)+ '"/>\n')
 
 def Send_Synapse( sourceNeuronName , targetNeuronName , weight ):
 
