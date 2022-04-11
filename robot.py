@@ -63,8 +63,9 @@ class Robot():
         y =  1.0 * yPos if yPos > 0 else 0.0
         combined_x_y_pos = (x + y) / 2.0
         with open(f"tmp{self.solution_id}.txt", "w") as f:
-            # fitness = combined_x_y_pos
-            fitness = x
+            fitness = combined_x_y_pos
+            # fitness = x
+            # fitness = (abs(xPos) + abs(yPos) + abs(zPos))/3
             f.write(str(fitness))
         f.close()
         time.sleep(.1)

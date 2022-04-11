@@ -1,4 +1,6 @@
 import math
+import os
+import time
 import matplotlib.pyplot as plt
 import numpy as np
 import networkx as nx
@@ -8,9 +10,7 @@ import networkx as nx
 import sys
 import inspect
 import random
-# from evolution_util import *
-import zlib
-# import sbi
+import pyrosim.pyrosim as pyrosim
 
 import constants as c
     
@@ -234,3 +234,106 @@ def get_avg_number_of_connections(population):
         count+=len(list(g.enabled_connections()))
     return count/len(population)
     
+
+def generate_body(id):
+    pyrosim.Start_URDF(f"body{id}.urdf")
+    pyrosim.Send_Cube(name="Torso", pos=[0, 0, 1], size=[1, 1, 1], mass=c.torso_weight)
+    pyrosim.Send_Joint( name = "Torso_BackLegRot" , parent= "Torso" , child = "BackLegRot" , type = "revolute", position = [0, -0.5, 1.0], jointAxis = "0 1 0")
+    pyrosim.Send_Joint( name = "BackLegRot_BackLeg" , parent= "BackLegRot" , child = "BackLeg" , type = "revolute" if c.num_motor_neurons > 9 else "fixed", position = [0, 0, 0], jointAxis = "1 0 0")
+    
+    pyrosim.Send_Cube(name="BackLegRot", pos=[0.0, -0.5, 0.0], size=[0,0,0], mass=0.0)
+    pyrosim.Send_Cube(name="BackLeg", pos=[0.0, -0.5, 0.0], size=[.2, 1., .2], mass=1.0)
+    pyrosim.Send_Joint( name = "Torso_FrontLegRot" , parent= "Torso" , child = "FrontLegRot" , type = "revolute", position = [0.0, 0.5, 1.0], jointAxis = "1 0 0")
+    pyrosim.Send_Joint( name ="FrontLegRot_FrontLeg" , parent= "FrontLegRot" , child = "FrontLeg" , type = "revolute" if c.num_motor_neurons > 9 else "fixed", position = [0.0, 0.0, 0.0], jointAxis = "0 1 0")
+    pyrosim.Send_Cube(name="FrontLegRot", pos=[0.0, 0.5, 0], size=[0,0,0], mass=0.0)
+    pyrosim.Send_Cube(name="FrontLeg", pos=[0.0, 0.5, 0], size=[.2, 1., .2], mass=1.0)
+    pyrosim.Send_Cube(name="LeftLeg", pos=[-0.5, 0.0, 0.0], size=[1.0, 0.2, 0.2], mass=1.0)
+    pyrosim.Send_Cube(name="LeftLegRot", pos=[-0.5, 0.0, 0.0], size=[0,0,0], mass=0.0)
+    pyrosim.Send_Joint( name = "Torso_LeftLegRot" , parent= "Torso" , child = "LeftLegRot" , type = "revolute", position = [-0.5, 0, 1.], jointAxis = "1 0 0")
+    pyrosim.Send_Joint( name = "LeftLegRot_LeftLeg" , parent= "LeftLegRot" , child = "LeftLeg" , type = "revolute" if c.num_motor_neurons > 9 else "fixed", position = [0,0,0], jointAxis = "0 1 0" )
+    pyrosim.Send_Cube(name="RightLegRot", pos=[0.5, 0.0, 0.0], size=[0,0,0], mass=0.0)
+    pyrosim.Send_Cube(name="RightLeg", pos=[0.5, 0.0, 0.0], size=[1.0, 0.2, 0.2], mass=1.0)
+    pyrosim.Send_Joint( name = "Torso_RightLegRot" , parent= "Torso" , child = "RightLegRot" , type = "revolute", position = [0.5, 0, 1.], jointAxis = "1 0 0")
+    pyrosim.Send_Joint( name = "RightLegRot_RightLeg" , parent= "RightLegRot" , child = "RightLeg" , type = "revolute" if c.num_motor_neurons > 9 else "fixed", position = [0,0,0], jointAxis = "0 1 0" )
+    pyrosim.Send_Cube(name="FrontLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.], mass=1.0)
+    pyrosim.Send_Joint( name = "FrontLeg_FrontLowerLeg" , parent= "FrontLeg" , child = "FrontLowerLeg" , type = "revolute", position = [0,1,0], jointAxis = "1 0 0")
+    pyrosim.Send_Cube(name="BackLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.], mass=1.0)
+    pyrosim.Send_Joint( name = "BackLeg_BackLowerLeg" , parent= "BackLeg" , child = "BackLowerLeg" , type = "revolute", position = [0,-1,0], jointAxis = "1 0 0")
+    pyrosim.Send_Cube(name="LeftLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.], mass=1.0)
+    pyrosim.Send_Joint( name = "LeftLeg_LeftLowerLeg" , parent= "LeftLeg" , child = "LeftLowerLeg" , type = "revolute", position = [-1,0,0], jointAxis = "0 1 0")
+    pyrosim.Send_Cube(name="RightLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.], mass=1.0)
+    pyrosim.Send_Joint( name = "RightLeg_RightLowerLeg" , parent= "RightLeg" , child = "RightLowerLeg" , type = "revolute", position = [1,0,0], jointAxis = "0 1 0")
+    pyrosim.End()
+
+def generate_brain(id, node_genome, hidden_nodes, connection_genome):
+    pyrosim.Start_NeuralNetwork(f"brain{id}.nndf")
+    
+    # Neurons:
+    # -Input
+    n = 0
+    pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "FrontLowerLeg", activation=node_genome[n].fn); n+=1
+    pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "BackLowerLeg", activation=node_genome[n].fn); n+=1
+    pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "LeftLowerLeg", activation=node_genome[n].fn); n+=1
+    pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "RightLowerLeg", activation=node_genome[n].fn); n+=1
+        
+    bodyID = 101 if c.use_obstacles else 1
+
+    if (c.use_cpg and c.num_sensor_neurons > 5) or ( not c.use_cpg and c.num_sensor_neurons > 4):
+        pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "BackLegRot_BackLeg", bodyID=bodyID, activation=node_genome[n].fn); n+=1
+        pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "FrontLegRot_FrontLeg", bodyID=bodyID, activation=node_genome[n].fn); n+=1
+        pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "LeftLegRot_LeftLeg", bodyID=bodyID, activation=node_genome[n].fn); n+=1
+        pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "LeftLegRot_LeftLeg", bodyID=bodyID, activation=node_genome[n].fn); n+=1
+
+    if (c.use_cpg and c.num_sensor_neurons > 9) or ( not c.use_cpg and c.num_sensor_neurons > 8):
+        pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "Torso_BackLegRot", bodyID=bodyID, activation=node_genome[n].fn); n+=1
+        pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "Torso_FrontLegRot", bodyID=bodyID, activation=node_genome[n].fn); n+=1
+        pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "Torso_LeftLegRot", bodyID=bodyID, activation=node_genome[n].fn); n+=1
+        pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "Torso_RightLegRot", bodyID=bodyID, activation=node_genome[n].fn); n+=1
+
+    if (c.use_cpg and c.num_sensor_neurons > 13) or ( not c.use_cpg and c.num_sensor_neurons > 12):
+        pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "BackLeg_BackLowerLeg", bodyID=bodyID, activation=node_genome[n].fn); n+=1
+        pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "FrontLeg_FrontLowerLeg", bodyID=bodyID, activation=node_genome[n].fn); n+=1
+        pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "LeftLeg_LeftLowerLeg", bodyID=bodyID, activation=node_genome[n].fn); n+=1
+        pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "RightLeg_RightLowerLeg", bodyID=bodyID, activation=node_genome[n].fn); n+=1
+
+
+    if c.use_cpg:
+        pyrosim.Send_CPG(name = n, activation=node_genome[n].fn ); n+=1
+
+    # -Hidden
+    for neuron in hidden_nodes:
+        pyrosim.Send_Hidden_Neuron(name = neuron.id, activation=neuron.fn)
+        
+    # -Output
+    pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_BackLegRot", activation=node_genome[n].fn); n+=1
+    pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_FrontLegRot", activation=node_genome[n].fn); n+=1
+    pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_LeftLegRot", activation=node_genome[n].fn); n+=1
+    pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_RightLegRot", activation=node_genome[n].fn); n+=1
+    
+    if (c.use_cpg and c.num_motor_neurons > 5) or (not c.use_cpg and c.num_motor_neurons > 4):
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "BackLeg_BackLowerLeg", activation=node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "FrontLeg_FrontLowerLeg", activation=node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "LeftLeg_LeftLowerLeg", activation=node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "RightLeg_RightLowerLeg", activation=node_genome[n].fn); n+=1
+    if (c.use_cpg and c.num_motor_neurons > 9) or (not c.use_cpg and c.num_motor_neurons > 8):
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "BackLegRot_BackLeg", activation=node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "FrontLegRot_FrontLeg", activation=node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "LeftLegRot_LeftLeg", activation=node_genome[n].fn); n+=1
+        pyrosim.Send_Motor_Neuron( name = n , jointName = "RightLegRot_RightLeg", activation=node_genome[n].fn); n+=1
+
+
+    # Synapses:
+    # fully connected:
+    for synapse in connection_genome:
+            if synapse.enabled:
+                pyrosim.Send_Synapse(sourceNeuronName = synapse.fromNode.id, targetNeuronName = synapse.toNode.id, weight = synapse.weight)
+
+    pyrosim.End()
+    
+    while not os.path.exists(f"brain{id}.nndf"):
+        time.sleep(0.01)
+        
+    if False:
+        num = len([n for n in os.listdir('tmp') if os.path.isfile(n)])
+        os.system(f"copy brain{id}.nndf tmp\\{id}.nndf")
+        visualize_network( sample=True, sample_point=[0.1, -0.1, .25, -.25], use_radial_distance=False, save_name=f"tmp/{id}_{num}.png", show_weights=False)

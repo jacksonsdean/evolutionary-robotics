@@ -70,10 +70,10 @@ def assign_species(all_species, population, threshold, SpeciesClass):
         placed = False
         # – The Species Loop:
         for s in all_species:
+            # ·get next species s from S
             species_pop = get_members_of_species(population, s.id)
             s.population_count = len(species_pop)
             if(s.population_count<1): continue
-            # ·get next species s from S
             # if(g.species_comparision(np.random.choice(species_pop, 1)[0], threshold)):
             if(g.species_comparision(species_pop[0], threshold)):
                 # ·If g is compatible with s, add g to s

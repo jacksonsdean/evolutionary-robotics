@@ -10,7 +10,7 @@ import pyrosim.pyrosim as pyrosim
 import platform
 import os, os.path
 import constants as c
-from util import visualize_network
+from util import generate_body, generate_brain, visualize_network
 import pybullet as p
 
 from util import choose_random_function, visualize_network
@@ -174,10 +174,9 @@ class Genome:
                         self.connection_genome.append(Connection(
                             hidden_node, output_node, self.random_weight()))
 
-
     def start_simulation(self, headless, show_debug_output=False, save_as_best=False):
-        self.generate_body()
-        self.generate_brain()
+        generate_body(self.id)
+        generate_brain(self.id, self.node_genome, self.hidden_nodes(), self.connection_genome)
         if platform.system() == "Windows":
             if show_debug_output:
                 os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''}")
@@ -216,89 +215,7 @@ class Genome:
     def set_id(self, id):
         self.id = id
 
-    def generate_body(self):
-        pyrosim.Start_URDF(f"body{self.id}.urdf")
-        pyrosim.Send_Cube(name="Torso", pos=[0, 0, 1], size=[1, 1, 1], mass=c.torso_weight)
-        pyrosim.Send_Joint( name = "Torso_BackLegRot" , parent= "Torso" , child = "BackLegRot" , type = "revolute", position = [0, -0.5, 1.0], jointAxis = "0 1 0")
-        pyrosim.Send_Joint( name = "BackLegRot_BackLeg" , parent= "BackLegRot" , child = "BackLeg" , type = "revolute", position = [0, 0, 0], jointAxis = "1 0 0")
-        pyrosim.Send_Cube(name="BackLegRot", pos=[0.0, -0.5, 0.0], size=[0,0,0], mass=0.0)
-        pyrosim.Send_Cube(name="BackLeg", pos=[0.0, -0.5, 0.0], size=[.2, 1., .2], mass=1.0)
-        pyrosim.Send_Joint( name = "Torso_FrontLegRot" , parent= "Torso" , child = "FrontLegRot" , type = "revolute", position = [0.0, 0.5, 1.0], jointAxis = "1 0 0")
-        pyrosim.Send_Joint( name ="FrontLegRot_FrontLeg" , parent= "FrontLegRot" , child = "FrontLeg" , type = "revolute", position = [0.0, 0.0, 0.0], jointAxis = "0 1 0")
-        pyrosim.Send_Cube(name="FrontLegRot", pos=[0.0, 0.5, 0], size=[0,0,0], mass=0.0)
-        pyrosim.Send_Cube(name="FrontLeg", pos=[0.0, 0.5, 0], size=[.2, 1., .2], mass=1.0)
-        pyrosim.Send_Cube(name="LeftLeg", pos=[-0.5, 0.0, 0.0], size=[1.0, 0.2, 0.2], mass=1.0)
-        pyrosim.Send_Cube(name="LeftLegRot", pos=[-0.5, 0.0, 0.0], size=[0,0,0], mass=0.0)
-        pyrosim.Send_Joint( name = "Torso_LeftLegRot" , parent= "Torso" , child = "LeftLegRot" , type = "revolute", position = [-0.5, 0, 1.], jointAxis = "1 0 0")
-        pyrosim.Send_Joint( name = "LeftLegRot_LeftLeg" , parent= "LeftLegRot" , child = "LeftLeg" , type = "revolute", position = [0,0,0], jointAxis = "0 1 0")
-        pyrosim.Send_Cube(name="RightLegRot", pos=[0.5, 0.0, 0.0], size=[0,0,0], mass=0.0)
-        pyrosim.Send_Cube(name="RightLeg", pos=[0.5, 0.0, 0.0], size=[1.0, 0.2, 0.2], mass=1.0)
-        pyrosim.Send_Joint( name = "Torso_RightLegRot" , parent= "Torso" , child = "RightLegRot" , type = "revolute", position = [0.5, 0, 1.], jointAxis = "1 0 0")
-        pyrosim.Send_Joint( name = "RightLegRot_RightLeg" , parent= "RightLegRot" , child = "RightLeg" , type = "revolute", position = [0,0,0], jointAxis = "0 1 0")
-        pyrosim.Send_Cube(name="FrontLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.], mass=1.0)
-        pyrosim.Send_Joint( name = "FrontLeg_FrontLowerLeg" , parent= "FrontLeg" , child = "FrontLowerLeg" , type = "revolute", position = [0,1,0], jointAxis = "1 0 0")
-        pyrosim.Send_Cube(name="BackLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.], mass=1.0)
-        pyrosim.Send_Joint( name = "BackLeg_BackLowerLeg" , parent= "BackLeg" , child = "BackLowerLeg" , type = "revolute", position = [0,-1,0], jointAxis = "1 0 0")
-        pyrosim.Send_Cube(name="LeftLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.], mass=1.0)
-        pyrosim.Send_Joint( name = "LeftLeg_LeftLowerLeg" , parent= "LeftLeg" , child = "LeftLowerLeg" , type = "revolute", position = [-1,0,0], jointAxis = "0 1 0")
-        pyrosim.Send_Cube(name="RightLowerLeg", pos=[0.0, 0.0, -.5], size=[.2, .2, 1.], mass=1.0)
-        pyrosim.Send_Joint( name = "RightLeg_RightLowerLeg" , parent= "RightLeg" , child = "RightLowerLeg" , type = "revolute", position = [1,0,0], jointAxis = "0 1 0")
-        pyrosim.End()
-
-    def generate_brain(self):
-        pyrosim.Start_NeuralNetwork(f"brain{self.id}.nndf")
-        
-        # Neurons:
-        # -Input
-        n = 0
-        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "FrontLowerLeg", activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "BackLowerLeg", activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "LeftLowerLeg", activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "RightLowerLeg", activation=self.node_genome[n].fn); n+=1
-            
-        bodyID = 101 if c.use_obstacles else 1
-        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_BackLegRot", bodyID=bodyID, activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_FrontLegRot", bodyID=bodyID, activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_LeftLegRot", bodyID=bodyID, activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_RightLegRot", bodyID=bodyID, activation=self.node_genome[n].fn); n+=1
-
-        if c.use_cpg:
-            pyrosim.Send_CPG(name = n, activation=self.node_genome[n].fn ); n+=1
-
-        # -Hidden
-        for neuron in self.hidden_nodes():
-            pyrosim.Send_Hidden_Neuron(name = neuron.id, activation=neuron.fn)
-            
-        # -Output
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_BackLegRot", activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "BackLegRot_BackLeg", activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_FrontLegRot", activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "FrontLegRot_FrontLeg", activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_LeftLegRot", activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "LeftLegRot_LeftLeg", activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_RightLegRot", activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "RightLegRot_RightLeg", activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "FrontLeg_FrontLowerLeg", activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "BackLeg_BackLowerLeg", activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "LeftLeg_LeftLowerLeg", activation=self.node_genome[n].fn); n+=1
-        pyrosim.Send_Motor_Neuron( name = n , jointName = "RightLeg_RightLowerLeg", activation=self.node_genome[n].fn); n+=1
-
-
-        # Synapses:
-        # fully connected:
-        for synapse in self.enabled_connections():
-                pyrosim.Send_Synapse(sourceNeuronName = synapse.fromNode.id, targetNeuronName = synapse.toNode.id, weight = synapse.weight)
-
-        pyrosim.End()
-        
-        while not os.path.exists(f"brain{self.id}.nndf"):
-            time.sleep(0.01)
-            
-        if False:
-            num = len([n for n in os.listdir('tmp') if os.path.isfile(n)])
-            os.system(f"copy brain{self.id}.nndf tmp\\{self.id}.nndf")
-            visualize_network(self, sample=True, sample_point=[0.1, -0.1, .25, -.25], use_radial_distance=False, save_name=f"tmp/{self.id}_{num}.png", show_weights=False)
-
+   
 
 
     def random_weight(self):

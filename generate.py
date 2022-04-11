@@ -58,10 +58,10 @@ def Generate_Brain():
     pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "LeftLowerLeg"); n+=1
     pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "RightLowerLeg"); n+=1
     
-    pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_BackLegRot", bodyID=1); n+=1
-    pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_FrontLegRot", bodyID=1); n+=1
-    pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_LeftLegRot", bodyID=1); n+=1
-    pyrosim.Send_Torque_Sensor_Neuron(name = n , jointName = "Torso_RightLegRot", bodyID=1); n+=1
+    pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "Torso_BackLegRot", bodyID=1); n+=1
+    pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "Torso_FrontLegRot", bodyID=1); n+=1
+    pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "Torso_LeftLegRot", bodyID=1); n+=1
+    pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "Torso_RightLegRot", bodyID=1); n+=1
 
     # -Hidden
     ...

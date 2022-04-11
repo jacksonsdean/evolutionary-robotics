@@ -6,7 +6,7 @@ simulation_fps = 240
 simulation_length = 2000
 
 motor_max_force = 60.
-motor_joint_range = 0.35
+motor_joint_range = .3
 
 num_gens = 10
 pop_size = 10
@@ -15,15 +15,22 @@ use_obstacles = False
 max_obstacle_height = 0.10
 
 num_motor_neurons = 12  
-num_sensor_neurons = 8
+num_sensor_neurons = 16
+# num_motor_neurons = 8 
+# num_sensor_neurons = 4
+
+use_cpg = True
+if use_cpg: num_sensor_neurons+=1
+torso_weight = 3
+
 
 hidden_nodes_at_start = 0
-init_connection_probability = .85
+init_connection_probability = .65
 
 species_target = 3
 species_selection_ratio= .5
-species_threshold_delta = .1
-init_species_threshold = .75
+species_threshold_delta = .5
+init_species_threshold = 7.5
 
 
 do_crossover = True
@@ -42,6 +49,7 @@ fitness_threshold = 1e10
 within_species_elitism = 1
 population_elitism = 1
 activations = [tanh]
+# activations = [tanh, sin, sigmoid, identity]
 novelty_selection_ratio_within_species = 0.0
 novelty_adjusted_fitness_proportion = 0.0
 novelty_k = 5
@@ -73,10 +81,6 @@ autoencoder_frequency = -1
 # clustering coefficent 
 clustering_fitness_ratio = 0
 
-use_cpg = True
-torso_weight = 10
-
-if use_cpg: num_sensor_neurons+=1
 # from activations import *
 
 # gravity = 0, 0, -9.8

@@ -223,17 +223,19 @@ class NEAT():
             
 
     def run_one_generation(self):
-        # update all ids:
-        for ind in self.population:
-            ind.set_id(Genome.get_id())
+       
         #------------#
-        # assessment # //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        # assessment # 
         #------------#
         self.update_fitnesses_and_novelty()
         self.population = sorted(self.population, key=lambda x: x.fitness, reverse=True) # sort by fitness
         self.solution = self.population[0]
         self.print_fitnesses()
-
+        
+         # update all ids:
+        for ind in self.population:
+            ind.set_id(Genome.get_id())
+            
         # if self.gen == 0:
             # self.show_best()
             
@@ -247,11 +249,8 @@ class NEAT():
             new_children.append(copy.deepcopy(self.population[i])) # keep most fit individuals without mutating (should already be sorted)
 
         if(c.use_speciation):
-            new_children.extend(self.neat_selection_and_reproduction())
+            new_children.extend(self.neat_selection_and_reproduction()) # make children within species
             assign_species(self.all_species, self.population, self.species_threshold, Species) # assign new species ids
-            
-           
-
         else:
             new_children.extend(classic_selection_and_reproduction(c, self.population, self.all_species, self.gen, mutation_rates))
 
@@ -266,7 +265,7 @@ class NEAT():
         # selection #
         #-----------#
         if(c.use_speciation): self.population = new_children # replace parents with new children (mu, lambda)
-        else: self.population += new_children # combine parents with new children (the + in mu+lambda)
+        else: self.population += new_children # combine parents with new children (mu + lambda)
        
 
         self.population = sorted(self.population, key=lambda individual: individual.fitness, reverse=True) # sort the full population by each individual's fitness (from highers to lowest)
@@ -336,7 +335,7 @@ class NEAT():
 
     def save_best_network_image(self):
         best = self.get_best()
-        visualize_network(self.get_best(), sample=True, save_name=f"best/{time.time()}_{self.gen}_{best.id}.png", extra_text="Generation: " + str(self.gen) + " fit: " + str(best.fitness) + " species: " + str(best.species_id))
+        visualize_network(self.get_best(), sample=False, save_name=f"best/{time.time()}_{self.gen}_{best.id}.png", extra_text="Generation: " + str(self.gen) + " fit: " + str(best.fitness) + " species: " + str(best.species_id))
 
 
 def classic_selection_and_reproduction(c, population, all_species, generation_num, mutation_rates):

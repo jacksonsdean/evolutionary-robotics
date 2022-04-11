@@ -71,7 +71,9 @@ def Get_Rotational_Sensor_Value_For_Joint(jointName, bodyID):
     
     torque = p.getJointState(bodyID, desiredJointIndex)[3]
     
-    return torque
+    rotation_of_joint = p.getJointState(bodyID, desiredJointIndex)[0]
+    
+    return rotation_of_joint
 
 def Prepare_Link_Dictionary(bodyID):
 
@@ -162,7 +164,7 @@ def Send_Touch_Sensor_Neuron(name,linkName, activation):
     activation = fn_to_string(activation)
     f.write('    <neuron name = "' + str(name) + '" type = "touch_sensor" linkName = "' + linkName + '" activation="'+str(activation) +'" />\n')
     
-def Send_Torque_Sensor_Neuron(name, jointName, bodyID, activation):
+def Send_Rotation_Sensor_Neuron(name, jointName, bodyID, activation):
     activation = fn_to_string(activation)
     f.write('    <neuron name = "' + str(name) + '" type = "proprioceptive_sensor" jointName = "' + jointName + '" bodyID="' + str(bodyID) + '" activation="'+str(activation) +'"  />\n')
     
