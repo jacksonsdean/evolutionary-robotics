@@ -389,8 +389,8 @@ class HyperNEATGenome(Genome):
                     node.outputs = node.fn(node.sum_inputs)  # apply activation
 
             weight = [node.outputs for node in self.output_nodes()]
-            phen_cx.weight = weight[0] if weight[0] > c.weight_threshold else 0.0
-
+            net_output = weight[0] if (weight[0] > c.weight_threshold or weight[0]< -c.weight_threshold) else 0.0
+            phen_cx.weight = net_output * c.max_weight
             
 
 
