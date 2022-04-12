@@ -178,20 +178,20 @@ class Genome:
                         self.connection_genome.append(Connection(
                             hidden_node, output_node, self.random_weight()))
 
-    # def start_simulation(self, headless, show_debug_output=False, save_as_best=False):
-    #     generate_body(self.id)
-    #     generate_brain(self.id, self.node_genome, self.connection_genome)
-    #     if platform.system() == "Windows":
-    #         if show_debug_output:
-    #             os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''}")
-    #         else:
-    #             os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''} > nul 2> nul")
+    def start_simulation(self, headless, show_debug_output=False, save_as_best=False):
+        generate_body(self.id)
+        generate_brain(self.id, self.node_genome, self.connection_genome)
+        if platform.system() == "Windows":
+            if show_debug_output:
+                os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''}")
+            else:
+                os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''} > nul 2> nul")
                 
-    #     else:   
-    #         if show_debug_output:
-    #             os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''}" + " &")
-    #         else:
-    #             os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''} 2&>1" + " &")
+        else:   
+            if show_debug_output:
+                os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''}" + " &")
+            else:
+                os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''} 2&>1" + " &")
             
     def wait_for_simulation(self):
         fit_file = f"fitness{self.id}.txt"
