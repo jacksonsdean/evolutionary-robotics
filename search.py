@@ -1,4 +1,5 @@
 import os
+from tkinter.tix import Tree
 from hyperneat import HyperNEAT
 from neat import NEAT
 import constants as c
@@ -43,7 +44,7 @@ try:
     neat.evolve()
 except KeyboardInterrupt:
     print("Stopping early...")
-    neat.save_best_network_image()
+    neat.save_best_network_image(True)
     
 neat.show_best()
 neat.show_fitness_curve()

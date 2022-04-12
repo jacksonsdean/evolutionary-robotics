@@ -130,11 +130,11 @@ class HyperNEAT(NEAT):
         
         return child
 
-    def save_best_network_image(self):
+    def save_best_network_image(self, end_early=False):
         best = self.get_best()
         visualize_network(self.get_best(), sample=False, save_name=f"best/{time.time()}_{self.gen}_{best.id}.png", extra_text="Generation: " + str(self.gen) + " fit: " + str(best.fitness) + " species: " + str(best.species_id))
         best.save_network_phenotype_image(self.gen, best.fitness, best.species_id)
-        if self.gen == c.num_gens -1:
+        if self.gen == c.num_gens -1 or end_early:
             vis = best.create_output_visualization(32, 32)
             vis = vis.reshape(32,32)
             plt.imsave("hyperneat_phenotypes/999hyperneat_phenotype_vis.png", vis, vmin=-1, vmax=1)
