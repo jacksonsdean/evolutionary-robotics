@@ -53,7 +53,7 @@ class NEURON:
 
     def Is_Sensor_Neuron(self):
 
-        return self.type == c.TOUCH_SENSOR_NEURON or self.type == c.PROPRIOCEPTIVE_SENSOR_NEURON
+        return self.type in [c.TOUCH_SENSOR_NEURON, c.ROTATIONAL_SENSOR_NEURON, c.LINK_VELOCITY_SENSOR_NEURON, c.BASE_VELOCITY_SENSOR_NEURON]
     
     def Is_CPG_Neuron(self):
 
@@ -84,10 +84,18 @@ class NEURON:
     def Update_Sensor_Neuron(self):
         if self.type == c.TOUCH_SENSOR_NEURON:
             val = pyrosim.Get_Touch_Sensor_Value_For_Link(self.Get_Link_Name())
-        elif self.type == c.PROPRIOCEPTIVE_SENSOR_NEURON:
+        elif self.type == c.ROTATIONAL_SENSOR_NEURON:
             if self.Get_BodyID() == 0:
                 raise Exception("Proprioceptive sensor neuron has no bodyID")
             val = pyrosim.Get_Rotational_Sensor_Value_For_Joint(self.Get_Joint_Name(), self.Get_BodyID())
+        elif self.type == c.LINK_VELOCITY_SENSOR_NEURON:
+            if self.Get_BodyID() == 0:
+                raise Exception("Proprioceptive sensor neuron has no bodyID")
+            val = pyrosim.Get_Velocity_Sensor_Value_For_Link(self.Get_Link_Name(), self.Get_BodyID())
+        elif self.type == c.BASE_VELOCITY_SENSOR_NEURON:
+            if self.Get_BodyID() == 0:
+                raise Exception("Proprioceptive sensor neuron has no bodyID")
+            val = pyrosim.Get_Base_Velocity_Sensor_Value(self.Get_BodyID())
             
         self.Set_Value(val)
         
@@ -121,9 +129,17 @@ class NEURON:
 
             self.type = c.TOUCH_SENSOR_NEURON
 
-        elif "proprioceptive_sensor" in line:
+        elif "rotation_sensor" in line:
 
-            self.type = c.PROPRIOCEPTIVE_SENSOR_NEURON
+            self.type = c.ROTATIONAL_SENSOR_NEURON
+
+        elif "link_velocity_sensor" in line:
+
+            self.type = c.LINK_VELOCITY_SENSOR_NEURON
+            
+        elif "base_velocity_sensor" in line:
+
+            self.type = c.BASE_VELOCITY_SENSOR_NEURON
             
         elif "cpg" in line:
 

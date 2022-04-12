@@ -81,6 +81,8 @@ class SandwichSubstrate(Substrate):
         [1, 3], # Rotation FrontLeg_FrontLowerLeg
         [2, 3], # Rotation LeftLeg_LeftLowerLeg
         [3, 3], # Rotation RightLeg_RightLowerLeg
+        
+        [0, 4], # Torso velocity
     ]
     sensor_rows = np.max([s[1] for s in sensor_layout])+1
     sensor_cols = np.max([s[0] for s in sensor_layout])+1
@@ -260,6 +262,7 @@ class HyperNEAT(NEAT):
         visualize_network(self.get_best(), sample=False, save_name=f"best/{time.time()}_{self.gen}_{best.id}.png", extra_text="Generation: " + str(self.gen) + " fit: " + str(best.fitness) + " species: " + str(best.species_id))
         best.save_network_phenotype_image(self.gen, best.fitness, best.species_id)
         if self.gen == c.num_gens -1 or end_early:
+            print("Saving weight map...")
             vis = best.create_output_visualization(32, 32)
             vis = vis.reshape(32,32)
             plt.imsave(f"hyperneat_phenotypes/{time.time()}_hyperneat_phenotype_vis.png", vis, vmin=-1, vmax=1)

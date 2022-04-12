@@ -75,6 +75,20 @@ def Get_Rotational_Sensor_Value_For_Joint(jointName, bodyID):
     
     return rotation_of_joint
 
+def Get_Velocity_Sensor_Value_For_Link(linkName, bodyID):
+
+    vel = 0
+    linkNameIndex = linkNamesToIndices[linkName]
+    
+    vel = p.getLinkState(bodyID, linkNameIndex)[6] # linear velocity
+    
+    return (abs(vel[0]) + abs(vel[1]) + abs(vel[2])) / 3.0
+
+def Get_Base_Velocity_Sensor_Value(bodyID):
+
+    vel = p.getBaseVelocity(bodyID)
+    return (abs(vel[0][0]) + abs(vel[0][1]) + abs(vel[0][2])) / 3.0
+
 def Prepare_Link_Dictionary(bodyID):
 
     global linkNamesToIndices
@@ -166,7 +180,16 @@ def Send_Touch_Sensor_Neuron(name,linkName, activation):
     
 def Send_Rotation_Sensor_Neuron(name, jointName, bodyID, activation):
     activation = fn_to_string(activation)
-    f.write('    <neuron name = "' + str(name) + '" type = "proprioceptive_sensor" jointName = "' + jointName + '" bodyID="' + str(bodyID) + '" activation="'+str(activation) +'"  />\n')
+    f.write('    <neuron name = "' + str(name) + '" type = "rotation_sensor" jointName = "' + jointName + '" bodyID="' + str(bodyID) + '" activation="'+str(activation) +'"  />\n')
+    
+def Send_Link_Velocity_Sensor_Neuron(name, linkName, bodyID, activation):
+    activation = fn_to_string(activation)
+    f.write('    <neuron name = "' + str(name) + '" type = "link_velocity_sensor" linkName = "' + linkName + '" bodyID="' + str(bodyID) + '" activation="'+str(activation) +'"  />\n')
+    
+    
+def Send_Base_Velocity_Sensor_Neuron(name, bodyID, activation):
+    activation = fn_to_string(activation)
+    f.write('    <neuron name = "' + str(name) + '" type = "base_velocity_sensor" linkName = "' + "BASE" + '" bodyID="' + str(bodyID) + '" activation="'+str(activation) +'"  />\n')
     
 def Send_CPG(name, activation):
     activation = fn_to_string(activation)

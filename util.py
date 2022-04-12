@@ -411,6 +411,8 @@ def generate_brain(id, node_genome, connection_genome):
         pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "FrontLeg_FrontLowerLeg", bodyID=bodyID, activation=node_genome[n].fn); n+=1
         pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "LeftLeg_LeftLowerLeg", bodyID=bodyID, activation=node_genome[n].fn); n+=1
         pyrosim.Send_Rotation_Sensor_Neuron(name = n , jointName = "RightLeg_RightLowerLeg", bodyID=bodyID, activation=node_genome[n].fn); n+=1
+    if (c.use_cpg and c.num_sensor_neurons > 17) or ( not c.use_cpg and c.num_sensor_neurons > 16):
+        pyrosim.Send_Base_Velocity_Sensor_Neuron(name = n , bodyID=bodyID, activation=node_genome[n].fn); n+=1
 
 
     if c.use_cpg:
