@@ -272,8 +272,10 @@ class HyperNEAT(NEAT):
 class HyperNEATGenome(Genome):
     def __init__(self, **kwargs):
         self.set_initial_values()
-        self.substrate = SandwichSubstrate()
-        # self.substrate = GridSubstrate()
+        if c.substrate_type == "sandwich":
+            self.substrate = SandwichSubstrate()
+        elif c.substrate_type == "grid":
+            self.substrate = GridSubstrate()
         self.create_cppn(c.num_hn_inputs, c.num_hn_outputs, c.hidden_nodes_at_start)
         self.phenotype_nodes = []
         
