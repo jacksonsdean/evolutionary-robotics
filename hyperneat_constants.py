@@ -2,7 +2,7 @@ from activations import *
 import constants as c
 
 def apply():
-    c.init_species_threshold = .75
+    c.init_species_threshold = 5.
     c.activations = [tanh, sin, gaussian, sigmoid, identity]
     c.init_connection_probability = 1.0
     
