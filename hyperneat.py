@@ -134,6 +134,10 @@ class HyperNEAT(NEAT):
         best = self.get_best()
         visualize_network(self.get_best(), sample=False, save_name=f"best/{time.time()}_{self.gen}_{best.id}.png", extra_text="Generation: " + str(self.gen) + " fit: " + str(best.fitness) + " species: " + str(best.species_id))
         best.save_network_phenotype_image(self.gen, best.fitness, best.species_id)
+        if self.gen == c.num_gens -1:
+            vis = best.create_output_visualization(32, 32)
+            vis = vis.reshape(32,32)
+            plt.imsave("hyperneat_phenotypes/999hyperneat_phenotype_vis.png", vis, vmin=-1, vmax=1)
 
 
 
@@ -229,8 +233,8 @@ class HyperNEATGenome(Genome):
                                 node.outputs = node.fn(node.sum_inputs)  # apply activation
 
                         weight = [node.outputs for node in self.output_nodes()]
-                        # output[int((y1+y2)/2.), int((x1+x2)/2.)] = weight
-                        output[int((x1+x2)/2.), int((y1+y2)/2.)] = weight
+                        output[int((y1+y2)/2.), int((x1+x2)/2.)] = weight
+                        
         return output
     def eval_substrate_simple(self):
         """ Calculates the weights of connections by passing the substrate through the CPPN
@@ -269,7 +273,7 @@ class HyperNEATGenome(Genome):
                     node.outputs = node.fn(node.sum_inputs)  # apply activation
 
             weight = [node.outputs for node in self.output_nodes()]
-            phen_cx.weight = weight[0]
+            phen_cx.weight = weight[0] if weight[0] > c.weight_threshold else 0.0
 
             
 
