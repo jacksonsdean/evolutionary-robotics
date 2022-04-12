@@ -143,6 +143,122 @@ def visualize_network(individual,sample_point=[.25]*c.num_sensor_neurons, color_
         plt.show()
         plt.close()
 
+def visualize_hn_phenotype_network(connection_genome, node_genome, sample_point=[.25]*c.num_sensor_neurons, visualize_disabled=False, layout='multi', sample=False, show_weights=False, use_inp_bias=False, use_radial_distance=True, save_name=None, extra_text=None):
+    # nodes = individual.node_genome
+    connections = connection_genome
+    input_nodes = [n for n in node_genome if n.type == 0]
+    output_nodes = [n for n in node_genome if n.type == 1]
+    hidden_nodes = [n for n in node_genome if n.type == 2]
+    max_weight = c.max_weight
+
+    G = nx.DiGraph()
+    function_colors = {}
+    # colors = ['r', 'g', 'b', 'c', 'm', 'y', 'orange', 'darkviolet',
+    #         'hotpink', 'chocolate', 'lawngreen', 'lightsteelblue']
+    colors = ['lightsteelblue'] * len([node.fn for node in node_genome])
+    node_labels = {}
+
+    node_size = 2000
+    # plt.figure(figsize=(int(1+(individual.count_layers())*1.5), 6), frameon=False)
+    # plt.figure(figsize=(7, 6), frameon=False)
+    plt.subplots_adjust(left=0, bottom=0, right=1.25, top=1.25, wspace=0, hspace=0)
+
+    for i, fn in enumerate([node.fn for node in node_genome]):
+        function_colors[fn.__name__] = colors[i]
+    function_colors["identity"] = colors[0]
+
+    fixed_positions={}
+    inputs = input_nodes
+    
+    for i, node in enumerate(inputs):
+        G.add_node(node, color=function_colors[node.fn.__name__], shape='d', layer=(node.layer))
+        if node.type == 0:
+            node_labels[node] = f"S{i}:\n{node.fn.__name__}\n"+(f"{node.output:.3f}" if node.output!=None else "")
+        else:
+            node_labels[node] = f"CPG"
+            
+        fixed_positions[node] = (-4,((i+1)*2.)/len(inputs))
+
+    for node in hidden_nodes:
+        G.add_node(node, color=function_colors[node.fn.__name__], shape='o', layer=(node.layer))
+        node_labels[node] = f"{node.id}\n{node.fn.__name__}\n"+(f"{node.output:.3f}" if node.output!=None else "" )
+
+    for i, node in enumerate(output_nodes):
+        title = i
+        G.add_node(node, color=function_colors[node.fn.__name__], shape='s', layer=(node.layer))
+        node_labels[node] = f"M{title}:\n{node.fn.__name__}\n"+(f"{node.output:.3f}")
+        fixed_positions[node] = (4, ((i+1)*2)/len(output_nodes))
+    pos = {}
+    # shells = [[node for node in individual.input_nodes()], [node for node in individual.hidden_nodes()], [node for node in individual.output_nodes()]]
+    # pos=nx.shell_layout(G, shells, scale=2)
+    # pos=nx.shell_layout(G, scale=2)
+    # pos=nx.spectral_layout(G, scale=2)
+    # pos=graphviz_layout(G, prog='neato') # neato, dot, twopi, circo, fdp, nop, wc, acyclic, gvpr, gvcolor, ccomps, sccmap, tred, sfdp, unflatten.
+    fixed_nodes = fixed_positions.keys()
+    if(layout=='multi'):
+        pos=nx.multipartite_layout(G, scale=4,subset_key='layer')
+    elif(layout=='spring'):
+        pos=nx.spring_layout(G, scale=4)
+
+    plt.figure(figsize=(10, 10))
+    # pos = nx.shell_layout(G)
+    # pos = fixed_positions
+    # pos = nx.spring_layout(G, pos=pos, fixed=fixed_nodes,k=.1,  scale = 2, iterations=2000)
+    # for f, p in fixed_positions.items():
+    #     pos[f] = (p[0]*20, p[1]*20)
+    shapes = set((node[1]["shape"] for node in G.nodes(data=True)))
+    for shape in shapes:
+        this_nodes = [sNode[0] for sNode in filter(
+            lambda x: x[1]["shape"] == shape, G.nodes(data=True))]
+        colors = [nx.get_node_attributes(G, 'color')[cNode] for cNode in this_nodes]
+        nx.draw_networkx_nodes(G, pos, node_size=node_size, node_color=colors,
+                            label=node_labels, node_shape=shape, nodelist=this_nodes)
+
+    edge_labels = {}
+    for cx in connections:
+        if(not visualize_disabled and (not cx.enabled or np.isclose(cx.weight, 0))): continue
+        style = ('-', 'k',  .5+abs(cx.weight)/max_weight) if cx.enabled else ('--', 'grey', .5+ abs(cx.weight)/max_weight)
+        if(cx.enabled and cx.weight<0): style  = ('-', 'r', .5+abs(cx.weight)/max_weight)
+        if cx.fromNode in G.nodes and cx.toNode in G.nodes:
+            G.add_edge(cx.fromNode, cx.toNode, weight=f"{cx.weight:.4f}", pos=pos, style=style)
+        else:
+            print("Connection not in graph:", cx.fromNode.id, "->", cx.toNode.id)
+        edge_labels[(cx.fromNode, cx.toNode)] = f"{cx.weight:.3f}"
+
+
+    edge_colors = nx.get_edge_attributes(G,'color').values()
+    edge_styles = shapes = set((s[2] for s in G.edges(data='style')))
+    # use_curved = show_weights or individual.count_layers()<3
+
+    for s in edge_styles:
+        edges = [e for e in filter(
+            lambda x: x[2] == s, G.edges(data='style'))]
+        nx.draw_networkx_edges(G, pos,
+                                edgelist=edges,
+                                arrowsize=25, arrows=True, 
+                                node_size=[node_size]*1000,
+                                style=s[0],
+                                edge_color=[s[1]]*1000,
+                                width =s[2],
+                                # connectionstyle= "arc3" if use_curved else "arc3,rad=0.2"
+                                connectionstyle= "arc3"
+                            )
+    
+    if extra_text is not None:
+        plt.text(0.5,0.05, extra_text, horizontalalignment='center', verticalalignment='center', transform=plt.gcf().transFigure)
+        
+    
+    if (show_weights):
+        nx.draw_networkx_edge_labels(G, pos, edge_labels, label_pos=.75)
+    nx.draw_networkx_labels(G, pos, labels=node_labels)
+    plt.tight_layout()
+    if save_name is not None:
+        plt.savefig(save_name, format="PNG")
+        plt.close()
+    else:
+        plt.show()
+        plt.close()
+
 
     ""
     # labels = nx.get_edge_attributes(G,'weight')
@@ -265,9 +381,9 @@ def generate_body(id):
     pyrosim.Send_Joint( name = "RightLeg_RightLowerLeg" , parent= "RightLeg" , child = "RightLowerLeg" , type = "revolute", position = [1,0,0], jointAxis = "0 1 0")
     pyrosim.End()
 
-def generate_brain(id, node_genome, hidden_nodes, connection_genome):
+def generate_brain(id, node_genome, connection_genome):
     pyrosim.Start_NeuralNetwork(f"brain{id}.nndf")
-    
+
     # Neurons:
     # -Input
     n = 0
@@ -301,8 +417,9 @@ def generate_brain(id, node_genome, hidden_nodes, connection_genome):
         pyrosim.Send_CPG(name = n, activation=node_genome[n].fn ); n+=1
 
     # -Hidden
-    for neuron in hidden_nodes:
-        pyrosim.Send_Hidden_Neuron(name = neuron.id, activation=neuron.fn)
+    for neuron in node_genome:
+        if neuron.type == 2: # Hidden
+            pyrosim.Send_Hidden_Neuron(name = neuron.id, activation=neuron.fn)
         
     # -Output
     pyrosim.Send_Motor_Neuron( name = n , jointName = "Torso_BackLegRot", activation=node_genome[n].fn); n+=1

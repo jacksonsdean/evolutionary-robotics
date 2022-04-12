@@ -4,7 +4,7 @@ import time
 from matplotlib import pyplot as plt
 import numpy as np
 from tqdm import trange
-from neat_genome import Connection, Genome, crossover,Node
+from neat_genome import Connection, Genome, Node, find_node_with_id, get_matching_connections
 from util import choose_random_function, get_avg_number_of_connections, get_avg_number_of_hidden_nodes, get_max_number_of_connections, get_max_number_of_hidden_nodes, visualize_network
 from species import *
 import copy 
@@ -201,11 +201,11 @@ class NEAT():
                                 other_id = sp2.id
                         if(other_id>-1): members = get_members_of_species(self.population, other_id)
                     parent2 = np.random.choice(members, size=1)[0] # allow parents to crossover with themselves
-                    child = crossover(parent1, parent2)
+                    child = self.crossover(parent1, parent2)
                 else:
                     child = copy.deepcopy(parent1)    
 
-                mutate(child, Genome, self.get_mutation_rates())
+                self.mutate(child, self.get_mutation_rates())
                 new_children.extend([child]) # add children to the new_children list
                 
         return new_children
@@ -224,6 +224,10 @@ class NEAT():
 
     def run_one_generation(self):
        
+         # update all ids:
+        if self.gen > 0:
+            for ind in self.population:
+                ind.set_id(Genome.get_id())
         #------------#
         # assessment # 
         #------------#
@@ -233,8 +237,8 @@ class NEAT():
         self.print_fitnesses()
         
          # update all ids:
-        for ind in self.population:
-            ind.set_id(Genome.get_id())
+        # for ind in self.population:
+            # ind.set_id(Genome.get_id())
             
         # if self.gen == 0:
             # self.show_best()
@@ -319,6 +323,84 @@ class NEAT():
         
         self.save_best_network_image()
     
+    
+    def mutate(self, child, rates):
+        prob_mutate_activation, prob_mutate_weight, prob_add_connection, prob_add_node, prob_remove_node, prob_disable_connection, weight_mutation_max, prob_reenable_connection = rates
+        
+        child.fitness, child.adjusted_fitness = -math.inf, -math.inf # new fitnesses after mutation
+
+        if(np.random.uniform(0,1) < c.prob_random_restart):
+            child = Genome()
+        if(np.random.uniform(0,1) < prob_add_node):
+            child.add_node()
+        if(np.random.uniform(0,1) < prob_remove_node):
+            child.remove_node()
+        if(np.random.uniform(0,1) < prob_add_connection):
+            child.add_connection()
+        if(np.random.uniform(0,1) < prob_disable_connection):
+            child.disable_connection()
+        # if(np.random.uniform(0,1)< prob_mutate_activation):
+        
+        child.mutate_activations()
+        child.mutate_weights()
+
+        
+    def crossover(self, parent1, parent2):
+        [fit_parent, less_fit_parent] = sorted(
+            [parent1, parent2], key=lambda x: x.fitness, reverse=True)
+        # child = copy.deepcopy(fit_parent)
+        child = Genome()
+        child.species_id = fit_parent.species_id
+        # disjoint/excess genes are inherited from more fit parent
+        child.node_genome = copy.deepcopy(fit_parent.node_genome)
+        child.connection_genome = copy.deepcopy(fit_parent.connection_genome)
+
+        # child.more_fit_parent = fit_parent # TODO
+
+        child.connection_genome.sort(key=lambda x: x.innovation)
+        matching1, matching2 = get_matching_connections(
+            fit_parent.connection_genome, less_fit_parent.connection_genome)
+        for match_index in range(len(matching1)):
+            # Matching genes are inherited randomly
+            inherit_from_more_fit = np.random.rand() < .5 
+            
+            child_cx = child.connection_genome[[x.innovation for x in child.connection_genome].index(
+                matching1[match_index].innovation)]
+            child_cx.weight = \
+                matching1[match_index].weight if inherit_from_more_fit else matching2[match_index].weight
+
+            new_from = copy.deepcopy(matching1[match_index].fromNode if inherit_from_more_fit else matching2[match_index].fromNode)
+            child_cx.fromNode = new_from
+            # if new_from.id<len(child.node_genome):
+            existing = find_node_with_id(child.node_genome, new_from.id)
+            index_existing = child.node_genome.index(existing)
+            child.node_genome[index_existing] = new_from
+            # else:
+                # print("********ERR:new from id", new_from.id, "len:", len(child.node_genome))
+                # continue # TODO
+
+            new_to = copy.deepcopy(matching1[match_index].toNode if inherit_from_more_fit else matching2[match_index].toNode)
+            child_cx.toNode = new_to
+
+            existing = find_node_with_id(child.node_genome, new_to.id)
+            index_existing = child.node_genome.index(existing)
+            child.node_genome[index_existing] = new_to
+
+            if(not matching1[match_index].enabled or not matching2[match_index].enabled):
+                if(np.random.rand() < 0.75):  # from Stanley/Miikulainen 2007
+                    child.connection_genome[match_index].enabled = False
+
+        for cx in child.connection_genome:
+            cx.fromNode = find_node_with_id(child.node_genome, cx.fromNode.id)
+            cx.toNode = find_node_with_id(child.node_genome, cx.toNode.id)
+            assert cx.fromNode in child.node_genome, f"{child.id}: {cx.fromNode.id} {child.node_genome[cx.fromNode.id].id}"
+            assert cx.toNode in child.node_genome, f"{child.id}: {cx.toNode.id} {child.node_genome[cx.toNode.id].id}"
+            # TODO this shouldn't be necessary
+            
+        child.update_node_layers()
+        # child.disable_invalid_connections()
+        
+        return child
     def get_best(self):
         lowest = max(self.population, key=(lambda k: k.fitness))
         return lowest
@@ -352,7 +434,7 @@ def classic_selection_and_reproduction(c, population, all_species, generation_nu
             child = copy.deepcopy(parent1)
 
         # mutation
-        mutate(child, Genome, mutation_rates)
+        self.mutate(child, mutation_rates)
 
         new_children.extend([child]) # add children to the new_children list
 
@@ -432,23 +514,3 @@ def update_solution_archive(solution_archive, genome, max_archive_length, novelt
         solution_archive.append(genome)
     return solution_archive
 
-    
-def mutate(child, genome, rates):
-    prob_mutate_activation, prob_mutate_weight, prob_add_connection, prob_add_node, prob_remove_node, prob_disable_connection, weight_mutation_max, prob_reenable_connection = rates
-    
-    child.fitness, child.adjusted_fitness = -math.inf, -math.inf # new fitnesses after mutation
-
-    if(np.random.uniform(0,1) < c.prob_random_restart):
-        child = genome()
-    if(np.random.uniform(0,1) < prob_add_node):
-        child.add_node()
-    if(np.random.uniform(0,1) < prob_remove_node):
-        child.remove_node()
-    if(np.random.uniform(0,1) < prob_add_connection):
-        child.add_connection()
-    if(np.random.uniform(0,1) < prob_disable_connection):
-        child.disable_connection()
-    # if(np.random.uniform(0,1)< prob_mutate_activation):
-    
-    child.mutate_activations()
-    child.mutate_weights()

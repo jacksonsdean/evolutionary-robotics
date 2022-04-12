@@ -1,4 +1,5 @@
 import os
+from hyperneat import HyperNEAT
 from neat import NEAT
 import constants as c
 
@@ -12,6 +13,7 @@ parser.add_argument('-t','--generations', action='store', help='Number of genera
 parser.add_argument('-p','--pop', action='store', help='Population size.')
 parser.add_argument('-s','--species', action='store', help='Number of species.')
 # parser.add_argument('-o','--obstacles', action='store_true', help='Use obstacles.')
+
 args = parser.parse_args()
 
 
@@ -27,10 +29,8 @@ if args.species:
 if args.generate:
     os.system("python generate.py")
     
-    
 
-
-neat = NEAT(args.debug)
+neat = HyperNEAT(args.debug)
 try:
     neat.evolve()
 except KeyboardInterrupt:

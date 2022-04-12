@@ -111,6 +111,10 @@ class Genome:
         return output
        
     def __init__(self) -> None:
+        self.set_initial_values()
+        self.create_cppn(c.num_sensor_neurons, c.num_motor_neurons, c.hidden_nodes_at_start)
+
+    def set_initial_values(self):
         self.fitness = -math.inf
         self.novelty = -math.inf
         self.adjusted_fitness = -math.inf
@@ -120,31 +124,31 @@ class Genome:
         self.connection_genome = []
         self.id = Genome.get_id()
         self.bodyID = -1
-
+        self.allow_recurrent = c.allow_recurrent
+        self.use_input_bias = c.use_input_bias
         self.more_fit_parent = None  # for record-keeping
-        self.n_hidden_nodes = c.hidden_nodes_at_start
-        self.n_inputs = c.num_sensor_neurons
-        self.n_outputs = c.num_motor_neurons
-        total_node_count = c.num_sensor_neurons + \
-            c.num_motor_neurons + c.hidden_nodes_at_start
         self.max_weight = c.max_weight
         self.weight_threshold = c.weight_threshold
-        self.use_input_bias = c.use_input_bias
-        self.allow_recurrent = c.allow_recurrent
 
-        for i in range(c.num_sensor_neurons):
+    def create_cppn(self, num_inputs, num_outputs, hidden_nodes_at_start):
+        self.n_hidden_nodes = hidden_nodes_at_start
+        self.n_inputs = num_inputs
+        self.n_outputs = num_outputs
+        total_node_count = num_inputs + \
+            num_outputs + hidden_nodes_at_start
+        for i in range(num_inputs):
             self.node_genome.append(
                 Node(choose_random_function(), NodeType.Input, i, 0))
         
         if c.use_cpg:
            self.node_genome[-1].type = NodeType.CPG
         
-        for i in range(c.num_sensor_neurons, c.num_sensor_neurons + c.num_motor_neurons):
+        for i in range(num_inputs, num_inputs + num_outputs):
             output_fn = choose_random_function() if c.output_activation is None else c.output_activation
             self.node_genome.append(
                 Node(output_fn, NodeType.Output, len(self.node_genome), 2))
             
-        for i in range(c.num_sensor_neurons + c.num_motor_neurons, total_node_count):
+        for i in range(num_inputs + num_outputs, total_node_count):
             self.node_genome.append(Node(choose_random_function(), NodeType.Hidden, self.get_new_node_id(), 1))
 
         # initialize connection genome
@@ -174,20 +178,20 @@ class Genome:
                         self.connection_genome.append(Connection(
                             hidden_node, output_node, self.random_weight()))
 
-    def start_simulation(self, headless, show_debug_output=False, save_as_best=False):
-        generate_body(self.id)
-        generate_brain(self.id, self.node_genome, self.hidden_nodes(), self.connection_genome)
-        if platform.system() == "Windows":
-            if show_debug_output:
-                os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''}")
-            else:
-                os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''} > nul 2> nul")
+    # def start_simulation(self, headless, show_debug_output=False, save_as_best=False):
+    #     generate_body(self.id)
+    #     generate_brain(self.id, self.node_genome, self.connection_genome)
+    #     if platform.system() == "Windows":
+    #         if show_debug_output:
+    #             os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''}")
+    #         else:
+    #             os.system(f"start /B python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''} > nul 2> nul")
                 
-        else:   
-            if show_debug_output:
-                os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''}" + " &")
-            else:
-                os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''} 2&>1" + " &")
+    #     else:   
+    #         if show_debug_output:
+    #             os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''}" + " &")
+    #         else:
+    #             os.system(f"python simulate.py {'DIRECT' if headless else 'GUI'} --id {self.id} {'--best' if save_as_best else ''} 2&>1" + " &")
             
     def wait_for_simulation(self):
         fit_file = f"fitness{self.id}.txt"
@@ -584,73 +588,6 @@ class Genome:
 
         return [node.output for node in self.output_nodes()]
 
-    def eval_substrate(self, res_h, res_w, color_mode):
-        if self.allow_recurrent:
-            raise Exception("Fast method doesn't work with recurrent yet")
-
-        if Genome.pixel_inputs is None or Genome.pixel_inputs.shape[0] != res_h or Genome.pixel_inputs.shape[1] != res_w:
-            # lazy init:
-            x_vals = np.linspace(-.5, .5, res_w)
-            y_vals = np.linspace(-.5, .5, res_h)
-            Genome.pixel_inputs = np.zeros(
-                (res_h, res_w, c.num_sensor_neurons), dtype=np.float32)
-            for y in range(res_h):
-                for x in range(res_w):
-                    this_pixel = [y_vals[y], x_vals[x]]  # coordinates
-                    if(self.use_input_bias):
-                        this_pixel.append(1.0)  # bias = 1.0
-                    Genome.pixel_inputs[y][x] = this_pixel
-
-        for i in range(len(self.node_genome)):
-            # initialize outputs to 0:
-            self.node_genome[i].outputs = np.zeros((res_h, res_w))
-
-        for i in range(c.num_sensor_neurons):
-            # inputs are first N nodes
-            self.node_genome[i].sum_inputs = Genome.pixel_inputs[:, :, i]
-            self.node_genome[i].outputs = self.node_genome[i].fn(
-                Genome.pixel_inputs[:, :, i])
-
-        # always an output node
-        output_layer = self.node_genome[self.n_inputs].layer
-
-        for layer_index in range(1, output_layer+1):
-            # hidden and output layers:
-            layer = self.get_layer(layer_index)
-            for node in layer:
-                node_inputs = list(
-                    filter(lambda x: x.toNode.id == node.id, self.enabled_connections()))  # cxs that end here
-
-                node.sum_inputs = np.zeros((res_h, res_w), dtype=np.float32)
-                for cx in node_inputs:
-                    if(not hasattr(cx.fromNode, "outputs")):
-                        print(cx.fromNode.type)
-                        print(list(self.enabled_connections()))
-                        print(cx.fromNode)
-                        print(self.node_genome)
-                    inputs = cx.fromNode.outputs * cx.weight
-                    node.sum_inputs = node.sum_inputs + inputs
-
-                if(np.isnan(node.sum_inputs).any() or np.isinf(np.abs(node.sum_inputs)).any()):
-                    print(f"inputs was {node.sum_inputs}")
-                    node.sum_inputs = np.zeros(
-                        (res_h, res_w), dtype=np.float32)  # TODO why?
-                    node.outputs = node.sum_inputs  # ignore node
-
-                node.outputs = node.fn(node.sum_inputs)  # apply activation
-                node.outputs = node.outputs.reshape((res_h, res_w))
-                # TODO not sure (SLOW)
-                node.outputs = np.clip(node.outputs, -1, 1)
-
-        outputs = [node.outputs for node in self.output_nodes()]
-        if(color_mode == 'RGB' or color_mode == "HSL"):
-            outputs = np.array(outputs).transpose(
-                1, 2, 0)  # move color axis to end
-        else:
-            outputs = np.reshape(outputs, (res_h, res_w))
-        self.image = outputs
-        return outputs
-
     def reset_activations(self):
         for node in self.node_genome:
             node.outputs = np.zeros(
@@ -671,68 +608,6 @@ class Genome:
             f.close()
 
         c.from_json(json_config)
-
-
-def crossover(parent1, parent2):
-    [fit_parent, less_fit_parent] = sorted(
-        [parent1, parent2], key=lambda x: x.fitness, reverse=True)
-    # child = copy.deepcopy(fit_parent)
-    child = Genome()
-    child.species_id = fit_parent.species_id
-    # disjoint/excess genes are inherited from more fit parent
-    child.node_genome = copy.deepcopy(fit_parent.node_genome)
-    child.connection_genome = copy.deepcopy(fit_parent.connection_genome)
-
-    # child.more_fit_parent = fit_parent # TODO
-
-    child.connection_genome.sort(key=lambda x: x.innovation)
-    matching1, matching2 = get_matching_connections(
-        fit_parent.connection_genome, less_fit_parent.connection_genome)
-    for match_index in range(len(matching1)):
-        # Matching genes are inherited randomly
-        inherit_from_more_fit = np.random.rand() < .5 
-        
-        child_cx = child.connection_genome[[x.innovation for x in child.connection_genome].index(
-            matching1[match_index].innovation)]
-        child_cx.weight = \
-            matching1[match_index].weight if inherit_from_more_fit else matching2[match_index].weight
-
-        new_from = copy.deepcopy(matching1[match_index].fromNode if inherit_from_more_fit else matching2[match_index].fromNode)
-        child_cx.fromNode = new_from
-        # if new_from.id<len(child.node_genome):
-        existing = find_node_with_id(child.node_genome, new_from.id)
-        index_existing = child.node_genome.index(existing)
-        child.node_genome[index_existing] = new_from
-        # else:
-            # print("********ERR:new from id", new_from.id, "len:", len(child.node_genome))
-            # continue # TODO
-
-        new_to = copy.deepcopy(matching1[match_index].toNode if inherit_from_more_fit else matching2[match_index].toNode)
-        child_cx.toNode = new_to
-        # if new_to.id<len(child.node_genome):
-        existing = find_node_with_id(child.node_genome, new_to.id)
-        index_existing = child.node_genome.index(existing)
-        child.node_genome[index_existing] = new_to
-        # else:
-            # print("********ERR: new to id", new_to.id, "len:", len(child.node_genome))
-            # continue # TODO
-
-        if(not matching1[match_index].enabled or not matching2[match_index].enabled):
-            if(np.random.rand() < 0.75):  # from Stanley/Miikulainen 2007
-                child.connection_genome[match_index].enabled = False
-
-    for cx in child.connection_genome:
-        cx.fromNode = find_node_with_id(child.node_genome, cx.fromNode.id)
-        cx.toNode = find_node_with_id(child.node_genome, cx.toNode.id)
-        assert cx.fromNode in child.node_genome, f"{child.id}: {cx.fromNode.id} {child.node_genome[cx.fromNode.id].id}"
-        assert cx.toNode in child.node_genome, f"{child.id}: {cx.toNode.id} {child.node_genome[cx.toNode.id].id}"
-        # TODO this shouldn't be necessary
-        
-    child.update_node_layers()
-    # child.disable_invalid_connections()
-    
-    return child
-
 
 if __name__ == "__main__":
     network = Genome()

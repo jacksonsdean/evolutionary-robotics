@@ -5,7 +5,7 @@ gravity = 0, 0, -9.8
 simulation_fps = 240
 simulation_length = 2000
 
-motor_max_force = 60.
+motor_max_force = 40.
 motor_joint_range = .3
 
 num_gens = 10
@@ -14,18 +14,25 @@ pop_size = 10
 use_obstacles = False
 max_obstacle_height = 0.10
 
+# num_motor_neurons = 2  
+# num_sensor_neurons = 2
 num_motor_neurons = 12  
 num_sensor_neurons = 16
-# num_motor_neurons = 8 
-# num_sensor_neurons = 4
 
-use_cpg = True
+
+
+num_hn_hidden_layers = 1
+num_hn_hidden_nodes_per_layer = 10
+num_hn_inputs = 4 # (x1, y1, x2, y2)
+num_hn_outputs = 1
+
+use_cpg = False
 if use_cpg: num_sensor_neurons+=1
 torso_weight = 3
 
 
 hidden_nodes_at_start = 0
-init_connection_probability = .65
+init_connection_probability = 1
 
 species_target = 3
 species_selection_ratio= .5
