@@ -137,7 +137,7 @@ class HyperNEAT(NEAT):
         if self.gen == c.num_gens -1 or end_early:
             vis = best.create_output_visualization(32, 32)
             vis = vis.reshape(32,32)
-            plt.imsave("hyperneat_phenotypes/999hyperneat_phenotype_vis.png", vis, vmin=-1, vmax=1)
+            plt.imsave(f"hyperneat_phenotypes/{time.time()}_hyperneat_phenotype_vis.png", vis, vmin=-1, vmax=1)
 
 
 
