@@ -19,16 +19,10 @@ import constants as c
 
 class Substrate:
     def __init__(self):
-        layer_heights = [c.num_sensor_neurons]
-        layer_heights.extend([c.num_hn_hidden_nodes_per_layer]*c.num_hn_hidden_layers)
-        layer_heights.append(c.num_motor_neurons)
-        total_num_layers = len(layer_heights)
-        self.x = np.linspace(-1,1,total_num_layers)
-        self.y = []
-        for h in layer_heights:
-            self.y.append(list(np.linspace(-1,1,h)))
+        ...
 
     def visualize(self):
+        ...
         xs = []
         ys = []
         for x in s.x:
@@ -38,6 +32,139 @@ class Substrate:
         data = np.vstack([xs, ys])
         plt.imshow(data, vmin=-1, vmax=1)
         plt.show()
+
+    def assign_node_positions(self, nodes):
+       raise NotImplementedError()
+    def get_connections(self, nodes):
+       raise NotImplementedError()
+
+class GridSubstrate(Substrate):
+    def assign_node_positions(self, nodes):
+        x_space = np.linspace(-1, 1, c.num_hn_hidden_layers+2)
+        for node in nodes:
+            layer_nodes = [n for n in nodes if n.layer == node.layer]
+            num_in_layer = len(layer_nodes)
+            y_space = np.linspace(-1, 1, num_in_layer)[index_in_layer]
+            index_in_layer = layer_nodes.index(node)
+            node.x = x_space[node.layer]
+            node.y = y_space[index_in_layer]
+            node.outputs = 0
+            node.sum_inputs = 0
+            
+    def get_connections(self, nodes):
+        output = []
+        for node0 in nodes:
+            for node1 in nodes:
+                if not node0.layer >= node1.layer:
+                    # no recurrent for now
+                    output.append(Connection(node0, node1, 0)) 
+        return output
+
+class SandwichSubstrate(Substrate):
+    sensor_layout = [
+        [0, 0], # Touch FrontLowerLeg   
+        [1, 0], # Touch BackLowerLeg  
+        [2, 0], # Touch LeftLowerLeg  
+        [3, 0], # Touch RightLowerLeg 
+
+        [0, 1], # Rotation BackLegRot_BackLeg
+        [1, 1], # Rotation FrontLegRot_FrontLeg
+        [2, 1], # Rotation LeftLegRot_LeftLeg
+        [3, 1], # Rotation LeftLegRot_LeftLeg
+
+        [0, 2], # Rotation Torso_BackLegRot
+        [1, 2], # Rotation Torso_FrontLegRot
+        [2, 2], # Rotation Torso_LeftLegRot
+        [3, 2], # Rotation Torso_RightLegRot
+
+        [0, 3], # Rotation BackLeg_BackLowerLeg
+        [1, 3], # Rotation FrontLeg_FrontLowerLeg
+        [2, 3], # Rotation LeftLeg_LeftLowerLeg
+        [3, 3], # Rotation RightLeg_RightLowerLeg
+    ]
+    sensor_rows = np.max([s[1] for s in sensor_layout])+1
+    sensor_cols = np.max([s[0] for s in sensor_layout])+1
+
+    output_layout = [
+        [0, 0], # Torso_BackLegRot
+        [1, 0], # Torso_FrontLegRot
+        [2, 0], # Torso_LeftLegRot
+        [3, 0], # Torso_RightLegRot
+        
+        [0, 1], # BackLeg_BackLowerLeg
+        [1, 1], # FrontLeg_FrontLowerLeg
+        [2, 1], # LeftLeg_LeftLowerLeg
+        [3, 1], # RightLeg_RightLowerLeg
+
+        [0, 2], # BackLegRot_BackLeg
+        [1, 2], # FrontLegRot_FrontLeg
+        [2, 2], # LeftLegRot_LeftLeg
+        [3, 2], # RightLegRot_RightLeg
+    ]
+
+    output_rows = np.max([s[1] for s in output_layout])+1
+    output_cols = np.max([s[0] for s in output_layout])+1
+
+    def __init__(self):
+        SandwichSubstrate.hidden_rows = math.ceil(math.sqrt(c.num_hn_hidden_nodes_per_layer))
+        SandwichSubstrate.hidden_cols = math.floor(c.num_hn_hidden_nodes_per_layer)
+
+    def assign_node_positions(self, nodes):
+        layers = []
+        layer_counts = []
+        for node in nodes:
+            if node.layer not in layers:
+                layers.append(node.layer)
+            layer_counts.append(len([n for n in nodes if n.layer == node.layer]))
+
+        for i, layer in enumerate(layers):
+            rows, cols = 0, 0
+            if i == 0:
+                # input
+                rows = self.sensor_rows
+                cols = self.sensor_cols
+            elif i == len(layers)-1:
+                # output
+                rows = self.output_rows
+                cols = self.output_cols
+            else:
+                # hidden
+                rows = self.hidden_rows
+                cols = self.hidden_cols
+            x_space = np.linspace(-1, 1, cols)
+            y_space = np.linspace(-1, 1, rows)
+            index_in_layer = 0
+            for node in nodes:
+                if node.layer != i:
+                    continue
+                if i == 0:
+                    # input
+                    node.x = x_space[self.sensor_layout[index_in_layer][0]]
+                    node.y = y_space[self.sensor_layout[index_in_layer][1]]
+                elif i == len(layers)-1:
+                    # output
+                    node.x = x_space[self.output_layout[index_in_layer][0]]
+                    node.y = y_space[self.output_layout[index_in_layer][1]]
+                else:
+                    # hidden
+                    node.x = x_space[index_in_layer%cols]
+                    node.y = y_space[math.floor(index_in_layer/cols)]
+                node.outputs = 0
+                node.sum_inputs = 0
+                index_in_layer += 1
+
+    def get_connections(self, nodes):
+        output = []
+        layers = []
+        for node in nodes:
+            if node.layer not in layers:
+                layers.append(node.layer)
+        for layer in layers:
+            for node0 in nodes:
+                for node1 in nodes:
+                    if node0.layer == layer and node1.layer == layer+1:
+                        output.append(Connection(node0, node1, 0))
+        return output
 
 class HyperNEAT(NEAT):
     def evolve(self):
@@ -65,8 +192,6 @@ class HyperNEAT(NEAT):
             child.add_connection()
         if(np.random.uniform(0,1) < prob_disable_connection):
             child.disable_connection()
-        # if(np.random.uniform(0,1)< prob_mutate_activation):
-        
         child.mutate_activations()
         child.mutate_weights()
     
@@ -144,7 +269,8 @@ class HyperNEAT(NEAT):
 class HyperNEATGenome(Genome):
     def __init__(self, **kwargs):
         self.set_initial_values()
-        self.substrate = Substrate()
+        self.substrate = SandwichSubstrate()
+        # self.substrate = GridSubstrate()
         self.create_cppn(c.num_hn_inputs, c.num_hn_outputs, c.hidden_nodes_at_start)
         self.phenotype_nodes = []
         
@@ -159,24 +285,11 @@ class HyperNEATGenome(Genome):
             self.phenotype_nodes.extend([Node(tanh, NodeType.Hidden, j+c.num_sensor_neurons+c.num_motor_neurons, i+1) for j in range(c.num_hn_hidden_nodes_per_layer)])
 
         # set x and y values:
-        for node in self.phenotype_nodes:
-            layer_nodes = [n for n in self.phenotype_nodes if n.layer == node.layer]
-            num_in_layer = len(layer_nodes)
-            index_in_layer = layer_nodes.index(node)
-            
-            node.x = np.linspace(-1, 1, c.num_hn_hidden_layers+2)[node.layer]
-            node.y = np.linspace(-1, 1, num_in_layer)[index_in_layer]
-            node.outputs = 0
-            node.sum_inputs = 0
+        self.substrate.assign_node_positions(self.phenotype_nodes)
 
         
-        self.phenotype_connections = []
-        for node0 in self.phenotype_nodes:
-            for node1 in self.phenotype_nodes:
-                if not node0.layer >= node1.layer:
-                    # no recurrent for now
-                    self.phenotype_connections.append(Connection(node0, node1, 0)) 
-
+        self.phenotype_connections = self.substrate.get_connections(self.phenotype_nodes)
+        
   
     def start_simulation(self, headless, show_debug_output=False, save_as_best=False):
         self.eval_substrate_simple()

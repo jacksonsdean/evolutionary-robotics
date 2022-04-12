@@ -9,7 +9,7 @@ def apply():
     c.weight_threshold = 0.0001
 
     c.num_hn_hidden_layers = 1
-    c.num_hn_hidden_nodes_per_layer = 10
+    c.num_hn_hidden_nodes_per_layer = 15
     c.num_hn_inputs = 4 # (x1, y1, x2, y2)
     c.num_hn_outputs = 1
 
@@ -21,4 +21,4 @@ def apply():
     c.prob_remove_node = 0.55
     c.prob_disable_connection = .6
 
-    c.hidden_nodes_at_start = 0
+    c.hidden_nodes_at_start = 5
