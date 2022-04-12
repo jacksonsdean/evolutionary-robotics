@@ -34,7 +34,7 @@ if args.generate:
 
 
     
-if args.alg == "neat":
+if not args.alg or args.alg == "neat":
     neat = NEAT(args.debug)
 elif args.alg == "hyperneat":
     hc.apply()
@@ -44,7 +44,10 @@ try:
     neat.evolve()
 except KeyboardInterrupt:
     print("Stopping early...")
-    neat.save_best_network_image(True)
+    if args.alg == "hyperneat":
+        neat.save_best_network_image(True)
+    else:
+        neat.save_best_network_image()
     
 neat.show_best()
 neat.show_fitness_curve()

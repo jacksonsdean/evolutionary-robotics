@@ -7,7 +7,7 @@ gravity = 0, 0, -9.8
 simulation_fps = 240
 simulation_length = 2000
 
-motor_max_force = 40.
+motor_max_force = 60.
 motor_joint_range = .3
 
 num_gens = 10
@@ -17,7 +17,7 @@ use_obstacles = False
 max_obstacle_height = 0.10
 
 num_motor_neurons = 12  
-num_sensor_neurons = 16
+num_sensor_neurons = 17
 
 
 use_cpg = False
