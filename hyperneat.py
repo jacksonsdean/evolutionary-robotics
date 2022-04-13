@@ -44,7 +44,7 @@ class GridSubstrate(Substrate):
         for node in nodes:
             layer_nodes = [n for n in nodes if n.layer == node.layer]
             num_in_layer = len(layer_nodes)
-            y_space = np.linspace(-1, 1, num_in_layer)[index_in_layer]
+            y_space = np.linspace(-1, 1, num_in_layer)
             index_in_layer = layer_nodes.index(node)
             node.x = x_space[node.layer]
             node.y = y_space[index_in_layer]

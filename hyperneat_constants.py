@@ -12,8 +12,8 @@ def apply():
     c.num_hn_hidden_nodes_per_layer = 15
     c.num_hn_inputs = 4 # (x1, y1, x2, y2)
     c.num_hn_outputs = 1
-    # c.substrate_type = "grid"
-    c.substrate_type = "sandwich"
+    c.substrate_type = "grid"
+    # c.substrate_type = "sandwich"
             
     c.prob_mutate_activation = .5 
     c.prob_mutate_weight = .5
