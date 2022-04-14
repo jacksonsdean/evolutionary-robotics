@@ -47,10 +47,20 @@ class Connection:
     # innovation_number            0      1
     # where innovation number is the same for all of same connection
     # i.e. 2->5 and 2->5 have same innovation number, regardless of Network
-    # innovations = []
+    innovations = [] # WRONG
     current_innovation = -1
 
+    def get_innovation_wrong(toNode, fromNode):
+        cx = (fromNode.id, toNode.id) # based on id
+        # cx = (fromNode.fn.__name__, toNode.fn.__name__) # based on fn
+        if(cx in Connection.innovations):
+            return Connection.innovations.index(cx)
+        else:
+            Connection.innovations.append(cx)
+            return len(Connection.innovations) - 1
+        
     def get_innovation():
+        # TODO correct:
         Connection.current_innovation += 1
         return Connection.current_innovation
 
@@ -58,7 +68,8 @@ class Connection:
         self.fromNode = fromNode  # TODO change to node ids?
         self.toNode = toNode
         self.weight = weight
-        self.innovation = Connection.get_innovation()
+        # self.innovation = Connection.get_innovation()
+        self.innovation = Connection.get_innovation_wrong(toNode,fromNode)
         self.enabled = enabled
         self.is_recurrent = toNode.layer < fromNode.layer
 
@@ -219,18 +230,16 @@ class Genome:
     def set_id(self, id):
         self.id = id
 
-   
-
-
     def random_weight(self):
         return np.random.uniform(-self.max_weight, self.max_weight)
 
     def get_new_node_id(self):
-        # new_id = 0
-        # while len(self.node_genome) > 0 and new_id in [node.id for node in self.node_genome]:
-            # new_id += 1
-        # return new_id
-        return Node.next_id()
+        # TODO wrong but works better
+        new_id = 0
+        while len(self.node_genome) > 0 and new_id in [node.id for node in self.node_genome]:
+            new_id += 1
+        return new_id
+        # return Node.next_id() # right but not good
 
     def update_with_fitness(self, fit, num_in_species):
         self.fitness = fit
