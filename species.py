@@ -1,4 +1,5 @@
 import math
+import random
 import numpy as np
 
 class Species:
@@ -64,18 +65,30 @@ def get_current_species_champs(population, all_species):
 
 
 def assign_species(all_species, population, threshold, SpeciesClass):
-     # The Genome Loop:
+    reps = {}
+    for s in all_species:
+        species_pop = get_members_of_species(population, s.id)
+        s.population_count = len(species_pop)
+        if(s.population_count<1): continue
+        reps[s.id] = np.random.choice(species_pop, 1)[0]
+        
+    
+    # The Genome Loop:
     for g in population:
         # – Take next genome g from P
         placed = False
+        species = list(range(len(all_species)))
+        random.shuffle(species)
+        
         # – The Species Loop:
-        for s in all_species:
+        for s_index in species:
+            s = all_species[s_index]
             # ·get next species s from S
             species_pop = get_members_of_species(population, s.id)
             s.population_count = len(species_pop)
             if(s.population_count<1): continue
-            # if(g.species_comparision(np.random.choice(species_pop, 1)[0], threshold)):
-            if(g.species_comparision(species_pop[0], threshold)):
+            if(g.species_comparision(reps[s.id], threshold)):
+            # if(g.species_comparision(species_pop[0], threshold)):
                 # ·If g is compatible with s, add g to s
                 g.species_id = s.id
                 placed = True
@@ -84,6 +97,7 @@ def assign_species(all_species, population, threshold, SpeciesClass):
             # ∗If all species in S have been checked, create new species and place g in it
             new_id = len(all_species)
             all_species.append(SpeciesClass(new_id))
+            reps[new_id] = g
             g.species_id = new_id
 
 def normalize_species_offspring(all_species, c):

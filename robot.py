@@ -64,6 +64,8 @@ class Robot():
         combined_x_y_pos = (x + y) / 2.0
         with open(f"tmp{self.solution_id}.txt", "w") as f:
             fitness = combined_x_y_pos
+            # fitness = zPos
+            # fitness = c.simulation_fps* combined_x_y_pos / c.simulation_length
             # fitness = x
             # fitness = (abs(xPos) + abs(yPos) + abs(zPos))/3
             f.write(str(fitness))

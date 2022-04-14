@@ -59,11 +59,11 @@ class Substrate:
 
 class GridSubstrate(Substrate):
     def assign_node_positions(self, nodes):
-        x_space = np.linspace(-1, 1, c.num_hn_hidden_layers+2)
+        x_space = np.linspace(1, -1, c.num_hn_hidden_layers+2)
         for node in nodes:
             layer_nodes = [n for n in nodes if n.layer == node.layer]
             num_in_layer = len(layer_nodes)
-            y_space = np.linspace(-1, 1, num_in_layer)
+            y_space = np.linspace(1, -1, num_in_layer)
             index_in_layer = layer_nodes.index(node)
             node.x = x_space[node.layer]
             node.y = y_space[index_in_layer]
@@ -163,8 +163,8 @@ class SandwichSubstrate(Substrate):
                 # hidden
                 rows = self.hidden_rows
                 cols = self.hidden_cols
-            x_space = np.linspace(-1, 1, cols)
-            y_space = np.linspace(-1, 1, rows)
+            x_space = np.linspace(1, -1, cols) if cols > 1 else [0] * cols
+            y_space = np.linspace(1, -1, rows) if rows > 1 else [0] * rows
             index_in_layer = 0
             for node in nodes:
                 if node.layer != i:
@@ -185,17 +185,26 @@ class SandwichSubstrate(Substrate):
                 node.sum_inputs = 0
                 index_in_layer += 1
                 
-    def visualize_substrate(self,nodes, connections):
-        fig = plt.figure()
+    def visualize_substrate(self,nodes, connections, weights=None):
+        fig = plt.figure(figsize=(10,10))
         ax = fig.add_subplot(111, projection='3d')
         for node in nodes:
-            ax.scatter(node.x, node.layer, node.y, c='b')
+            ax.scatter(node.x, node.layer, node.y, c='b', marker='o', s=30)
             # ax.text(node.x-.1, node.y+0.1, node.layer+0.1, f"{node.layer}.{node.id}")
         ax.set_xlabel('X')
         ax.set_ylabel('Layer')
         ax.set_zlabel('Y')
-        for connection in connections:
-            ax.plot([connection.fromNode.x, connection.toNode.x],[connection.fromNode.layer, connection.toNode.layer], [connection.fromNode.y, connection.toNode.y], c='g', alpha=0.5)
+        for i, connection in enumerate(connections):
+            if weights is None:
+                color = 'k'
+                alpha = .5
+            else:
+                color = 'r' if weights[i] < 0 else 'k'
+                alpha = abs(weights[i]) / c.max_weight
+                
+
+            ax.plot([connection.fromNode.x, connection.toNode.x],[connection.fromNode.layer, connection.toNode.layer], [connection.fromNode.y, connection.toNode.y], c=color, alpha=alpha)
+        plt.tight_layout()
         plt.show()
         
     def get_connections(self, nodes):
@@ -302,15 +311,19 @@ class HyperNEAT(NEAT):
 
     def save_best_network_image(self, end_early=False):
         best = self.get_best()
-        visualize_network(self.get_best(), sample=False, save_name=f"best/{time.time()}_{self.gen}_{best.id}.png", extra_text="Generation: " + str(self.gen) + " fit: " + str(best.fitness) + " species: " + str(best.species_id))
+        best.eval_substrate_simple()
+        visualize_network(best, sample=False, save_name=f"best/{time.time()}_{self.gen}_{best.id}.png", extra_text="Generation: " + str(self.gen) + " fit: " + str(best.fitness) + " species: " + str(best.species_id))
+        plt.close()
         best.save_network_phenotype_image(self.gen, best.fitness, best.species_id)
+        plt.close()
         if self.gen == c.num_gens -1 or end_early:
             print("Saving weight map...")
             vis = best.create_output_visualization(32, 32)
             vis = vis.reshape(32,32)
             plt.imsave(f"hyperneat_phenotypes/{time.time()}_hyperneat_phenotype_vis.png", vis, vmin=-1, vmax=1)
-
-
+            plt.close()
+            best.substrate.visualize_substrate(best.phenotype_nodes, best.phenotype_connections, best.weights)
+        
 class HyperNEATGenome(Genome):
     def __init__(self, **kwargs):
         self.set_initial_values()
@@ -334,12 +347,15 @@ class HyperNEATGenome(Genome):
         # set x and y values:
         self.substrate.assign_node_positions(self.phenotype_nodes)
         self.phenotype_connections = self.substrate.get_connections(self.phenotype_nodes)
+        self.weights = np.zeros(len(self.phenotype_connections))
 
         # self.substrate.visualize_substrate(self.phenotype_nodes, self.phenotype_connections)
   
     def start_simulation(self, headless, show_debug_output=False, save_as_best=False):
         # self.eval_substrate_fast()
         self.eval_substrate_simple()
+        # self.substrate.visualize_substrate(self.phenotype_nodes, self.phenotype_connections, self.weights)
+        
         generate_body(self.id)
         generate_brain(self.id, self.phenotype_nodes, self.phenotype_connections)
         if platform.system() == "Windows":
@@ -358,7 +374,9 @@ class HyperNEATGenome(Genome):
         visualize_hn_phenotype_network(self.phenotype_connections,self.phenotype_nodes, sample=False, save_name=f"hyperneat_phenotypes/{time.time()}_{gen}_{self.id}.png", extra_text="Generation: " + str(gen) + " fit: " + str(fitness) + " species: " + str(species_id))
 
     def visualize_phenotype_network(self):
-        visualize_hn_phenotype_network(self.phenotype_connections,self.phenotype_nodes)
+        visualize_hn_phenotype_network(self.phenotype_connections,self.phenotype_nodes,  visualize_disabled=True)
+    def visualize_genotype_network(self):
+        visualize_network(self, visualize_disabled=True)
 
     def create_output_visualization(self, res_h, res_w):
         output = np.zeros((res_h, res_w, 1), dtype=np.float32)
@@ -406,8 +424,8 @@ class HyperNEATGenome(Genome):
             self.node_genome[i].outputs = 0
         # always an output node
         output_layer = self.node_genome[self.n_inputs].layer
-        
-        for phen_cx in self.phenotype_connections:
+        self.weights = np.zeros(len(self.phenotype_connections))
+        for cx_index, phen_cx in enumerate(self.phenotype_connections):
             x1 = phen_cx.fromNode.x
             y1 = phen_cx.toNode.y
             x2 = phen_cx.toNode.x
@@ -434,6 +452,7 @@ class HyperNEATGenome(Genome):
 
             weight = [node.outputs for node in self.output_nodes()]
             net_output = weight[0] if (weight[0] > c.weight_threshold or weight[0]< -c.weight_threshold) else 0.0
+            self.weights[cx_index] = net_output * c.max_phen_weight
             phen_cx.weight = net_output * c.max_phen_weight
             
     def eval_substrate_fast(self):

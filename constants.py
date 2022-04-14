@@ -1,13 +1,14 @@
 from activations import *
 import numpy as np
 import random
-np.random.seed(0)
-random.seed(0)
+SEED = 1
+np.random.seed(SEED)
+random.seed(SEED)
 
 
 gravity = 0, 0, -9.8
 
-simulation_fps = 240
+simulation_fps = 120
 simulation_length = 2000
 
 motor_max_force = 50.
@@ -19,13 +20,15 @@ pop_size = 10
 use_obstacles = False
 max_obstacle_height = 0.10
 
-num_motor_neurons = 12  
-num_sensor_neurons = 8
+# num_motor_neurons = 12  
+# num_sensor_neurons = 8
+num_motor_neurons = 12 
+num_sensor_neurons = 4
 
 
 use_cpg = False
 if use_cpg: num_sensor_neurons+=1
-torso_weight = 3
+torso_weight = 10
 
 
 hidden_nodes_at_start = 0
@@ -44,12 +47,21 @@ use_speciation = True
 use_map_elites = False
 allow_recurrent = True
 
-max_weight = 1.0
-weight_threshold = 0
+max_weight = 2.0
+weight_threshold = .01
 weight_mutation_max = .5
 prob_random_restart =.001
 prob_weight_reinit = 0.2
 prob_reenable_connection = 0.1
+
+prob_mutate_activation = .1 
+prob_mutate_weight = .4
+prob_add_connection = .3
+prob_add_node = .3
+prob_remove_node = 0.15
+prob_disable_connection = .15
+
+
 species_stagnation_threshold = 20
 fitness_threshold = 1e10
 within_species_elitism = 1
@@ -64,12 +76,6 @@ novelty_archive_len = 5
 curriculum = []
 num_workers = 4 
 
-prob_mutate_activation = .1 
-prob_mutate_weight = .2
-prob_add_connection = .35
-prob_add_node = .4
-prob_remove_node = 0.35
-prob_disable_connection = .3
 
 use_dynamic_mutation_rates = False
 dynamic_mutation_rate_end_modifier = .1

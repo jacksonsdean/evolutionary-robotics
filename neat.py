@@ -148,7 +148,7 @@ class NEAT():
         print(f" |  Best species (avg. fitness): {sorted(self.all_species, key=lambda x: x.avg_fitness if x.population_count > 0 else -1000000000, reverse=True)[0].id}")
         for species in self.all_species:
             if species.population_count > 0:
-                print(f" |    Species {species.id:03d} |> stag: {self.gen-species.last_improvement} | fit: {species.avg_fitness:.4f} | adj: {species.avg_adjusted_fitness:.4f} | pop: {species.population_count} | offspring: {species.allowed_offspring if species.allowed_offspring > 0 else 'X'}")
+                print(f" |    Species {species.id:03d} |> fit: {species.avg_fitness:.4f} | adj: {species.avg_adjusted_fitness:.4f} | stag: {self.gen-species.last_improvement} | pop: {species.population_count} | offspring: {species.allowed_offspring if species.allowed_offspring > 0 else 'X'}")
 
         print(f" "+ str(self.gen), f"{self.get_best().fitness:.4f}")
         print()

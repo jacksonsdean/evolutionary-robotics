@@ -68,8 +68,8 @@ class Connection:
         self.fromNode = fromNode  # TODO change to node ids?
         self.toNode = toNode
         self.weight = weight
-        # self.innovation = Connection.get_innovation()
-        self.innovation = Connection.get_innovation_wrong(toNode,fromNode)
+        self.innovation = Connection.get_innovation()
+        # self.innovation = Connection.get_innovation_wrong(toNode,fromNode)
         self.enabled = enabled
         self.is_recurrent = toNode.layer < fromNode.layer
 
@@ -235,11 +235,11 @@ class Genome:
 
     def get_new_node_id(self):
         # TODO wrong but works better
-        new_id = 0
-        while len(self.node_genome) > 0 and new_id in [node.id for node in self.node_genome]:
-            new_id += 1
-        return new_id
-        # return Node.next_id() # right but not good
+        # new_id = 0
+        # while len(self.node_genome) > 0 and new_id in [node.id for node in self.node_genome]:
+            # new_id += 1
+        # return new_id
+        return Node.next_id() # right but not good
 
     def update_with_fitness(self, fit, num_in_species):
         self.fitness = fit
@@ -413,7 +413,7 @@ class Genome:
         # self.connection_genome.append(Connection(
             # self.node_genome[old.fromNode.id], self.node_genome[new_node.id],   self.random_weight()))
         self.connection_genome.append(Connection(
-                find_node_with_id(self.node_genome, old.fromNode.id), self.node_genome[-1],   self.random_weight()))
+                find_node_with_id(self.node_genome, old.fromNode.id), self.node_genome[-1],   1))
 
         # TODO shouldn't be necessary
         self.connection_genome[-1].fromNode = find_node_with_id(self.node_genome, old.fromNode.id)
@@ -425,7 +425,7 @@ class Genome:
         self.connection_genome[-1].toNode = find_node_with_id(self.node_genome, old.toNode.id)
 
         self.update_node_layers()
-        self.disable_invalid_connections()
+        # self.disable_invalid_connections()
     def remove_node(self):
         # This is a bit of a buggy mess
         hidden = self.hidden_nodes()
@@ -441,7 +441,7 @@ class Genome:
                 break
 
         self.update_node_layers()
-        self.disable_invalid_connections()
+        # self.disable_invalid_connections()
 
     def disable_connection(self):
         eligible_cxs = list(self.enabled_connections())
