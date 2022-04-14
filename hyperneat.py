@@ -127,15 +127,18 @@ class SandwichSubstrate(Substrate):
         
         SandwichSubstrate.sensor_layout = SandwichSubstrate.sensor_layout[:c.num_sensor_neurons]
         SandwichSubstrate.output_layout = SandwichSubstrate.output_layout[:c.num_motor_neurons]
-        
-
 
         SandwichSubstrate.output_rows = np.max([s[1] for s in SandwichSubstrate.output_layout])+1
         SandwichSubstrate.output_cols = np.max([s[0] for s in SandwichSubstrate.output_layout])+1
         SandwichSubstrate.sensor_rows = np.max([s[1] for s in SandwichSubstrate.sensor_layout])+1
         SandwichSubstrate.sensor_cols = np.max([s[0] for s in SandwichSubstrate.sensor_layout])+1
-        SandwichSubstrate.hidden_rows = math.ceil(math.sqrt(c.num_hn_hidden_nodes_per_layer))
-        SandwichSubstrate.hidden_cols = math.floor(math.sqrt(c.num_hn_hidden_nodes_per_layer))
+        
+        if isinstance(c.num_hn_hidden_nodes_per_layer, list):
+            SandwichSubstrate.hidden_rows = [math.ceil(math.sqrt(l)) for l in c.num_hn_hidden_nodes_per_layer]
+            SandwichSubstrate.hidden_cols = [math.ceil(math.sqrt(l)) for l in c.num_hn_hidden_nodes_per_layer]
+        else:
+            SandwichSubstrate.hidden_rows = math.ceil(math.sqrt(c.num_hn_hidden_nodes_per_layer))
+            SandwichSubstrate.hidden_cols = math.ceil(math.sqrt(c.num_hn_hidden_nodes_per_layer))
       
         if c.use_cpg:
             SandwichSubstrate.sensor_layout.append([1, SandwichSubstrate.sensor_rows-1]), # CPG
@@ -161,8 +164,12 @@ class SandwichSubstrate(Substrate):
                 cols = self.output_cols
             else:
                 # hidden
-                rows = self.hidden_rows
-                cols = self.hidden_cols
+                if isinstance(c.num_hn_hidden_nodes_per_layer, list):
+                    rows = self.hidden_rows[i-1]
+                    cols = self.hidden_cols[i-1]
+                else:    
+                    rows = self.hidden_rows
+                    cols = self.hidden_cols
             x_space = np.linspace(1, -1, cols) if cols > 1 else [0] * cols
             y_space = np.linspace(1, -1, rows) if rows > 1 else [0] * rows
             index_in_layer = 0
@@ -342,7 +349,10 @@ class HyperNEATGenome(Genome):
             self.phenotype_nodes.append(Node(tanh,NodeType.Output, j+c.num_sensor_neurons, 1+c.num_hn_hidden_layers))
 
         for i in range(c.num_hn_hidden_layers):
-            self.phenotype_nodes.extend([Node(tanh, NodeType.Hidden, j+c.num_sensor_neurons+c.num_motor_neurons, i+1) for j in range(c.num_hn_hidden_nodes_per_layer)])
+            if isinstance(c.num_hn_hidden_nodes_per_layer, list):
+                self.phenotype_nodes.extend([Node(tanh, NodeType.Hidden, j+c.num_sensor_neurons+c.num_motor_neurons, i+1) for j in range(c.num_hn_hidden_nodes_per_layer[i])])
+            else:
+                self.phenotype_nodes.extend([Node(tanh, NodeType.Hidden, j+c.num_sensor_neurons+c.num_motor_neurons, i+1) for j in range(c.num_hn_hidden_nodes_per_layer)])
 
         # set x and y values:
         self.substrate.assign_node_positions(self.phenotype_nodes)

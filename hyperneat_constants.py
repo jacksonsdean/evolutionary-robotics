@@ -9,8 +9,9 @@ def apply():
     
     c.weight_threshold = 0.01
     c.allow_recurrent=False
-    c.num_hn_hidden_layers = 2 # 2 works well
-    c.num_hn_hidden_nodes_per_layer = 4
+    
+    c.num_hn_hidden_layers = 3 # 2 works well
+    c.num_hn_hidden_nodes_per_layer = [4, 8, 4]
     c.num_hn_inputs = 4 # (x1, y1, x2, y2)
     c.num_hn_outputs = 1
     # c.substrate_type = "grid"
