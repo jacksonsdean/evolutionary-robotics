@@ -10,7 +10,7 @@ gravity = 0, 0, -9.8
 simulation_fps = 240
 simulation_length = 2000
 
-motor_max_force = 60.
+motor_max_force = 100.
 motor_joint_range = .3
 
 num_gens = 10
@@ -23,7 +23,7 @@ num_motor_neurons = 12
 num_sensor_neurons = 17
 
 
-use_cpg = False
+use_cpg = True
 if use_cpg: num_sensor_neurons+=1
 torso_weight = 3
 

@@ -122,7 +122,7 @@ class NEAT():
         plt.close()
         plt.plot(self.diversity_over_time, label="Diversity")
         plt.title("Diversity over time")
-        plt.ylabel("Fitness")
+        plt.ylabel("Diversity")
         plt.xlabel("Generation")
         plt.legend()
         plt.show()

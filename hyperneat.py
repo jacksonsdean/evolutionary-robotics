@@ -55,8 +55,8 @@ class GridSubstrate(Substrate):
         output = []
         for node0 in nodes:
             for node1 in nodes:
-                if not node0.layer >= node1.layer:
-                    # no recurrent for now
+                # if not node0.layer >= node1.layer:
+                # if not node0.layer != node1.layer:
                     output.append(Connection(node0, node1, 0)) 
         return output
 
@@ -294,7 +294,6 @@ class HyperNEATGenome(Genome):
 
         
         self.phenotype_connections = self.substrate.get_connections(self.phenotype_nodes)
-        
   
     def start_simulation(self, headless, show_debug_output=False, save_as_best=False):
         self.eval_substrate_simple()
@@ -392,7 +391,7 @@ class HyperNEATGenome(Genome):
 
             weight = [node.outputs for node in self.output_nodes()]
             net_output = weight[0] if (weight[0] > c.weight_threshold or weight[0]< -c.weight_threshold) else 0.0
-            phen_cx.weight = net_output * c.max_weight
+            phen_cx.weight = net_output * c.max_phen_weight
             
 
 

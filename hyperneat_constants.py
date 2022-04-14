@@ -6,10 +6,10 @@ def apply():
     c.activations = [tanh, sin, gaussian, sigmoid, identity]
     c.init_connection_probability = 1.0
     
-    c.weight_threshold = 0.0001
+    c.weight_threshold = 0.01
 
     c.num_hn_hidden_layers = 1
-    c.num_hn_hidden_nodes_per_layer = 15
+    c.num_hn_hidden_nodes_per_layer = 16
     c.num_hn_inputs = 4 # (x1, y1, x2, y2)
     c.num_hn_outputs = 1
     c.substrate_type = "grid"
@@ -22,4 +22,7 @@ def apply():
     c.prob_remove_node = 0.55
     c.prob_disable_connection = .6
 
-    c.hidden_nodes_at_start = 5
+    c.hidden_nodes_at_start = 0
+    
+    c.max_weight = 5.
+    c.max_phen_weight = 1.
