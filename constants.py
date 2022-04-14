@@ -10,7 +10,7 @@ gravity = 0, 0, -9.8
 simulation_fps = 240
 simulation_length = 2000
 
-motor_max_force = 100.
+motor_max_force = 50.
 motor_joint_range = .3
 
 num_gens = 10
@@ -20,10 +20,10 @@ use_obstacles = False
 max_obstacle_height = 0.10
 
 num_motor_neurons = 12  
-num_sensor_neurons = 17
+num_sensor_neurons = 8
 
 
-use_cpg = True
+use_cpg = False
 if use_cpg: num_sensor_neurons+=1
 torso_weight = 3
 
@@ -33,8 +33,10 @@ init_connection_probability = .35
 
 species_target = 3
 species_selection_ratio= .5
-species_threshold_delta = .5
-init_species_threshold = 7.5
+# species_threshold_delta = .5
+species_threshold_delta = .1
+# init_species_threshold = 7.5
+init_species_threshold = .75
 
 
 do_crossover = True

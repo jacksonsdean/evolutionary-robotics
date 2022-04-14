@@ -37,6 +37,25 @@ class Substrate:
        raise NotImplementedError()
     def get_connections(self, nodes):
        raise NotImplementedError()
+   
+    def visualize_node_positions(self,nodes):
+            fig = plt.figure()
+            ax = fig.add_subplot(111)
+            for node in nodes:
+                ax.scatter(node.x, node.y, c='b')
+                ax.text(node.x-.1, node.y+0.1, f"{node.layer}.{node.id}")
+            plt.show()
+            
+    def visualize_substrate(self,nodes, connections):
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        for node in nodes:
+            ax.scatter(node.x, node.y, c='b')
+            ax.text(node.x-.1, node.y+0.1, f"{node.layer}.{node.id}")
+            
+        for connection in connections:
+            ax.plot([connection.fromNode.x, connection.toNode.x], [connection.fromNode.y, connection.toNode.y], c='g', alpha=0.5)
+        plt.show()
 
 class GridSubstrate(Substrate):
     def assign_node_positions(self, nodes):
@@ -84,8 +103,7 @@ class SandwichSubstrate(Substrate):
         
         [0, 4], # Torso velocity
     ]
-    sensor_rows = np.max([s[1] for s in sensor_layout])+1
-    sensor_cols = np.max([s[0] for s in sensor_layout])+1
+    
 
     output_layout = [
         [0, 0], # Torso_BackLegRot
@@ -104,12 +122,24 @@ class SandwichSubstrate(Substrate):
         [3, 2], # RightLegRot_RightLeg
     ]
 
-    output_rows = np.max([s[1] for s in output_layout])+1
-    output_cols = np.max([s[0] for s in output_layout])+1
 
     def __init__(self):
+        
+        SandwichSubstrate.sensor_layout = SandwichSubstrate.sensor_layout[:c.num_sensor_neurons]
+        SandwichSubstrate.output_layout = SandwichSubstrate.output_layout[:c.num_motor_neurons]
+        
+
+
+        SandwichSubstrate.output_rows = np.max([s[1] for s in SandwichSubstrate.output_layout])+1
+        SandwichSubstrate.output_cols = np.max([s[0] for s in SandwichSubstrate.output_layout])+1
+        SandwichSubstrate.sensor_rows = np.max([s[1] for s in SandwichSubstrate.sensor_layout])+1
+        SandwichSubstrate.sensor_cols = np.max([s[0] for s in SandwichSubstrate.sensor_layout])+1
         SandwichSubstrate.hidden_rows = math.ceil(math.sqrt(c.num_hn_hidden_nodes_per_layer))
-        SandwichSubstrate.hidden_cols = math.floor(c.num_hn_hidden_nodes_per_layer)
+        SandwichSubstrate.hidden_cols = math.floor(math.sqrt(c.num_hn_hidden_nodes_per_layer))
+      
+        if c.use_cpg:
+            SandwichSubstrate.sensor_layout.append([1, SandwichSubstrate.sensor_rows-1]), # CPG
+            SandwichSubstrate.sensor_cols += 1
 
     def assign_node_positions(self, nodes):
         layers = []
@@ -154,7 +184,20 @@ class SandwichSubstrate(Substrate):
                 node.outputs = 0
                 node.sum_inputs = 0
                 index_in_layer += 1
-
+                
+    def visualize_substrate(self,nodes, connections):
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        for node in nodes:
+            ax.scatter(node.x, node.layer, node.y, c='b')
+            # ax.text(node.x-.1, node.y+0.1, node.layer+0.1, f"{node.layer}.{node.id}")
+        ax.set_xlabel('X')
+        ax.set_ylabel('Layer')
+        ax.set_zlabel('Y')
+        for connection in connections:
+            ax.plot([connection.fromNode.x, connection.toNode.x],[connection.fromNode.layer, connection.toNode.layer], [connection.fromNode.y, connection.toNode.y], c='g', alpha=0.5)
+        plt.show()
+        
     def get_connections(self, nodes):
         output = []
         layers = []
@@ -268,7 +311,6 @@ class HyperNEAT(NEAT):
             plt.imsave(f"hyperneat_phenotypes/{time.time()}_hyperneat_phenotype_vis.png", vis, vmin=-1, vmax=1)
 
 
-
 class HyperNEATGenome(Genome):
     def __init__(self, **kwargs):
         self.set_initial_values()
@@ -291,11 +333,12 @@ class HyperNEATGenome(Genome):
 
         # set x and y values:
         self.substrate.assign_node_positions(self.phenotype_nodes)
-
-        
         self.phenotype_connections = self.substrate.get_connections(self.phenotype_nodes)
+
+        # self.substrate.visualize_substrate(self.phenotype_nodes, self.phenotype_connections)
   
     def start_simulation(self, headless, show_debug_output=False, save_as_best=False):
+        # self.eval_substrate_fast()
         self.eval_substrate_simple()
         generate_body(self.id)
         generate_brain(self.id, self.phenotype_nodes, self.phenotype_connections)
@@ -358,22 +401,22 @@ class HyperNEATGenome(Genome):
         Input:  (x1, y1, x2, y2)
         Output: (weight)
         """
+        for i in range(len(self.node_genome)):
+            # initialize outputs to 0:
+            self.node_genome[i].outputs = 0
+        # always an output node
+        output_layer = self.node_genome[self.n_inputs].layer
+        
         for phen_cx in self.phenotype_connections:
             x1 = phen_cx.fromNode.x
             y1 = phen_cx.toNode.y
             x2 = phen_cx.toNode.x
             y2 = phen_cx.fromNode.y
-            for i in range(len(self.node_genome)):
-                # initialize outputs to 0:
-                self.node_genome[i].outputs = 0
             coord_inputs = [x1, y1, x2, y2]
             for i in range(self.n_inputs):
                 # inputs are first N nodes
                 self.node_genome[i].sum_inputs = coord_inputs[i]
                 self.node_genome[i].outputs = self.node_genome[i].fn(coord_inputs[i])
-
-            # always an output node
-            output_layer = self.node_genome[self.n_inputs].layer
 
             for layer_index in range(1, output_layer+1):
                 # hidden and output layers:
@@ -391,6 +434,52 @@ class HyperNEATGenome(Genome):
 
             weight = [node.outputs for node in self.output_nodes()]
             net_output = weight[0] if (weight[0] > c.weight_threshold or weight[0]< -c.weight_threshold) else 0.0
+            phen_cx.weight = net_output * c.max_phen_weight
+            
+    def eval_substrate_fast(self):
+        """ Calculates the weights of connections by passing the substrate through the CPPN
+        Input:  (x1, y1, x2, y2)
+        Output: (weight)
+        """
+        for i in range(len(self.node_genome)):
+            # initialize outputs to 0:
+            self.node_genome[i].outputs = 0
+        # always an output node
+        output_layer = self.node_genome[self.n_inputs].layer
+        inputs = []
+        for phen_cx in self.phenotype_connections:
+            x1 = phen_cx.fromNode.x
+            y1 = phen_cx.toNode.y
+            x2 = phen_cx.toNode.x
+            y2 = phen_cx.fromNode.y
+            coord_inputs = [x1, y1, x2, y2]
+            inputs.append(coord_inputs)
+        inputs = np.array(inputs)
+        for i in range(self.n_inputs):
+            # inputs are first N nodes
+            self.node_genome[i].sum_inputs = inputs[:,i]
+            self.node_genome[i].outputs = self.node_genome[i].fn(inputs[:,i])
+
+        for layer_index in range(1, output_layer+1):
+            # hidden and output layers:
+            layer = self.get_layer(layer_index)
+            for node in layer:
+                node_inputs = list(
+                    filter(lambda x: x.toNode.id == node.id, self.enabled_connections()))  # cxs that end here
+
+                node.sum_inputs = np.zeros(len(inputs))
+                for cx in node_inputs:
+                    inputs = cx.fromNode.outputs * cx.weight
+                    node.sum_inputs = node.sum_inputs + inputs
+
+                node.outputs = node.fn(node.sum_inputs)  # apply activation
+
+        weights = [node.outputs for node in self.output_nodes()]
+        weights = np.array(weights)
+        weights= weights[0] # only one output node
+        for i, phen_cx in enumerate(self.phenotype_connections):
+            weight = weights[i]
+            net_output = weight if (weight > c.weight_threshold or weight< -c.weight_threshold) else 0.0
             phen_cx.weight = net_output * c.max_phen_weight
             
 
