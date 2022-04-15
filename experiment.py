@@ -9,8 +9,7 @@ import constants as c
 class Experiment:
     def load_conditions_file(filename):
         conditions = []
-        conditions_file = "experiments/weight_mutation_rate.json"
-        with open(conditions_file) as f:
+        with open(filename) as f:
             json_data = json.load(f)
             conditions = json_data["conditions"]
             name = json_data["name"]

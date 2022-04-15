@@ -35,7 +35,7 @@ def main(args = None):
     
     alg = args.alg
 
-    experiment_file = "experiments/weight_mutation_rate.json"
+    experiment_file = "experiments/weight_mutation_rate_low_mid.json"
 
     name, conditions = Experiment.load_conditions_file(experiment_file)
 

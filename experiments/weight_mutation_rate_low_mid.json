@@ -1,0 +1,16 @@
+{
+    "name": "Weight Mutation Rate",
+    "conditions": [
+        {
+            "mid": {
+                "prob_mutate_weight": 0.5
+            }
+        },
+        {
+            "low": {
+                "prob_mutate_weight": 0.15
+            }
+        },
+       
+    ]
+}
