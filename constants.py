@@ -98,9 +98,8 @@ clustering_fitness_ratio = 0
 
 
 
-
-
-
+def apply_condition(k, v):
+    globals()[k] = v
 
 
 # from activations import *

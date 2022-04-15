@@ -4,13 +4,26 @@ import numpy as np
     
 from util import *
 from neat_genome import *
+import constants as c
 
 class Experiment:
-    def __init__(self, name, num_runs=1) -> None:
-        self.name = name
+    def load_conditions_file(filename):
+        conditions = []
+        conditions_file = "experiments/weight_mutation_rate.json"
+        with open(conditions_file) as f:
+            json_data = json.load(f)
+            conditions = json_data["conditions"]
+            name = json_data["name"]
+
+        return name, conditions
+
+
+    def __init__(self, condition, num_runs=1) -> None:
+        self.name = list(condition.keys())[0]
+        self.condition = condition[self.name]
         self.results = []
         self.num_runs = num_runs
-        self.experiment_results = np.zeros((num_runs, c.num_gens))
+        self.fitness_results = np.zeros((num_runs, c.num_gens))
         self.diversity_results = np.zeros((num_runs, c.num_gens))
         self.species_results =   np.zeros((num_runs, c.num_gens))
         self.threshold_results = np.zeros((num_runs, c.num_gens))
@@ -22,12 +35,17 @@ class Experiment:
         self.species_champs_results = []
         self.me_maps = []
         self.current_run = 0
+   
+    def apply_condition(self):
+        for k, v in self.condition.items():
+            print(f"\t  {k}->{v}")
+            c.apply_condition(k, v)
             
     def found_solution(self, generation):
         self.gens_to_find_solution[self.current_run] = generation
         
     def record_results(self, fitness_over_time, diversity_over_time, solutions_over_time, species_over_time, species_threshold_over_time, nodes_over_time, connections_over_time, gens_to_converge, species_champs_over_time=None, me_map=None):
-        self.experiment_results[self.current_run] = fitness_over_time
+        self.fitness_results[self.current_run] = fitness_over_time
         self.diversity_results[self.current_run] = diversity_over_time
         self.species_results[self.current_run] = species_over_time
         self.threshold_results[self.current_run] = species_threshold_over_time
@@ -54,7 +72,7 @@ class Experiment:
         print(f"Run {run}, Generation {gen}: {len(self.species_champs_results[run][gen])} species")
 
     def plot_results(self, do_bootstrap, show=False):
-        plot_mean_and_bootstrapped_ci_over_time(self.experiment_results, [self.experiment_results], self.name, "Generation", "Fitness", plot_bootstrap=do_bootstrap, show=show)
+        plot_mean_and_bootstrapped_ci_over_time(self.fitness_results, [self.fitness_results], self.name, "Generation", "Fitness", plot_bootstrap=do_bootstrap, show=show)
         # plot diversity 
         plot_mean_and_bootstrapped_ci_over_time(self.diversity_results, [self.diversity_results], self.name, "Generation", "Diversity", plot_bootstrap=do_bootstrap, show=show)
         # plot species
@@ -117,7 +135,7 @@ class Experiment:
     def from_json(self, json_dict):
         self.config = self.config.to_json()
         self.__dict__ = json_dict
-        self.experiment_results  = np.array(self.experiment_results) 
+        self.fitness_results  = np.array(self.fitness_results) 
         self.diversity_results   = np.array(self.diversity_results)
         self.species_results     = np.array(self.species_results)
         self.threshold_results   = np.array(self.threshold_results)
@@ -127,7 +145,7 @@ class Experiment:
         self.recover_solutions()
 
     def to_json(self):
-        self.experiment_results  = self.experiment_results.tolist()
+        self.fitness_results  = self.fitness_results.tolist()
         self.diversity_results   = self.diversity_results.tolist()
         self.species_results     = self.species_results.tolist()
         self.threshold_results   = self.threshold_results.tolist()
@@ -138,7 +156,7 @@ class Experiment:
 
         json_string = json.dumps(self.__dict__, sort_keys=True, indent=4)
 
-        self.experiment_results  = np.array(self.experiment_results) 
+        self.fitness_results  = np.array(self.fitness_results) 
         self.diversity_results   = np.array(self.diversity_results)
         self.species_results     = np.array(self.species_results)
         self.threshold_results   = np.array(self.threshold_results)

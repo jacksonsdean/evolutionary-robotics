@@ -1,7 +1,9 @@
+import json
 import os
 from tkinter.tix import Tree
 
 from matplotlib import pyplot as plt
+import numpy as np
 from hyperneat import HyperNEAT
 from neat import NEAT
 import constants as c
@@ -31,14 +33,20 @@ def main(args = None):
         runs = 1
     
     alg = args.alg
-    algs = ["hyperneat", "neat"]
-    experimentA = Experiment(algs[0], runs)
-    experimentB = Experiment(algs[1], runs)
-    experiments = []
-    experiments.append(experimentA)
-    experiments.append(experimentB)
+
+    experiment_file = "experiments/weight_mutation_rate.json"
+
+    name, conditions = Experiment.load_conditions_file(experiment_file)
+
+    experiments = [Experiment(condition, runs) for condition in conditions]
+    
+    
+    print(f"Running experiment: {name}")
     for i, experiment in enumerate(experiments):
-        args.alg = algs[i]
+        if alg == "hyperneat":
+            hc.apply()
+        print(f"\tCondition {i} ({experiment.name})")
+        experiment.apply_condition()
         for run in range(runs):
             try:
                 experiment.current_run = run
@@ -46,13 +54,12 @@ def main(args = None):
                 if not alg or alg == "neat":
                     neat = NEAT(args.debug)
                 elif alg == "hyperneat":
-                    hc.apply()
                     neat = HyperNEAT(args.debug)
                     
-                neat.evolve(run)
+                neat.evolve(run, show_output=len(experiments)<2)
                 
                 experiment.record_results(neat.fitness_over_time, neat.diversity_over_time, neat.solutions_over_time, neat.species_over_time, neat.species_threshold_over_time, neat.nodes_over_time, neat.connections_over_time, neat.solution_generation, neat.species_champs_over_time, None)
-                
+                # print(f"\tRun {run} complete with fitness {neat.get_best().fitness}")
                 # if runs<2:
                     # neat.show_best()
                     # neat.show_fitness_curve()
@@ -65,20 +72,20 @@ def main(args = None):
                     neat.save_best_network_image(True)
                 else:
                     neat.save_best_network_image()
-                    
-        # experiment.plot_results(True, False)
-        bootst = True
-        # plot fitness
-        plot_mean_and_bootstrapped_ci_over_time([experiment.experiment_results for experiment in experiments], [experiment.experiment_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "Fitness", plot_bootstrap=bootst)
-        # plot diversity 
-        plot_mean_and_bootstrapped_ci_over_time([experiment.diversity_results for experiment in experiments], [experiment.diversity_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "Diversity", plot_bootstrap=bootst)
-        # plot species
-        plot_mean_and_bootstrapped_ci_over_time([experiment.species_results for experiment in experiments], [experiment.species_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "N Species", plot_bootstrap=bootst)
-        plot_mean_and_bootstrapped_ci_over_time([experiment.threshold_results for experiment in experiments], [experiment.threshold_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "Species Threshold", plot_bootstrap=bootst)
+        print(f"\tCondition {i} complete with fitness {np.mean(experiment.fitness_results[:,-1])}\n")
+    # experiment.plot_results(True, False)
+    bootst = args.do_bootstrap
+    # plot fitness
+    plot_mean_and_bootstrapped_ci_over_time([experiment.fitness_results for experiment in experiments], [experiment.fitness_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "Fitness", plot_bootstrap=bootst)
+    # plot diversity 
+    plot_mean_and_bootstrapped_ci_over_time([experiment.diversity_results for experiment in experiments], [experiment.diversity_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "Diversity", plot_bootstrap=bootst)
+    # plot species
+    plot_mean_and_bootstrapped_ci_over_time([experiment.species_results for experiment in experiments], [experiment.species_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "N Species", plot_bootstrap=bootst)
+    plot_mean_and_bootstrapped_ci_over_time([experiment.threshold_results for experiment in experiments], [experiment.threshold_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "Species Threshold", plot_bootstrap=bootst)
 
-        plot_mean_and_bootstrapped_ci_over_time([experiment.nodes_results for experiment in experiments], [experiment.nodes_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "Number of Nodes", plot_bootstrap=bootst)
-        plot_mean_and_bootstrapped_ci_over_time([experiment.connections_results for experiment in experiments], [experiment.connections_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "Number of Connections", plot_bootstrap=bootst)
-   
+    plot_mean_and_bootstrapped_ci_over_time([experiment.nodes_results for experiment in experiments], [experiment.nodes_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "Number of Nodes", plot_bootstrap=bootst)
+    plot_mean_and_bootstrapped_ci_over_time([experiment.connections_results for experiment in experiments], [experiment.connections_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "Number of Connections", plot_bootstrap=bootst)
+    
    
     # save results to file
     with open("results.txt", "w") as f:
@@ -86,7 +93,7 @@ def main(args = None):
             f.write("\n")
             f.write(experiment.name + "\n")
             f.write("Fitness\n")
-            f.write(str(experiment.experiment_results) + "\n")
+            f.write(str(experiment.fitness_results) + "\n")
             f.write("Diversity\n")
             f.write(str(experiment.diversity_results) + "\n")
             f.write("Species\n")
@@ -115,6 +122,7 @@ if __name__ == '__main__':
     parser.add_argument('-s','--species', action='store', help='Number of species.')
     parser.add_argument('-a','--alg', action='store', help='Algorithm to use.')
     parser.add_argument('-e','--experiment_runs', action='store', help='Number of experiment runs.')
+    parser.add_argument('-b','--do_bootstrap', action='store_true', help='Show bootstrap CI on experiment plots.')
     # parser.add_argument('-o','--obstacles', action='store_true', help='Use obstacles.')
 
     args = parser.parse_args() 

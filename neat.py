@@ -22,7 +22,7 @@ class NEAT():
         self.debug_output = debug_output
         self.all_species = []
         Node.current_id =  c.num_sensor_neurons + c.num_motor_neurons # reset node id counter
-        
+        self.show_output = True
         
         self.diversity_over_time = np.zeros(c.num_gens,dtype=float)
         self.species_over_time = np.zeros(c.num_gens,dtype=np.float)
@@ -69,14 +69,22 @@ class NEAT():
             return  c.prob_mutate_activation, c.prob_mutate_weight, c.prob_add_connection, c.prob_add_node, c.prob_remove_node, c.prob_disable_connection, c.weight_mutation_max, c.prob_reenable_connection
 
     def update_fitnesses_and_novelty(self):
-        pbar = trange(len(self.population))
+        if self.show_output:
+            pbar = trange(len(self.population))
+        else:
+            pbar = range(len(self.population))
         for i in pbar:
-            pbar.set_description_str("Creating simulations for gen " + str(self.gen) + ": ")
+            if self.show_output:
+                pbar.set_description_str("Creating simulations for gen " + str(self.gen) + ": ")
             self.population[i].start_simulation(True, self.debug_output)
             
-        pbar = trange(len(self.population))
+        if self.show_output:
+            pbar = trange(len(self.population))
+        else:
+            pbar = range(len(self.population))
         for i in pbar:
-            pbar.set_description_str("Simulating gen " + str(self.gen) + ": ")
+            if self.show_output:
+                pbar.set_description_str("Simulating gen " + str(self.gen) + ": ")
             self.population[i].wait_for_simulation()
             
         for i, g in enumerate(self.population):
@@ -210,8 +218,9 @@ class NEAT():
                 
         return new_children
 
-    def evolve(self, run_number = 1):
+    def evolve(self, run_number = 1, show_output=True):
         self.run_number = run_number
+        self.show_output = show_output or self.debug_output
         for i in range(c.pop_size): # only create parents for initialization (the mu in mu+lambda)
             self.population.append(Genome()) # generate new random individuals as parents
             
@@ -236,7 +245,8 @@ class NEAT():
         self.population = sorted(self.population, key=lambda x: x.fitness, reverse=True) # sort by fitness
         self.solution = self.population[0]
         
-        # self.print_fitnesses()
+        if self.show_output:
+            self.print_fitnesses()
         
          # update all ids:
         # for ind in self.population:
@@ -322,8 +332,9 @@ class NEAT():
         self.species_threshold_over_time[self.gen:] = self.species_threshold
         champs = get_current_species_champs(self.population, self.all_species)
         self.species_champs_over_time.append(champs) 
-        
-        # self.save_best_network_image()
+
+        if self.show_output:
+            self.save_best_network_image()
     
     
     def mutate(self, child, rates):
