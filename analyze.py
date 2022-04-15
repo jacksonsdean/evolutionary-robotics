@@ -9,7 +9,7 @@ from util import plot_mean_and_bootstrapped_ci_over_time
 # plt.plot(frontLegSensorValues, label="Front Leg", linestyle="--")
 
 #%%
-filename = "experiments/weight_mutation_rate_results.json"
+filename = "experiments/weight_mutation_rate_low_mid_results.json"
 with open(filename) as f:
     data = json.load(f)
 
