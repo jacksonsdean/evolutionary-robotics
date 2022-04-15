@@ -48,7 +48,8 @@ def main(args = None):
             hc.apply()
         print(f"\tCondition {i} ({experiment.name})")
         experiment.apply_condition()
-        for run in trange(runs):
+        pbar = trange(runs)
+        for run in pbar:
             try:
                 experiment.current_run = run
                 # plt.ion()
@@ -89,28 +90,15 @@ def main(args = None):
     
    
     # save results to file
-    with open("results.txt", "w") as f:
+    filename = f"{experiment_file.split('.')[0]}_results.json"
+    with open(filename, "w") as f:
+        f.write("[\n")
         for experiment in experiments:
-            f.write("\n")
-            f.write(experiment.name + "\n")
-            f.write("Fitness\n")
-            f.write(str(experiment.fitness_results) + "\n")
-            f.write("Diversity\n")
-            f.write(str(experiment.diversity_results) + "\n")
-            f.write("Species\n")
-            f.write(str(experiment.species_results) + "\n")
-            f.write("Species Threshold\n")
-            f.write(str(experiment.threshold_results) + "\n")
-            f.write("Nodes\n")
-            f.write(str(experiment.nodes_results) + "\n")
-            f.write("Connections\n")
-            f.write(str(experiment.connections_results) + "\n")
-            f.write("Solutions\n")
-            f.write(str(experiment.solutions_results) + "\n")
-            f.write("Species Champs\n")
-            f.write(str(experiment.species_champs_results) + "\n")
-            f.write("\n")
-    
+            experiment.generate_results_dictionary()
+            json.dump(experiment.results, f)
+            if experiment != experiments[-1]:f.write(",\n")
+            else:
+                f.write("\n]")
     plt.show()
     
 if __name__ == '__main__':

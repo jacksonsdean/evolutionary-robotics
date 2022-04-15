@@ -5,13 +5,13 @@ class Arguments:
     ...
 # %%
 args = Arguments()
-args.generations = 20
-args.pop = 10
+args.generations = 2
+args.pop = 4
 args.species = 2
-args.experiment_runs = 3
+args.experiment_runs = 2
 args.alg = "neat"
 args.generate=False
 args.debug = False
-args.do_bootstrap = True
+args.do_bootstrap = False
 
 search(args)

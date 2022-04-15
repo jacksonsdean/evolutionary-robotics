@@ -21,7 +21,6 @@ class Experiment:
     def __init__(self, condition, num_runs=1) -> None:
         self.name = list(condition.keys())[0]
         self.condition = condition[self.name]
-        self.results = []
         self.num_runs = num_runs
         self.fitness_results = np.zeros((num_runs, c.num_gens))
         self.diversity_results = np.zeros((num_runs, c.num_gens))
@@ -66,7 +65,24 @@ class Experiment:
         visualize_network(get_best_solution_from_all_runs(self.solutions_results)[0],
             visualize_disabled=visualize_disabled_cxs,
             sample=True, sample_point=[.5,.5])
-
+    
+    def generate_results_dictionary(self):
+        self.results = {}
+        self.results["name"] = self.name
+        self.results["condition"] = self.condition
+        self.results["num_runs"] = self.num_runs
+        self.results["fitness_results"] = self.fitness_results.tolist()
+        self.results["diversity_results"] = self.diversity_results.tolist()
+        self.results["species_results"] = self.species_results.tolist()
+        self.results["threshold_results"] = self.threshold_results.tolist()
+        self.results["nodes_results"] = self.nodes_results.tolist()
+        self.results["connections_results"] = self.connections_results.tolist()
+        self.results["gens_to_converge"] = self.gens_to_converge
+        # self.results["gens_to_find_solution"] = self.gens_to_find_solution
+        # self.results["solutions_results"] = self.solutions_results
+        # self.results["species_champs_results"] = self.species_champs_results
+        # self.results["me_maps"] = self.me_maps
+        
 
     def show_species_champs(self, run=-1, gen=-1,):
         print(f"Run {run}, Generation {gen}: {len(self.species_champs_results[run][gen])} species")

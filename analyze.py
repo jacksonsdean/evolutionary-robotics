@@ -1,15 +1,23 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
-backLegSensorValues =  np.load("data/backLegSensorValues.npy")
-frontLegSensorValues =  np.load("data/frontLegSensorValues.npy")
+import json
+from util import plot_mean_and_bootstrapped_ci_over_time
+#%%
+# backLegSensorValues =  np.load("data/backLegSensorValues.npy")
+# frontLegSensorValues =  np.load("data/frontLegSensorValues.npy")
 # plt.plot(backLegSensorValues , label="Back Leg", linewidth=3.5)
 # plt.plot(frontLegSensorValues, label="Front Leg", linestyle="--")
 
-frontMotorTargetAngles = np.load("data/frontMotorTargetAngles.npy")
-backMotorTargetAngles = np.load("data/backMotorTargetAngles.npy")
-plt.plot(frontMotorTargetAngles, label="Front Leg", linewidth=3.5)
-plt.plot(backMotorTargetAngles, label="Back Leg", linestyle="--")
+#%%
+filename = "experiments/weight_mutation_rate_results.json"
+with open(filename) as f:
+    data = json.load(f)
+
+
+#%%
+bootst = True
+plot_mean_and_bootstrapped_ci_over_time([np.array(c["fitness_results"]) for c in data], [np.array(c["fitness_results"]) for c in data], [c["name"] for c in data], "Generation", "Best fitness", plot_bootstrap=bootst)
+plot_mean_and_bootstrapped_ci_over_time([np.array(c["diversity_results"]) for c in data], [np.array(c["diversity_results"]) for c in data], [c["name"] for c in data], "Generation", "Average diversity", plot_bootstrap=bootst)
 
 plt.legend()
 plt.show()
