@@ -228,17 +228,18 @@ class SandwichSubstrate(Substrate):
         return output
 
 class HyperNEAT(NEAT):
-    def evolve(self):
-            for i in range(c.pop_size): # only create parents for initialization (the mu in mu+lambda)
-                self.population.append(HyperNEATGenome()) # generate new random individuals as parents
-                
-            if c.use_speciation:
-                assign_species(self.all_species, self.population, self.species_threshold, Species)
+    def evolve(self, run_number = 1):
+        self.run_number = run_number
+        for i in range(c.pop_size): # only create parents for initialization (the mu in mu+lambda)
+            self.population.append(HyperNEATGenome()) # generate new random individuals as parents
+            
+        if c.use_speciation:
+            assign_species(self.all_species, self.population, self.species_threshold, Species)
 
-            # Run NEAT
-            for self.gen in range(c.num_gens):
-                self.run_one_generation()
-    
+        # Run NEAT
+        for self.gen in range(c.num_gens):
+            self.run_one_generation()
+
     def mutate(self, child, rates):
         prob_mutate_activation, prob_mutate_weight, prob_add_connection, prob_add_node, prob_remove_node, prob_disable_connection, weight_mutation_max, prob_reenable_connection = rates
         child.fitness, child.adjusted_fitness = -math.inf, -math.inf # new fitnesses after mutation
@@ -320,15 +321,15 @@ class HyperNEAT(NEAT):
         best = self.get_best()
         best.eval_substrate_simple()
         visualize_network(best, sample=False, save_name=f"best/{time.time()}_{self.gen}_{best.id}.png", extra_text="Generation: " + str(self.gen) + " fit: " + str(best.fitness) + " species: " + str(best.species_id))
-        plt.close()
+        # plt.close()
         best.save_network_phenotype_image(self.gen, best.fitness, best.species_id)
-        plt.close()
+        # plt.close()
         if self.gen == c.num_gens -1 or end_early:
             print("Saving weight map...")
             vis = best.create_output_visualization(32, 32)
             vis = vis.reshape(32,32)
             plt.imsave(f"hyperneat_phenotypes/{time.time()}_hyperneat_phenotype_vis.png", vis, vmin=-1, vmax=1)
-            plt.close()
+            # plt.close()
             best.substrate.visualize_substrate(best.phenotype_nodes, best.phenotype_connections, best.weights)
         
 class HyperNEATGenome(Genome):

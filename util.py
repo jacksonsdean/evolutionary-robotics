@@ -11,8 +11,11 @@ import sys
 import inspect
 import random
 import pyrosim.pyrosim as pyrosim
+from scikits import bootstrap
 
 import constants as c
+import warnings
+warnings.filterwarnings("ignore")
     
 def choose_random_function():
     return random.choice(c.activations)
@@ -138,10 +141,10 @@ def visualize_network(individual, sample_point=[.25]*c.num_sensor_neurons, color
     plt.tight_layout()
     if save_name is not None:
         plt.savefig(save_name, format="PNG")
-        plt.close()
+        # plt.close()
     else:
         plt.show()
-        plt.close()
+        # plt.close()
 
 def visualize_hn_phenotype_network(connection_genome, node_genome, sample_point=[.25]*c.num_sensor_neurons, visualize_disabled=False, layout='multi', sample=False, show_weights=False, use_inp_bias=False, use_radial_distance=True, save_name=None, extra_text=None):
     # nodes = individual.node_genome
@@ -254,10 +257,10 @@ def visualize_hn_phenotype_network(connection_genome, node_genome, sample_point=
     plt.tight_layout()
     if save_name is not None:
         plt.savefig(save_name, format="PNG")
-        plt.close()
+        # plt.close()
     else:
         plt.show()
-        plt.close()
+        # plt.close()
 
 
     ""
@@ -265,7 +268,7 @@ def visualize_hn_phenotype_network(connection_genome, node_genome, sample_point=
 
 
 
-def plot_mean_and_bootstrapped_ci_over_time(input_data = None, dataset=None, name = "change me", x_label = "change me", y_label="change me", y_limit = None, plot_bootstrap = True):
+def plot_mean_and_bootstrapped_ci_over_time(input_data = None, dataset=None, name = "change me", x_label = "change me", y_label="change me", y_limit = None, plot_bootstrap = True, show=False):
     """
     
     parameters: 
@@ -283,7 +286,7 @@ def plot_mean_and_bootstrapped_ci_over_time(input_data = None, dataset=None, nam
 
     # for this_input_data, this_name in zip(input_data, name):
     for index, this_name in enumerate(name):
-        print("plotting",this_name)
+        # print("plotting",this_name)
         this_input_data = dataset[index]
         total_generations = this_input_data.shape[1]
         if(plot_bootstrap):
@@ -299,7 +302,8 @@ def plot_mean_and_bootstrapped_ci_over_time(input_data = None, dataset=None, nam
         ax.set_ylabel(y_label)
         if y_limit: ax.set_ylim(y_limit[0],y_limit[1])
         plt.legend(loc='best'); # add legend
-
+        if show:
+            plt.show() 
 
 def get_best_solution_from_all_runs(results):
     best_fit = -math.inf

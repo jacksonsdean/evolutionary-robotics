@@ -110,7 +110,7 @@ class NEAT():
             sp.update(global_average_fitness, members, self.gen, c.species_stagnation_threshold, c.pop_size)
 
     def show_fitness_curve(self):
-        plt.close()
+        # plt.close()
         plt.plot(self.fitness_over_time, label="Highest fitness")
         plt.title("Fitness over time")
         plt.ylabel("Fitness")
@@ -119,7 +119,7 @@ class NEAT():
         plt.show()
         
     def show_diversity_curve(self):
-        plt.close()
+        # plt.close()
         plt.plot(self.diversity_over_time, label="Diversity")
         plt.title("Diversity over time")
         plt.ylabel("Diversity")
@@ -210,7 +210,8 @@ class NEAT():
                 
         return new_children
 
-    def evolve(self):
+    def evolve(self, run_number = 1):
+        self.run_number = run_number
         for i in range(c.pop_size): # only create parents for initialization (the mu in mu+lambda)
             self.population.append(Genome()) # generate new random individuals as parents
             
@@ -234,7 +235,8 @@ class NEAT():
         self.update_fitnesses_and_novelty()
         self.population = sorted(self.population, key=lambda x: x.fitness, reverse=True) # sort by fitness
         self.solution = self.population[0]
-        self.print_fitnesses()
+        
+        # self.print_fitnesses()
         
          # update all ids:
         # for ind in self.population:
@@ -321,7 +323,7 @@ class NEAT():
         champs = get_current_species_champs(self.population, self.all_species)
         self.species_champs_over_time.append(champs) 
         
-        self.save_best_network_image()
+        # self.save_best_network_image()
     
     
     def mutate(self, child, rates):
@@ -417,7 +419,7 @@ class NEAT():
 
     def save_best_network_image(self):
         best = self.get_best()
-        visualize_network(self.get_best(), sample=False, save_name=f"best/{time.time()}_{self.gen}_{best.id}.png", extra_text="Generation: " + str(self.gen) + " fit: " + str(best.fitness) + " species: " + str(best.species_id))
+        visualize_network(self.get_best(), sample=False, save_name=f"best/{time.time()}_e{self.run_number}_{self.gen}_{best.id}.png", extra_text=f"Run {self.run_number} Generation: " + str(self.gen) + " fit: " + str(best.fitness) + " species: " + str(best.species_id))
 
 
 def classic_selection_and_reproduction(c, population, all_species, generation_num, mutation_rates):

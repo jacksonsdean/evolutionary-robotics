@@ -8,11 +8,14 @@ random.seed(SEED)
 
 gravity = 0, 0, -9.8
 
+# CANNOT BE CHANGED AT RUN TIME
 simulation_fps = 120
 simulation_length = 2000
-
 motor_max_force = 50.
 motor_joint_range = .3
+###
+
+
 
 num_gens = 10
 pop_size = 10
