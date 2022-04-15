@@ -228,7 +228,8 @@ class SandwichSubstrate(Substrate):
         return output
 
 class HyperNEAT(NEAT):
-    def evolve(self, run_number = 1):
+    def evolve(self, run_number = 1, show_output= True):
+        self.show_output = show_output or self.debug_output
         self.run_number = run_number
         for i in range(c.pop_size): # only create parents for initialization (the mu in mu+lambda)
             self.population.append(HyperNEATGenome()) # generate new random individuals as parents
