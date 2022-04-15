@@ -10,7 +10,7 @@
             "low": {
                 "prob_mutate_weight": 0.15
             }
-        },
+        }
        
     ]
 }
