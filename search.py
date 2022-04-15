@@ -4,6 +4,7 @@ from tkinter.tix import Tree
 
 from matplotlib import pyplot as plt
 import numpy as np
+from tqdm import trange
 from hyperneat import HyperNEAT
 from neat import NEAT
 import constants as c
@@ -47,7 +48,7 @@ def main(args = None):
             hc.apply()
         print(f"\tCondition {i} ({experiment.name})")
         experiment.apply_condition()
-        for run in range(runs):
+        for run in trange(runs):
             try:
                 experiment.current_run = run
                 # plt.ion()
