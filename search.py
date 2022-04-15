@@ -36,6 +36,8 @@ def main(args = None):
     alg = args.alg
 
     experiment_file = "experiments/weight_mutation_rate_low_mid.json"
+    if args.experiment_file:
+        experiment_file = args.experiment_file
 
     name, conditions = Experiment.load_conditions_file(experiment_file)
 
@@ -112,6 +114,7 @@ if __name__ == '__main__':
     parser.add_argument('-a','--alg', action='store', help='Algorithm to use.')
     parser.add_argument('-e','--experiment_runs', action='store', help='Number of experiment runs.')
     parser.add_argument('-b','--do_bootstrap', action='store_true', help='Show bootstrap CI on experiment plots.')
+    parser.add_argument('-f','--experiment_file', action='store', help='Experiment description file.')
     # parser.add_argument('-o','--obstacles', action='store_true', help='Use obstacles.')
 
     args = parser.parse_args() 
