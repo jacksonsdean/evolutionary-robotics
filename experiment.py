@@ -65,6 +65,19 @@ class Experiment:
             visualize_disabled=visualize_disabled_cxs,
             sample=True, sample_point=[.5,.5])
     
+    def generate_empty_results_dictionary(self):
+        self.results = {}
+        self.results["name"] = self.name
+        self.results["condition"] = self.condition
+        self.results["num_runs"] = self.num_runs
+        self.results["fitness_results"] = []
+        self.results["diversity_results"] = []
+        self.results["species_results"] =[]
+        self.results["threshold_results"] = []
+        self.results["nodes_results"] = []
+        self.results["connections_results"] = []
+        self.results["gens_to_converge"] = []
+        
     def generate_results_dictionary(self):
         self.results = {}
         self.results["name"] = self.name

@@ -1,0 +1,16 @@
+{
+    "name": "Algorithm",
+    "conditions": [
+        {
+            "neat": {
+                "alg": "neat"
+            }
+        },
+        {
+            "hyperneat": {
+                "alg": "hyperneat"
+            }
+        }
+       
+    ]
+}

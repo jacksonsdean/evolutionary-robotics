@@ -1,0 +1,18 @@
+{
+    "name": "Num hidden nodes",
+    "conditions": [
+        {
+            "4-8-16-32": {
+                "num_hn_hidden_nodes_per_layer": [4,8, 16,32],
+                "num_hn_hidden_layers": 4
+            }
+        },
+        {
+            "8-16-32": {
+                "num_hn_hidden_nodes_per_layer": [8,16, 32],
+                "num_hn_hidden_layers": 3
+            }
+        }
+       
+    ]
+}

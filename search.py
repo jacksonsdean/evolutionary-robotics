@@ -33,7 +33,8 @@ def main(args = None):
     else:
         runs = 1
     
-    alg = args.alg
+    
+    # alg = args.alg
 
     experiment_file = "experiments/weight_mutation_rate_low_mid.json"
     if args.experiment_file:
@@ -43,13 +44,40 @@ def main(args = None):
 
     experiments = [Experiment(condition, runs) for condition in conditions]
     
+    results_filename = f"{experiment_file.split('.')[0]}_results.json"
+    
+    results =[]
+    if os.path.exists(results_filename):
+        with open(results_filename, "r") as f:
+            try:
+                results = json.load(f)
+            except:
+                ...
+            
+    if not os.path.exists(results_filename) or len(results)==0:
+        with open(results_filename, "w+") as f:
+            f.write("[\n")
+            for experiment in experiments:
+                experiment.generate_empty_results_dictionary()
+                r = experiment.results
+                r["num_runs"] = 0
+                json.dump(r, f, indent=4)
+                if experiment != experiments[-1]:f.write(",\n")
+                
+            f.write("\n]")
+            f.close()
+        
     
     print(f"Running experiment: {name}")
     for i, experiment in enumerate(experiments):
-        if alg == "hyperneat":
-            hc.apply()
+        
         print(f"\tCondition {i} ({experiment.name})")
         experiment.apply_condition()
+        alg = c.alg
+       
+        if alg == "hyperneat":
+            hc.apply()
+            experiment.apply_condition()
         pbar = trange(runs)
         for run in pbar:
             try:
@@ -70,6 +98,25 @@ def main(args = None):
                     # neat.show_diversity_curve()
                 # plt.ioff()
             
+                # save results to file
+                with open(results_filename, "r+") as f:
+                    results = json.load(f)
+                    index = [r["name"] for r in results].index(experiment.name)
+                    if index>-1:
+                        results[index]["num_runs"] += 1
+                        experiment.generate_results_dictionary()
+                        for k in ["fitness_results", "diversity_results", "species_results", "threshold_results", "nodes_results", "connections_results"]:
+                            results[index][k] = results[index][k] + experiment.results[k]
+                    f.seek(0)
+                    f.truncate()
+                    f.write("[\n")
+                    for r in results:
+                        json.dump(r, f, indent=4)
+                        
+                        if r != results[-1]:f.write(",\n")
+                    f.write("\n]")
+                    f.close()
+                    
             except KeyboardInterrupt:
                 print("Stopping early...")
                 if alg == "hyperneat":
@@ -77,32 +124,10 @@ def main(args = None):
                 else:
                     neat.save_best_network_image()
         print(f"\tCondition {i} complete with fitness {np.mean(experiment.fitness_results[:,-1])}\n")
-    # experiment.plot_results(True, False)
-    bootst = args.do_bootstrap
-    # plot fitness
-    plot_mean_and_bootstrapped_ci_over_time([experiment.fitness_results for experiment in experiments], [experiment.fitness_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "Fitness", plot_bootstrap=bootst)
-    # plot diversity 
-    plot_mean_and_bootstrapped_ci_over_time([experiment.diversity_results for experiment in experiments], [experiment.diversity_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "Diversity", plot_bootstrap=bootst)
-    # plot species
-    plot_mean_and_bootstrapped_ci_over_time([experiment.species_results for experiment in experiments], [experiment.species_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "N Species", plot_bootstrap=bootst)
-    plot_mean_and_bootstrapped_ci_over_time([experiment.threshold_results for experiment in experiments], [experiment.threshold_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "Species Threshold", plot_bootstrap=bootst)
-
-    plot_mean_and_bootstrapped_ci_over_time([experiment.nodes_results for experiment in experiments], [experiment.nodes_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "Number of Nodes", plot_bootstrap=bootst)
-    plot_mean_and_bootstrapped_ci_over_time([experiment.connections_results for experiment in experiments], [experiment.connections_results for experiment in experiments], [experiment.name for experiment in experiments], "Generation", "Number of Connections", plot_bootstrap=bootst)
+    
     
    
-    # save results to file
-    filename = f"{experiment_file.split('.')[0]}_results.json"
-    with open(filename, "w") as f:
-        f.write("[\n")
-        for experiment in experiments:
-            experiment.generate_results_dictionary()
-            json.dump(experiment.results, f)
-            if experiment != experiments[-1]:f.write(",\n")
-            else:
-                f.write("\n]")
-    plt.show()
-    
+  
 if __name__ == '__main__':
     # parse args
     parser = argparse.ArgumentParser(description='Run search on the robot controller.')

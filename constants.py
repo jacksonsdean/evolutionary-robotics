@@ -1,11 +1,11 @@
 from activations import *
 import numpy as np
 import random
-SEED = 1
-np.random.seed(SEED)
-random.seed(SEED)
+# SEED = 1
+# np.random.seed(SEED)
+# random.seed(SEED)
 
-
+alg = "neat"
 gravity = 0, 0, -9.8
 
 # CANNOT BE CHANGED AT RUN TIME
