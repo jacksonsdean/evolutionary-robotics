@@ -238,7 +238,8 @@ class HyperNEAT(NEAT):
             assign_species(self.all_species, self.population, self.species_threshold, Species)
 
         # Run NEAT
-        for self.gen in range(c.num_gens):
+        pbar = trange(c.num_gens, desc="Generations")
+        for self.gen in pbar:
             self.run_one_generation()
 
     def mutate(self, child, rates):

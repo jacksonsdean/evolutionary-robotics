@@ -32,9 +32,8 @@ def main(args = None):
         runs = int(args.experiment_runs)
     else:
         runs = 1
-    
-    
-    # alg = args.alg
+
+    c.apply_condition("alg", args.alg)
 
     experiment_file = "experiments/weight_mutation_rate_low_mid.json"
     if args.experiment_file:
@@ -70,7 +69,6 @@ def main(args = None):
     
     print(f"Running experiment: {name}")
     for i, experiment in enumerate(experiments):
-        
         print(f"\tCondition {i} ({experiment.name})")
         experiment.apply_condition()
         alg = c.alg
