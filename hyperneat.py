@@ -228,96 +228,9 @@ class SandwichSubstrate(Substrate):
         return output
 
 class HyperNEAT(NEAT):
-    def evolve(self, run_number = 1, show_output= True):
-        self.show_output = show_output or self.debug_output
-        self.run_number = run_number
-        for i in range(c.pop_size): # only create parents for initialization (the mu in mu+lambda)
-            self.population.append(HyperNEATGenome()) # generate new random individuals as parents
-            
-        if c.use_speciation:
-            assign_species(self.all_species, self.population, self.species_threshold, Species)
-
-        # Run NEAT
-        pbar = trange(c.num_gens, desc="Generations")
-        for self.gen in pbar:
-            self.run_one_generation()
-
-    def mutate(self, child, rates):
-        prob_mutate_activation, prob_mutate_weight, prob_add_connection, prob_add_node, prob_remove_node, prob_disable_connection, weight_mutation_max, prob_reenable_connection = rates
-        child.fitness, child.adjusted_fitness = -math.inf, -math.inf # new fitnesses after mutation
-
-        if(np.random.uniform(0,1) < c.prob_random_restart):
-            child = HyperNEATGenome()
-        if(np.random.uniform(0,1) < prob_add_node):
-            child.add_node()
-        if(np.random.uniform(0,1) < prob_remove_node):
-            child.remove_node()
-        if(np.random.uniform(0,1) < prob_add_connection):
-            child.add_connection()
-        if(np.random.uniform(0,1) < prob_disable_connection):
-            child.disable_connection()
-        child.mutate_activations()
-        child.mutate_weights()
-    
-    def crossover(self, parent1, parent2):
-        [fit_parent, less_fit_parent] = sorted(
-            [parent1, parent2], key=lambda x: x.fitness, reverse=True)
-        # child = copy.deepcopy(fit_parent)
-        child = HyperNEATGenome()
-        child.species_id = fit_parent.species_id
-        # disjoint/excess genes are inherited from more fit parent
-        child.node_genome = copy.deepcopy(fit_parent.node_genome)
-        child.connection_genome = copy.deepcopy(fit_parent.connection_genome)
-
-        # child.more_fit_parent = fit_parent # TODO
-
-        child.connection_genome.sort(key=lambda x: x.innovation)
-        matching1, matching2 = get_matching_connections(
-            fit_parent.connection_genome, less_fit_parent.connection_genome)
-        for match_index in range(len(matching1)):
-            # Matching genes are inherited randomly
-            inherit_from_more_fit = np.random.rand() < .5 
-            
-            child_cx = child.connection_genome[[x.innovation for x in child.connection_genome].index(
-                matching1[match_index].innovation)]
-            child_cx.weight = \
-                matching1[match_index].weight if inherit_from_more_fit else matching2[match_index].weight
-
-            new_from = copy.deepcopy(matching1[match_index].fromNode if inherit_from_more_fit else matching2[match_index].fromNode)
-            child_cx.fromNode = new_from
-            # if new_from.id<len(child.node_genome):
-            existing = find_node_with_id(child.node_genome, new_from.id)
-            index_existing = child.node_genome.index(existing)
-            child.node_genome[index_existing] = new_from
-            # else:
-                # print("********ERR:new from id", new_from.id, "len:", len(child.node_genome))
-                # continue # TODO
-
-            new_to = copy.deepcopy(matching1[match_index].toNode if inherit_from_more_fit else matching2[match_index].toNode)
-            child_cx.toNode = new_to
-            # if new_to.id<len(child.node_genome):
-            existing = find_node_with_id(child.node_genome, new_to.id)
-            index_existing = child.node_genome.index(existing)
-            child.node_genome[index_existing] = new_to
-            # else:
-                # print("********ERR: new to id", new_to.id, "len:", len(child.node_genome))
-                # continue # TODO
-
-            if(not matching1[match_index].enabled or not matching2[match_index].enabled):
-                if(np.random.rand() < 0.75):  # from Stanley/Miikulainen 2007
-                    child.connection_genome[match_index].enabled = False
-
-        for cx in child.connection_genome:
-            cx.fromNode = find_node_with_id(child.node_genome, cx.fromNode.id)
-            cx.toNode = find_node_with_id(child.node_genome, cx.toNode.id)
-            assert cx.fromNode in child.node_genome, f"{child.id}: {cx.fromNode.id} {child.node_genome[cx.fromNode.id].id}"
-            assert cx.toNode in child.node_genome, f"{child.id}: {cx.toNode.id} {child.node_genome[cx.toNode.id].id}"
-            # TODO this shouldn't be necessary
-            
-        child.update_node_layers()
-        # child.disable_invalid_connections()
-        
-        return child
+    def __init__(self):
+        super().__init__()
+        self.genome_type = HyperNEATGenome
 
     def save_best_network_image(self, end_early=False):
         best = self.get_best()

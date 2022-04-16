@@ -50,6 +50,8 @@ class NEAT():
             os.system("rm body*.urdf > /dev/null 2> /dev/null")
             os.system("rm fitness*.txt > /dev/null 2> /dev/null")
             os.system("rm tmp*.txt > /dev/null 2> /dev/null")
+            
+        self.genome_type = Genome
     
     
     def get_mutation_rates(self):
@@ -222,7 +224,7 @@ class NEAT():
         self.run_number = run_number
         self.show_output = show_output or self.debug_output
         for i in range(c.pop_size): # only create parents for initialization (the mu in mu+lambda)
-            self.population.append(Genome()) # generate new random individuals as parents
+            self.population.append(self.genome_type()) # generate new random individuals as parents
             
         if c.use_speciation:
             assign_species(self.all_species, self.population, self.species_threshold, Species)
@@ -238,7 +240,7 @@ class NEAT():
          # update all ids:
         if self.gen > 0:
             for ind in self.population:
-                ind.set_id(Genome.get_id())
+                ind.set_id(self.genome_type.get_id())
         #------------#
         # assessment # 
         #------------#
@@ -344,7 +346,7 @@ class NEAT():
         child.fitness, child.adjusted_fitness = -math.inf, -math.inf # new fitnesses after mutation
 
         if(np.random.uniform(0,1) < c.prob_random_restart):
-            child = Genome()
+            child = self.genome_type()
         if(np.random.uniform(0,1) < prob_add_node):
             child.add_node()
         if(np.random.uniform(0,1) < prob_remove_node):
@@ -363,7 +365,7 @@ class NEAT():
         [fit_parent, less_fit_parent] = sorted(
             [parent1, parent2], key=lambda x: x.fitness, reverse=True)
         # child = copy.deepcopy(fit_parent)
-        child = Genome()
+        child = self.genome_type()
         child.species_id = fit_parent.species_id
         # disjoint/excess genes are inherited from more fit parent
         child.node_genome = copy.deepcopy(fit_parent.node_genome)
