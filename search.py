@@ -41,7 +41,7 @@ def main(args = None):
 
     name, conditions = Experiment.load_conditions_file(experiment_file)
 
-    experiments = [Experiment(condition, runs) for condition in conditions]
+    experiments = [Experiment(condition, args, runs) for condition in conditions]
     
     results_filename = f"{experiment_file.split('.')[0]}_results.json"
     
@@ -104,7 +104,8 @@ def main(args = None):
                         results[index]["num_runs"] += 1
                         experiment.generate_results_dictionary()
                         for k in ["fitness_results", "diversity_results", "species_results", "threshold_results", "nodes_results", "connections_results"]:
-                            results[index][k] = results[index][k] + experiment.results[k]
+                            results[index][k] = results[index][k] + [experiment.results[k][run]]
+                        results[index]["gens_to_converge"] = results[index]["gens_to_converge"] + experiment.results["gens_to_converge"]
                     f.seek(0)
                     f.truncate()
                     f.write("[\n")

@@ -17,7 +17,7 @@ class Experiment:
         return name, conditions
 
 
-    def __init__(self, condition, num_runs=1) -> None:
+    def __init__(self, condition, args, num_runs=1) -> None:
         self.name = list(condition.keys())[0]
         self.condition = condition[self.name]
         self.num_runs = num_runs
@@ -33,6 +33,7 @@ class Experiment:
         self.species_champs_results = []
         self.me_maps = []
         self.current_run = 0
+        self.args = args.__dict__
    
     def apply_condition(self):
         for k, v in self.condition.items():
@@ -77,6 +78,7 @@ class Experiment:
         self.results["nodes_results"] = []
         self.results["connections_results"] = []
         self.results["gens_to_converge"] = []
+        self.results["args"] = self.args
         
     def generate_results_dictionary(self):
         self.results = {}
@@ -90,6 +92,7 @@ class Experiment:
         self.results["nodes_results"] = self.nodes_results.tolist()
         self.results["connections_results"] = self.connections_results.tolist()
         self.results["gens_to_converge"] = self.gens_to_converge
+        self.results["args"] = self.args
         # self.results["gens_to_find_solution"] = self.gens_to_find_solution
         # self.results["solutions_results"] = self.solutions_results
         # self.results["species_champs_results"] = self.species_champs_results

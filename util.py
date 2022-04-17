@@ -29,7 +29,7 @@ def name_to_fn(name):
     fns.extend([("avg_pixel_distance_fitness", avg_pixel_distance_fitness)])
     return fns[[f[0] for f in fns].index(name)][1]
     
-def visualize_network(individual, sample_point=[.25]*c.num_sensor_neurons, color_mode="L", visualize_disabled=False, layout='multi', sample=False, show_weights=False, use_inp_bias=False, use_radial_distance=True, save_name=None, extra_text=None):
+def visualize_network(individual, sample_point=[.25]*c.num_sensor_neurons, color_mode="L", visualize_disabled=False, layout='multi', sample=False, show_weights=False, use_inp_bias=False, use_radial_distance=True, save_name=None, extra_text=None, curved=False):
     if(sample):
         individual.eval(sample_point)
         
@@ -115,8 +115,8 @@ def visualize_network(individual, sample_point=[.25]*c.num_sensor_neurons, color
 
     edge_colors = nx.get_edge_attributes(G,'color').values()
     edge_styles = shapes = set((s[2] for s in G.edges(data='style')))
-    use_curved = show_weights or individual.count_layers()<3
-
+    # use_curved = show_weights or individual.count_layers()<3
+    use_curved = curved
     for s in edge_styles:
         edges = [e for e in filter(
             lambda x: x[2] == s, G.edges(data='style'))]
@@ -127,8 +127,8 @@ def visualize_network(individual, sample_point=[.25]*c.num_sensor_neurons, color
                                 style=s[0],
                                 edge_color=[s[1]]*1000,
                                 width =s[2],
-                                # connectionstyle= "arc3" if use_curved else "arc3,rad=0.2"
-                                connectionstyle= "arc3"
+                                connectionstyle= "arc3" if not use_curved else f"arc3,rad={0.2*random.random()}",
+                                # connectionstyle= "arc3"
                             )
     
     if extra_text is not None:
@@ -281,12 +281,13 @@ def plot_mean_and_bootstrapped_ci_over_time(input_data = None, dataset=None, nam
     None
     """
     fig, ax = plt.subplots() # generate figure and axes
+    input_data = [np.array(x) for x in input_data if isinstance(x, list)]
     input_data = np.array(input_data)
     if isinstance(name, str): name = [name]; input_data = [input_data]
 
     # for this_input_data, this_name in zip(input_data, name):
     for index, this_name in enumerate(name):
-        # print("plotting",this_name)
+        # print("plotting",this_name, "with shape", dataset[index].shape)
         this_input_data = dataset[index]
         total_generations = this_input_data.shape[1]
         if(plot_bootstrap):

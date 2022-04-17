@@ -228,8 +228,8 @@ class SandwichSubstrate(Substrate):
         return output
 
 class HyperNEAT(NEAT):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, debug):
+        super().__init__(debug)
         self.genome_type = HyperNEATGenome
 
     def save_best_network_image(self, end_early=False):
@@ -426,6 +426,7 @@ class HyperNEATGenome(Genome):
             weight = weights[i]
             net_output = weight if (weight > c.weight_threshold or weight< -c.weight_threshold) else 0.0
             phen_cx.weight = net_output * c.max_phen_weight
+            self.weights[i] = net_output * c.max_phen_weight
             
 
 

@@ -167,20 +167,22 @@ class Genome:
             # connect all input nodes to all output nodes
             for input_node in self.input_nodes():
                 for output_node in self.output_nodes():
-                    new_cx = Connection(
-                        input_node, output_node, self.random_weight())
-                    self.connection_genome.append(new_cx)
-                    if(np.random.rand() > c.init_connection_probability):
-                        new_cx.enabled = False
+                    if(np.random.rand() < c.init_connection_probability):
+                        new_cx = Connection(
+                            input_node, output_node, self.random_weight())
+                        self.connection_genome.append(new_cx)
+                    # if(np.random.rand() > c.init_connection_probability):
+                        # new_cx.enabled = False
         else:
            # connect all input nodes to all hidden nodes
             for input_node in self.input_nodes():
                 for hidden_node in self.hidden_nodes():
-                    new_cx = Connection(
-                        input_node, hidden_node, self.random_weight())
-                    self.connection_genome.append(new_cx)
-                    if(np.random.rand() > c.init_connection_probability):
-                        new_cx.enabled = False
+                    if(np.random.rand() < c.init_connection_probability):
+                        new_cx = Connection(
+                            input_node, hidden_node, self.random_weight())
+                        self.connection_genome.append(new_cx)
+                    # if(np.random.rand() > c.init_connection_probability):
+                        # new_cx.enabled = False
 
            # connect all hidden nodes to all output nodes
             for hidden_node in self.hidden_nodes():
