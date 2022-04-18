@@ -1,0 +1,15 @@
+{
+    "name": "Prob add node",
+    "conditions": [
+        {
+            "high": {
+                "prob_add_node": 1.0
+            }
+        },
+        {
+            "mid": {
+                "prob_add_node": 0.75
+            }
+        }
+    ]
+}

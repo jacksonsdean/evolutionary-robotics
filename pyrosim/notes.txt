@@ -1,0 +1,10 @@
+Changes:
+    * added weight to torso (now 10 units)
+    * added obstacles
+    * added proprioceptive sensors (TODO)
+    * added 1 extra DOF to each leg (rotation around normal with torso at top leg joint)
+    * made fitness 0 for negative motion
+    * allowed recurrent connections
+    * added cpg
+    * allowed many different activation functions
+    * changed fitness function to be x and y distance from center

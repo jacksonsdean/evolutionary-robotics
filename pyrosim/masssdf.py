@@ -3,9 +3,9 @@ from pyrosim.commonFunctions import Save_Whitespace
 
 class MASS_SDF: 
 
-    def __init__(self):
+    def __init__(self, mass):
 
-        self.string =  '<mass>1.0</mass>'
+        self.string =  f'<mass>{mass}</mass>'
 
         self.depth = 4
 

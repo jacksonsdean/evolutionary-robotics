@@ -1,0 +1,16 @@
+{
+    "name": "Control",
+    "conditions": [
+        {
+            "neat-A": {
+                "alg": "neat"
+            }
+        },
+        {
+            "neat-B": {
+                "alg": "neat"
+            }
+        }
+       
+    ]
+}

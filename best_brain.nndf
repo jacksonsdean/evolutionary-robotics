@@ -1,0 +1,47 @@
+<neuralNetwork>
+    <neuron name = "0" type = "touch_sensor" linkName = "FrontLowerLeg" activation="tanh" />
+    <neuron name = "1" type = "touch_sensor" linkName = "BackLowerLeg" activation="tanh" />
+    <neuron name = "2" type = "touch_sensor" linkName = "LeftLowerLeg" activation="tanh" />
+    <neuron name = "3" type = "touch_sensor" linkName = "RightLowerLeg" activation="tanh" />
+    <neuron name = "4" type = "proprioceptive_sensor" jointName = "Torso_BackLegRot" bodyID="1" activation="tanh"  />
+    <neuron name = "5" type = "proprioceptive_sensor" jointName = "Torso_FrontLegRot" bodyID="1" activation="tanh"  />
+    <neuron name = "6" type = "proprioceptive_sensor" jointName = "Torso_LeftLegRot" bodyID="1" activation="tanh"  />
+    <neuron name = "7" type = "proprioceptive_sensor" jointName = "Torso_RightLegRot" bodyID="1" activation="tanh"  />
+    <neuron name = "8" type = "cpg" activation="tanh"  />
+    <neuron name = "5712" type = "hidden" activation="tanh"/>
+    <neuron name = "5953" type = "hidden" activation="tanh"/>
+    <neuron name = "6068" type = "hidden" activation="tanh"/>
+    <neuron name = "9328" type = "hidden" activation="tanh"/>
+    <neuron name = "9462" type = "hidden" activation="tanh"/>
+    <neuron name = "9505" type = "hidden" activation="tanh"/>
+    <neuron name = "9549" type = "hidden" activation="tanh"/>
+    <neuron name = "10752" type = "hidden" activation="tanh"/>
+    <neuron name = "10933" type = "hidden" activation="tanh"/>
+    <neuron name = "9" type = "motor"  jointName = "Torso_BackLegRot" activation="tanh" />
+    <neuron name = "10" type = "motor"  jointName = "BackLegRot_BackLeg" activation="tanh" />
+    <neuron name = "11" type = "motor"  jointName = "Torso_FrontLegRot" activation="tanh" />
+    <neuron name = "12" type = "motor"  jointName = "FrontLegRot_FrontLeg" activation="tanh" />
+    <neuron name = "13" type = "motor"  jointName = "Torso_LeftLegRot" activation="tanh" />
+    <neuron name = "14" type = "motor"  jointName = "LeftLegRot_LeftLeg" activation="tanh" />
+    <neuron name = "15" type = "motor"  jointName = "Torso_RightLegRot" activation="tanh" />
+    <neuron name = "16" type = "motor"  jointName = "RightLegRot_RightLeg" activation="tanh" />
+    <neuron name = "17" type = "motor"  jointName = "FrontLeg_FrontLowerLeg" activation="tanh" />
+    <neuron name = "18" type = "motor"  jointName = "BackLeg_BackLowerLeg" activation="tanh" />
+    <neuron name = "19" type = "motor"  jointName = "LeftLeg_LeftLowerLeg" activation="tanh" />
+    <neuron name = "20" type = "motor"  jointName = "RightLeg_RightLowerLeg" activation="tanh" />
+    <synapse sourceNeuronName = "4" targetNeuronName = "9" weight = "0.10037528777396232" />
+    <synapse sourceNeuronName = "4" targetNeuronName = "10" weight = "-0.6606212771170998" />
+    <synapse sourceNeuronName = "4" targetNeuronName = "11" weight = "0.3656837056481159" />
+    <synapse sourceNeuronName = "4" targetNeuronName = "20" weight = "0.1888766132101638" />
+    <synapse sourceNeuronName = "5" targetNeuronName = "12" weight = "0.6375096264978567" />
+    <synapse sourceNeuronName = "6" targetNeuronName = "9328" weight = "-0.8004144255119428" />
+    <synapse sourceNeuronName = "5" targetNeuronName = "9462" weight = "0.89030622039825" />
+    <synapse sourceNeuronName = "9462" targetNeuronName = "19" weight = "-0.9679117244872909" />
+    <synapse sourceNeuronName = "15" targetNeuronName = "7" weight = "0.5241760505614625" />
+    <synapse sourceNeuronName = "9505" targetNeuronName = "9" weight = "0.1508006307514611" />
+    <synapse sourceNeuronName = "1" targetNeuronName = "9549" weight = "0.511253663148532" />
+    <synapse sourceNeuronName = "5" targetNeuronName = "10752" weight = "-0.22088928287616227" />
+    <synapse sourceNeuronName = "10752" targetNeuronName = "18" weight = "-0.014471283159879778" />
+    <synapse sourceNeuronName = "9328" targetNeuronName = "10933" weight = "-0.9305306305762922" />
+    <synapse sourceNeuronName = "10933" targetNeuronName = "9" weight = "-0.5104898467604021" />
+</neuralNetwork>

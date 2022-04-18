@@ -1,3 +1,13 @@
+fitness*.txt
+tmp/
+tmp*/txt
+bodies/
+brains/ 
+best/
+tmp*.txt
+best_*.png
+cube_*.urdf
+
 #VS Code
 .vscode/
 

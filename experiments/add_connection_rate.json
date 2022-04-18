@@ -1,0 +1,25 @@
+{
+    "name": "Add CX Mutation Rate",
+    "conditions": [
+        {
+            "high": {
+                "prob_add_connection": 1.0
+            }
+        },
+        {
+            "mid": {
+                "prob_add_connection": 0.5
+            }
+        },
+        {
+            "low": {
+                "prob_add_connection": 0.15
+            }
+        },
+        {
+            "none": {
+                "prob_add_connection": 0.0
+            }
+        }
+    ]
+}

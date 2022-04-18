@@ -1,0 +1,23 @@
+{
+    "name": "max_weight",
+    "conditions": [
+        {
+            "10": {
+                "max_weight": 10,
+                "weight_mutation_max" : 5
+            }
+        },
+        {
+            "5": {
+                "max_weight": 5,
+                "weight_mutation_max": 2.5
+            }
+        },
+        {
+            "1": {
+                "max_weight": 1,
+                "weight_mutation_max": 0.5
+            }
+        }
+    ]
+}
