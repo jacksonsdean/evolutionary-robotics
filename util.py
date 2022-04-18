@@ -268,7 +268,7 @@ def visualize_hn_phenotype_network(connection_genome, node_genome, sample_point=
 
 
 
-def plot_mean_and_bootstrapped_ci_over_time(input_data = None, dataset=None, name = "change me", x_label = "change me", y_label="change me", y_limit = None, plot_bootstrap = True, show=False):
+def plot_mean_and_bootstrapped_ci_over_time(input_data = None, dataset=None, name = "change me", x_label = "change me", y_label="change me", y_limit = None, plot_bootstrap = True, show=False, title=None):
     """
     
     parameters: 
@@ -302,6 +302,10 @@ def plot_mean_and_bootstrapped_ci_over_time(input_data = None, dataset=None, nam
         ax.set_xlabel(x_label) # add axes labels
         ax.set_ylabel(y_label)
         if y_limit: ax.set_ylim(y_limit[0],y_limit[1])
+        if title is not None:
+            plt.title(title)
+        else:
+            plt.title(y_label)
         plt.legend(loc='best'); # add legend
         if show:
             plt.show() 

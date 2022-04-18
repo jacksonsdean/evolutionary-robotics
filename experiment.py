@@ -37,8 +37,9 @@ class Experiment:
    
     def apply_condition(self):
         for k, v in self.condition.items():
-            print(f"\t  {k}->{v}")
-            c.apply_condition(k, v)
+            if k is not None:
+                print(f"\t  {k}->{v}")
+                c.apply_condition(k, v)
             
     def found_solution(self, generation):
         self.gens_to_find_solution[self.current_run] = generation

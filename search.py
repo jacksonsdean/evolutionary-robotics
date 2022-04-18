@@ -35,7 +35,7 @@ def main(args = None):
 
     c.apply_condition("alg", args.alg)
 
-    experiment_file = "experiments/weight_mutation_rate_low_mid.json"
+    experiment_file = "experiments/empty_experiment.json"
     if args.experiment_file:
         experiment_file = args.experiment_file
 
@@ -90,8 +90,8 @@ def main(args = None):
                 
                 experiment.record_results(neat.fitness_over_time, neat.diversity_over_time, neat.solutions_over_time, neat.species_over_time, neat.species_threshold_over_time, neat.nodes_over_time, neat.connections_over_time, neat.solution_generation, neat.species_champs_over_time, None)
                 # print(f"\tRun {run} complete with fitness {neat.get_best().fitness}")
-                # if runs<2:
-                    # neat.show_best()
+                if runs<2:
+                    neat.show_best()
                     # neat.show_fitness_curve()
                     # neat.show_diversity_curve()
                 # plt.ioff()

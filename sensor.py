@@ -16,9 +16,8 @@ class Sensor():
         
 class TorqueSensor(Sensor):
     def __init__(self, linkName, bodyID):
-        self.linkName = linkName
+        super().__init__(linkName)
         self.bodyID = bodyID
-        self.values = np.zeros(c.simulation_length)
     
     def GetValue(self, step):
         self.values[step] = pyrosim.Get_Rotational_Sensor_Value_For_Joint(self.linkName, self.bodyID)
@@ -26,9 +25,8 @@ class TorqueSensor(Sensor):
     
 class OrientationSensor(Sensor):
     def __init__(self, linkName, bodyID):
-        self.linkName = linkName
+        super().__init__(linkName)
         self.bodyID = bodyID
-        self.values = np.zeros(c.simulation_length)
         self.axis = 0
     
     def GetValue(self, step):

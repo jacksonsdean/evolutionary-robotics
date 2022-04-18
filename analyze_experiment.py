@@ -28,7 +28,13 @@ def main(args):
             "nodes_results",
             "connections_results"]
 
-
+    experiment_name = filename.split("/")[-1].split(".")[0]
+    if "args" in data[0].keys():
+        experiment_config = data[0]["args"]["experiment_file"]
+        with open(experiment_config) as f:
+            config = json.load(f)
+            experiment_name = config["name"]
+            
     for i, d in enumerate(data):
         for k in keys:
             lengths = [len(d[k][j]) for j in range(len(d[k]))]
@@ -44,23 +50,24 @@ def main(args):
             d[k] = np.array(d[k])
             
     plot_mean_and_bootstrapped_ci_over_time([np.array(c["fitness_results"]) for c in data], [np.array(
-        c["fitness_results"]) for c in data], [c["name"] for c in data], "Generation", "Best fitness", plot_bootstrap=bootst)
+        c["fitness_results"]) for c in data], [c["name"] for c in data], "Generation", "Best fitness", plot_bootstrap=bootst, title=f"{experiment_name} - Fitness")
+    
     plot_mean_and_bootstrapped_ci_over_time([np.array(c["diversity_results"]) for c in data], [np.array(
-        c["diversity_results"]) for c in data], [c["name"] for c in data], "Generation", "Average diversity", plot_bootstrap=bootst)
+        c["diversity_results"]) for c in data], [c["name"] for c in data], "Generation", "Average diversity", plot_bootstrap=bootst, title=f"{experiment_name} - Diversity") 
 
     bootst = args.do_bootstrap
     # plot fitness
     # plot species
     plot_mean_and_bootstrapped_ci_over_time([np.array(c["species_results"]) for c in data], [np.array(
-        c["species_results"]) for c in data], [c["name"] for c in data], "Generation", "N Species", plot_bootstrap=bootst)
+        c["species_results"]) for c in data], [c["name"] for c in data], "Generation", "N Species", plot_bootstrap=bootst, title=f"{experiment_name} - Species")
     plot_mean_and_bootstrapped_ci_over_time([np.array(c["threshold_results"]) for c in data], [np.array(c["threshold_results"]) for c in data], [
-                                            np.array(c["name"]) for c in data], "Generation", "Species Threshold", plot_bootstrap=bootst)
+                                            np.array(c["name"]) for c in data], "Generation", "Species Threshold", plot_bootstrap=bootst, title=f"{experiment_name} - Species Threshold")
 
     plot_mean_and_bootstrapped_ci_over_time([np.array(c["nodes_results"]) for c in data], [np.array(c["nodes_results"]) for c in data], [
-                                            np.array(c["name"]) for c in data], "Generation", "Number of Nodes", plot_bootstrap=bootst)
+                                            np.array(c["name"]) for c in data], "Generation", "Number of Nodes", plot_bootstrap=bootst, title=f"{experiment_name} - Number of Nodes")
     plot_mean_and_bootstrapped_ci_over_time([np.array(c["connections_results"]) for c in data], [np.array(
-        c["connections_results"]) for c in data], [c["name"] for c in data], "Generation", "Number of Connections", plot_bootstrap=bootst)
-
+        c["connections_results"]) for c in data], [c["name"] for c in data], "Generation", "Number of Connections", plot_bootstrap=bootst, title=f"{experiment_name} - Number of Connections")
+    
     plt.legend()
     plt.show()
 

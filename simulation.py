@@ -25,7 +25,7 @@ class Simulation():
   
         if Simulation.world is None:
             Simulation.world = World()
-        self.robot = Robot(self.solution_id, brain_path, body_path)
+        self.robot = Robot(self.solution_id, brain_path, body_path, save_best)
         
         self.camera_lock = True
         
@@ -75,8 +75,7 @@ class Simulation():
                     p.resetDebugVisualizerCamera( cameraDistance=dist, cameraYaw=yaw, cameraPitch=pitch, cameraTargetPosition=p.getBasePositionAndOrientation(self.robot.robotId)[0])
                 
                 step += 1
-                
-                step+=1
+
                 if step >= c.simulation_length:
                     # full simulation time has elapsed
                     break

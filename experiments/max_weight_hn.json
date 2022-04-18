@@ -1,0 +1,26 @@
+{
+    "name": "max_weight (HN)",
+    "conditions": [
+        {
+            "10": {
+                "alg": "hyperneat",
+                "max_weight": 10,
+                "weight_mutation_max" : 5
+            }
+        },
+        {
+            "5": {
+                "alg": "hyperneat",
+                "max_weight": 5,
+                "weight_mutation_max": 2.5
+            }
+        },
+        {
+            "1": {
+                "alg": "hyperneat",
+                "max_weight": 1,
+                "weight_mutation_max": 0.5
+            }
+        }
+    ]
+}

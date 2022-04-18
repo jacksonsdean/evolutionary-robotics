@@ -7,13 +7,14 @@ import constants as c
 from sensor import Sensor, TorqueSensor
 from motor import Motor
 from pyrosim.neuralNetwork import NEURAL_NETWORK
+import json
 import platform
 
 class Robot():
-    def __init__(self, solution_id,brain_path=None, body_path=None):
+    def __init__(self, solution_id,brain_path=None, body_path=None,save_sensor_data=False):
         self.solution_id = solution_id
         self.brain_path = brain_path
-        
+        self.save_sensor_data = save_sensor_data
         # load robot
         self.robotId = p.loadURDF(f"body{solution_id}.urdf" if body_path is None else body_path)
 
@@ -44,7 +45,7 @@ class Robot():
         # sensors:
         for sensor in self.sensors.values():
             sensor.GetValue(step)
-
+        
     def Think(self, step):
         self.nn.Update(step)
     
@@ -72,6 +73,25 @@ class Robot():
         f.close()
         time.sleep(.1)
         if platform.system() == "Windows":
-            os.rename("tmp"+str(self.solution_id)+".txt" , "fitness"+str(self.solution_id)+".txt")
+            os.replace("tmp"+str(self.solution_id)+".txt" , "fitness"+str(self.solution_id)+".txt")
         else:
             os.system(f"mv tmp{self.solution_id}.txt fitness{self.solution_id}.txt")
+        
+        if self.save_sensor_data:
+            data = {}
+            for name, sensor in self.sensors.items():
+                data[name] = sensor.values.tolist() 
+            
+            saved= {}           
+            with open(f"data/sensor_values.json", "r") as f:
+                try:
+                    saved = json.load(f)
+                except:
+                    pass
+                slash = "/" if platform.system() != "Windows" else "\\"
+                saved[f'sensors_{self.brain_path.split(".")[-2].replace(slash, "")}'] = data
+                f.close()
+                
+            with open(f"data/sensor_values.json", "w") as f:
+                json.dump(saved, f)
+                f.close()
