@@ -1,0 +1,20 @@
+{
+    "name": "CPG - HyperNEAT",
+    "conditions": [
+        {
+            "With CPG (HyperNEAT)": {
+                "alg": "hyperneat",
+                "use_cpg": true,
+                "num_sensor_neurons": 5
+            }
+        },
+        {
+            "Without CPG (HyperNEAT)": {
+                "alg": "hyperneat",
+                "use_cpg": false,
+                "num_sensor_neurons": 4
+            }
+        }
+       
+    ]
+}
