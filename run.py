@@ -8,12 +8,11 @@ class Arguments:
 args = Arguments()
 args.generations = 100
 args.pop = 20
-args.species = 3
+args.species = 4
 args.experiment_runs = 3
-# args.alg = "neat"
 args.alg = "hyperneat"
 args.generate = False
 args.debug = False
 args.do_bootstrap = False
-args.experiment_file = "experiments/max_weight_hn.json"
+args.experiment_file = "experiments/neat_vs_hyperneat.json"
 search(args)

@@ -293,10 +293,10 @@ def plot_mean_and_bootstrapped_ci_over_time(input_data = None, dataset=None, nam
         if(plot_bootstrap):
             boostrap_ci_generation_found = np.zeros((2,total_generations))
             for this_gen in range(total_generations):
-                boostrap_ci_generation_found[:,this_gen] = bootstrap.ci(this_input_data[:,this_gen], np.mean, alpha=0.05)
+                boostrap_ci_generation_found[:,this_gen] = bootstrap.ci(this_input_data[:,this_gen], np.nanmean, alpha=0.05)
 
 
-        ax.plot(np.arange(total_generations), np.mean(this_input_data,axis=0), label = this_name) # plot the fitness over time
+        ax.plot(np.arange(total_generations), np.nanmean(this_input_data,axis=0), label = this_name) # plot the fitness over time
         if plot_bootstrap:
             ax.fill_between(np.arange(total_generations), boostrap_ci_generation_found[0,:], boostrap_ci_generation_found[1,:],alpha=0.3) # plot, and fill, the confidence interval for fitness over time
         ax.set_xlabel(x_label) # add axes labels

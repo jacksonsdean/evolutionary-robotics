@@ -16,13 +16,6 @@ def apply():
     c.num_hn_outputs = 1
     # c.substrate_type = "grid"
     c.substrate_type = "sandwich"
-            
-    # c.prob_mutate_activation = .5 
-    # c.prob_mutate_weight = .5
-    # c.prob_add_connection = .65
-    # c.prob_add_node = .8
-    # c.prob_remove_node = 0.55
-    # c.prob_disable_connection = .6
 
     c.hidden_nodes_at_start = 0
     

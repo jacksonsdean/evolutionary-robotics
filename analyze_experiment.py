@@ -34,40 +34,43 @@ def main(args):
         with open(experiment_config) as f:
             config = json.load(f)
             experiment_name = config["name"]
-            
+
     for i, d in enumerate(data):
         for k in keys:
             lengths = [len(d[k][j]) for j in range(len(d[k]))]
             max = np.max(lengths)
-            max_index = lengths.index(max)
             for j, run in enumerate(d[k]):
                 orig_len = len(run)
-                if orig_len < max:
-                    for x in range(max-orig_len):
-                        run.append(d[k][max_index][orig_len+x])
-                                    
+                if args.gens:
+                    if orig_len > int(args.gens):
+                        d[k][j] = run[:int(args.gens)]
+                        print(f"Truncated {k} from {orig_len} to {len(d[k][j])}")
+                    else: 
+                        d[k][j] = np.array([np.nan] * int(args.gens))
+                elif orig_len < max:
+                    for _ in range(max-orig_len):
+                        run.append(np.nan)
+
             lengths = [len(d[k][j]) for j in range(len(d[k]))]
             d[k] = np.array(d[k])
-            
-    plot_mean_and_bootstrapped_ci_over_time([np.array(c["fitness_results"]) for c in data], [np.array(
-        c["fitness_results"]) for c in data], [c["name"] for c in data], "Generation", "Best fitness", plot_bootstrap=bootst, title=f"{experiment_name} - Fitness")
-    
-    plot_mean_and_bootstrapped_ci_over_time([np.array(c["diversity_results"]) for c in data], [np.array(
-        c["diversity_results"]) for c in data], [c["name"] for c in data], "Generation", "Average diversity", plot_bootstrap=bootst, title=f"{experiment_name} - Diversity") 
+
+    print("\nNumber of runs: ", np.min([len(c["fitness_results"]) for c in data]))
 
     bootst = args.do_bootstrap
-    # plot fitness
-    # plot species
+
+    plot_mean_and_bootstrapped_ci_over_time([np.array(c["diversity_results"]) for c in data], [np.array(
+        c["diversity_results"]) for c in data], [c["name"] for c in data], "Generation", "Average diversity", plot_bootstrap=bootst, title=f"{experiment_name} - Diversity")
     plot_mean_and_bootstrapped_ci_over_time([np.array(c["species_results"]) for c in data], [np.array(
         c["species_results"]) for c in data], [c["name"] for c in data], "Generation", "N Species", plot_bootstrap=bootst, title=f"{experiment_name} - Species")
     plot_mean_and_bootstrapped_ci_over_time([np.array(c["threshold_results"]) for c in data], [np.array(c["threshold_results"]) for c in data], [
                                             np.array(c["name"]) for c in data], "Generation", "Species Threshold", plot_bootstrap=bootst, title=f"{experiment_name} - Species Threshold")
-
     plot_mean_and_bootstrapped_ci_over_time([np.array(c["nodes_results"]) for c in data], [np.array(c["nodes_results"]) for c in data], [
                                             np.array(c["name"]) for c in data], "Generation", "Number of Nodes", plot_bootstrap=bootst, title=f"{experiment_name} - Number of Nodes")
     plot_mean_and_bootstrapped_ci_over_time([np.array(c["connections_results"]) for c in data], [np.array(
         c["connections_results"]) for c in data], [c["name"] for c in data], "Generation", "Number of Connections", plot_bootstrap=bootst, title=f"{experiment_name} - Number of Connections")
-    
+
+    plot_mean_and_bootstrapped_ci_over_time([np.array(c["fitness_results"]) for c in data], [np.array(
+        c["fitness_results"]) for c in data], [c["name"] for c in data], "Generation", "Best fitness", plot_bootstrap=bootst, title=f"{experiment_name} - Fitness")
     plt.legend()
     plt.show()
 
@@ -79,5 +82,7 @@ if __name__ == "__main__":
                         help='Show bootstrap CI on experiment plots.')
     parser.add_argument('-f', '--experiment_file',
                         action='store', help='Experiment results file.')
+    parser.add_argument('-g', '--gens', action='store',
+                        help='Show only experimental runs with this number of generations.')
     args = parser.parse_args()
     main(args)

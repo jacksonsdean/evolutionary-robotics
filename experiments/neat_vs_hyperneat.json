@@ -1,14 +1,30 @@
 {
     "name": "Algorithm",
+    "controls":
+    {
+    },
     "conditions": [
+
         {
-            "neat": {
-                "alg": "neat"
+            "hyperneat 16-16": {
+                "alg": "hyperneat",
+                "pop_size": 20,
+                "species_target": 3,
+                "num_gens": 100,
+                "init_species_threshold": 2.0,
+                "species_threshold_delta": 0.5,
+                "num_hn_hidden_nodes_per_layer": [16,16],
+                "num_hn_hidden_layers": 2,
+                "substrate_type": "sandwich"
+
             }
         },
         {
-            "hyperneat": {
-                "alg": "hyperneat"
+            "neat": {
+                "alg": "neat",
+                "pop_size": 20,
+                "species_target": 3,
+                "num_gens": 100
             }
         }
        

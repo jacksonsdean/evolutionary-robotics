@@ -11,14 +11,16 @@ class Experiment:
         conditions = []
         with open(filename) as f:
             json_data = json.load(f)
+            controls = json_data["controls"]
             conditions = json_data["conditions"]
             name = json_data["name"]
 
-        return name, conditions
+        return name, controls, conditions
 
 
-    def __init__(self, condition, args, num_runs=1) -> None:
+    def __init__(self, condition, controls, args, num_runs=1) -> None:
         self.name = list(condition.keys())[0]
+        self.controls = controls
         self.condition = condition[self.name]
         self.num_runs = num_runs
         self.fitness_results = np.zeros((num_runs, c.num_gens))
@@ -34,11 +36,32 @@ class Experiment:
         self.me_maps = []
         self.current_run = 0
         self.args = args.__dict__
+    
+    def setup_arrays(self):
+        self.fitness_results = np.zeros((self.num_runs, c.num_gens))
+        self.diversity_results = np.zeros((self.num_runs, c.num_gens))
+        self.species_results =   np.zeros((self.num_runs, c.num_gens))
+        self.threshold_results = np.zeros((self.num_runs, c.num_gens))
+        self.nodes_results = np.zeros((self.num_runs, c.num_gens))
+        self.connections_results = np.zeros((self.num_runs, c.num_gens))
+        self.gens_to_find_solution = [math.inf] * self.num_runs
+        self.solutions_results = []
+        self.gens_to_converge = []
+        self.species_champs_results = []
+        self.me_maps = []
+        self.current_run = 0
+        
    
     def apply_condition(self):
+        for k,v in self.controls.items():
+            print("\t Control:", k, "->", v)
+            c.apply_condition(k, v)
+            if k == "num_runs":
+                self.num_runs = v
+            
         for k, v in self.condition.items():
             if k is not None:
-                print(f"\t  {k}->{v}")
+                print(f"\tIV: {k}->{v}")
                 c.apply_condition(k, v)
             
     def found_solution(self, generation):

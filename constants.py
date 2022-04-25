@@ -15,8 +15,6 @@ motor_max_force = 50.
 motor_joint_range = .3
 ###
 
-
-
 num_gens = 10
 pop_size = 10
 

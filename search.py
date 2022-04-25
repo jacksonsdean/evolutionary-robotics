@@ -39,9 +39,9 @@ def main(args = None):
     if args.experiment_file:
         experiment_file = args.experiment_file
 
-    name, conditions = Experiment.load_conditions_file(experiment_file)
+    name, controls, conditions = Experiment.load_conditions_file(experiment_file)
 
-    experiments = [Experiment(condition, args, runs) for condition in conditions]
+    experiments = [Experiment(condition, controls, args, runs) for condition in conditions]
     
     results_filename = f"{experiment_file.split('.')[0]}_results.json"
     
@@ -74,8 +74,11 @@ def main(args = None):
         alg = c.alg
        
         if alg == "hyperneat":
+            # TODO FIXME
             hc.apply()
             experiment.apply_condition()
+        
+        experiment.setup_arrays()
         pbar = trange(runs)
         for run in pbar:
             try:
@@ -86,11 +89,11 @@ def main(args = None):
                 elif alg == "hyperneat":
                     neat = HyperNEAT(args.debug)
                     
-                neat.evolve(run, show_output=len(experiments)<2)
+                neat.evolve(run, show_output=len(experiments)<2 and runs < 2)
                 
                 experiment.record_results(neat.fitness_over_time, neat.diversity_over_time, neat.solutions_over_time, neat.species_over_time, neat.species_threshold_over_time, neat.nodes_over_time, neat.connections_over_time, neat.solution_generation, neat.species_champs_over_time, None)
                 # print(f"\tRun {run} complete with fitness {neat.get_best().fitness}")
-                if runs<2:
+                if runs<2 and len(experiments)<2:
                     neat.show_best()
                     # neat.show_fitness_curve()
                     # neat.show_diversity_curve()
@@ -99,13 +102,19 @@ def main(args = None):
                 # save results to file
                 with open(results_filename, "r+") as f:
                     results = json.load(f)
-                    index = [r["name"] for r in results].index(experiment.name)
+                    try:
+                        index = [r["name"] for r in results].index(experiment.name)
+                    except ValueError as e:
+                        index = -1
                     if index>-1:
                         results[index]["num_runs"] += 1
                         experiment.generate_results_dictionary()
                         for k in ["fitness_results", "diversity_results", "species_results", "threshold_results", "nodes_results", "connections_results"]:
                             results[index][k] = results[index][k] + [experiment.results[k][run]]
                         results[index]["gens_to_converge"] = results[index]["gens_to_converge"] + experiment.results["gens_to_converge"]
+                    else:
+                        experiment.generate_results_dictionary()
+                        results.append(experiment.results)
                     f.seek(0)
                     f.truncate()
                     f.write("[\n")
