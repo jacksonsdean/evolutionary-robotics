@@ -72,7 +72,8 @@ def main(args = None):
         print(f"\tCondition {i} ({experiment.name})")
         if "alg" in experiment.condition.keys():
             alg = experiment.condition["alg"]
-       
+        else:
+            alg = args.alg
         if alg == "hyperneat":
             hc.apply()
         experiment.apply_condition()
