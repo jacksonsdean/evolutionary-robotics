@@ -32,6 +32,7 @@ class Experiment:
         self.gens_to_find_solution = [math.inf] * num_runs
         self.solutions_results = []
         self.gens_to_converge = []
+        self.best_brain = None
         self.species_champs_results = []
         self.me_maps = []
         self.current_run = 0
@@ -61,13 +62,13 @@ class Experiment:
             
         for k, v in self.condition.items():
             if k is not None:
-                print(f"\tIV: {k}->{v}")
+                print(f"\t\tapply {k}->{v}")
                 c.apply_condition(k, v)
             
     def found_solution(self, generation):
         self.gens_to_find_solution[self.current_run] = generation
         
-    def record_results(self, fitness_over_time, diversity_over_time, solutions_over_time, species_over_time, species_threshold_over_time, nodes_over_time, connections_over_time, gens_to_converge, species_champs_over_time=None, me_map=None):
+    def record_results(self, fitness_over_time, diversity_over_time, solutions_over_time, species_over_time, species_threshold_over_time, nodes_over_time, connections_over_time, gens_to_converge, species_champs_over_time=None, me_map=None, best_brain=None):
         self.fitness_results[self.current_run] = fitness_over_time
         self.diversity_results[self.current_run] = diversity_over_time
         self.species_results[self.current_run] = species_over_time
@@ -79,6 +80,7 @@ class Experiment:
         self.species_champs_results.append(species_champs_over_time)
         self.current_run+=1
         self.me_maps.append(me_map)
+        self.best_brain = best_brain
 
     def show_results(self, visualize_disabled_cxs=False):
         self.show_target_and_trained_images()
@@ -103,6 +105,7 @@ class Experiment:
         self.results["connections_results"] = []
         self.results["gens_to_converge"] = []
         self.results["args"] = self.args
+        self.results["brain"] = {"fitness": 0, "network":self.best_brain}
         
     def generate_results_dictionary(self):
         self.results = {}
@@ -117,6 +120,7 @@ class Experiment:
         self.results["connections_results"] = self.connections_results.tolist()
         self.results["gens_to_converge"] = self.gens_to_converge
         self.results["args"] = self.args
+        self.results["brain"] = {"fitness": np.max(self.fitness_results), "network":self.best_brain}
         # self.results["gens_to_find_solution"] = self.gens_to_find_solution
         # self.results["solutions_results"] = self.solutions_results
         # self.results["species_champs_results"] = self.species_champs_results

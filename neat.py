@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from tqdm import trange
 from neat_genome import Connection, Genome, Node, find_node_with_id, get_matching_connections
-from util import choose_random_function, get_avg_number_of_connections, get_avg_number_of_hidden_nodes, get_max_number_of_connections, get_max_number_of_hidden_nodes, visualize_network
+from util import choose_random_function, generate_brain, get_avg_number_of_connections, get_avg_number_of_hidden_nodes, get_max_number_of_connections, get_max_number_of_hidden_nodes, visualize_network
 from species import *
 import copy 
 
@@ -39,6 +39,8 @@ class NEAT():
         self.solution = None
         
         self.solution_fitness = 0
+        self.best_brain = None
+
         # remove temp files:
         if platform.system() == "Windows":
             os.system("del brain*.nndf > nul 2> nul")
@@ -160,7 +162,7 @@ class NEAT():
             if species.population_count > 0:
                 print(f" |    Species {species.id:03d} |> fit: {species.avg_fitness:.4f} | adj: {species.avg_adjusted_fitness:.4f} | stag: {self.gen-species.last_improvement} | pop: {species.population_count} | offspring: {species.allowed_offspring if species.allowed_offspring > 0 else 'X'}")
 
-        print(f" "+ str(self.gen), f"{self.get_best().fitness:.4f}")
+        print(f" Gen "+ str(self.gen), f"fitness: {self.get_best().fitness:.4f}")
         print()
 
     def neat_selection_and_reproduction(self):
@@ -322,6 +324,15 @@ class NEAT():
             self.solution = self.population[0]                 # update best solution records
             self.solution_fitness = self.population[0].fitness
             self.solution_generation = self.gen
+            if hasattr(self.solution, "phenotype_nodes"):
+                generate_brain("_best", self.solution.phenotype_nodes, self.solution.phenotype_connections)
+            else:
+                generate_brain("_best", self.solution.node_genome, self.solution.connection_genome)
+            name = f"brain_best.nndf"
+            with open(name, "r") as f:
+                string = f.read()
+                self.best_brain = string
+                f.close()
                 
         self.fitness_over_time[self.gen:] = self.solution_fitness # record the fitness of the current best over evolutionary time
         self.solutions_over_time.append(copy.deepcopy(self.solution))
@@ -336,8 +347,8 @@ class NEAT():
         champs = get_current_species_champs(self.population, self.all_species)
         self.species_champs_over_time.append(champs) 
 
-        if self.show_output:
-            self.save_best_network_image()
+        # if self.show_output:
+            # self.save_best_network_image()
     
     
     def mutate(self, child, rates):

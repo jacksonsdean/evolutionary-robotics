@@ -6,13 +6,14 @@ class Arguments:
 
 # %%
 args = Arguments()
-args.generations = 100
-args.pop = 20
-args.species = 4
-args.experiment_runs = 3
-args.alg = "hyperneat"
+args.generations = 2
+args.pop = 10
+args.species = 2
+args.experiment_runs = 1
+args.alg = "neat"
 args.generate = False
 args.debug = False
+args.print = True
 args.do_bootstrap = False
 args.experiment_file = "experiments/neat_vs_hyperneat.json"
 search(args)

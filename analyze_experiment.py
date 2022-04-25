@@ -53,8 +53,8 @@ def main(args):
 
             lengths = [len(d[k][j]) for j in range(len(d[k]))]
             d[k] = np.array(d[k])
-
-    print("\nNumber of runs: ", np.min([len(c["fitness_results"]) for c in data]))
+    num_runs = np.min([len(c["fitness_results"]) for c in data])
+    print("\nNumber of runs: ", num_runs)
 
     bootst = args.do_bootstrap
 
@@ -70,7 +70,7 @@ def main(args):
         c["connections_results"]) for c in data], [c["name"] for c in data], "Generation", "Number of Connections", plot_bootstrap=bootst, title=f"{experiment_name} - Number of Connections")
 
     plot_mean_and_bootstrapped_ci_over_time([np.array(c["fitness_results"]) for c in data], [np.array(
-        c["fitness_results"]) for c in data], [c["name"] for c in data], "Generation", "Best fitness", plot_bootstrap=bootst, title=f"{experiment_name} - Fitness")
+        c["fitness_results"]) for c in data], [c["name"] for c in data], "Generation", f"Best fitness (average of {num_runs} runs)", plot_bootstrap=bootst, title=f"{experiment_name} - Fitness")
     plt.legend()
     plt.show()
 
