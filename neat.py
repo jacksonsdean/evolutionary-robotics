@@ -235,6 +235,7 @@ class NEAT():
         pbar = trange(c.num_gens, desc="Generations")
         for self.gen in pbar:
             self.run_one_generation()
+            pbar.set_postfix_str(f"f: {self.get_best().fitness:.4f}")
             
 
     def run_one_generation(self):
@@ -396,8 +397,8 @@ class NEAT():
             child_cx.weight = \
                 matching1[match_index].weight if inherit_from_more_fit else matching2[match_index].weight
 
-            new_from = copy.deepcopy(matching1[match_index].fromNode if inherit_from_more_fit else matching2[match_index].fromNode)
-            child_cx.fromNode = new_from
+            new_from = copy.deepcopy(matching1[match_index].from_node if inherit_from_more_fit else matching2[match_index].from_node)
+            child_cx.from_node = new_from
             # if new_from.id<len(child.node_genome):
             existing = find_node_with_id(child.node_genome, new_from.id)
             index_existing = child.node_genome.index(existing)
@@ -406,8 +407,8 @@ class NEAT():
                 # print("********ERR:new from id", new_from.id, "len:", len(child.node_genome))
                 # continue # TODO
 
-            new_to = copy.deepcopy(matching1[match_index].toNode if inherit_from_more_fit else matching2[match_index].toNode)
-            child_cx.toNode = new_to
+            new_to = copy.deepcopy(matching1[match_index].to_node if inherit_from_more_fit else matching2[match_index].to_node)
+            child_cx.to_node = new_to
 
             existing = find_node_with_id(child.node_genome, new_to.id)
             index_existing = child.node_genome.index(existing)
@@ -418,10 +419,10 @@ class NEAT():
                     child.connection_genome[match_index].enabled = False
 
         for cx in child.connection_genome:
-            cx.fromNode = find_node_with_id(child.node_genome, cx.fromNode.id)
-            cx.toNode = find_node_with_id(child.node_genome, cx.toNode.id)
-            assert cx.fromNode in child.node_genome, f"{child.id}: {cx.fromNode.id} {child.node_genome[cx.fromNode.id].id}"
-            assert cx.toNode in child.node_genome, f"{child.id}: {cx.toNode.id} {child.node_genome[cx.toNode.id].id}"
+            cx.from_node = find_node_with_id(child.node_genome, cx.from_node.id)
+            cx.to_node = find_node_with_id(child.node_genome, cx.to_node.id)
+            assert cx.from_node in child.node_genome, f"{child.id}: {cx.from_node.id} {child.node_genome[cx.from_node.id].id}"
+            assert cx.to_node in child.node_genome, f"{child.id}: {cx.to_node.id} {child.node_genome[cx.to_node.id].id}"
             # TODO this shouldn't be necessary
             
         child.update_node_layers()

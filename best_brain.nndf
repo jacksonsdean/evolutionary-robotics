@@ -3,45 +3,97 @@
     <neuron name = "1" type = "touch_sensor" linkName = "BackLowerLeg" activation="tanh" />
     <neuron name = "2" type = "touch_sensor" linkName = "LeftLowerLeg" activation="tanh" />
     <neuron name = "3" type = "touch_sensor" linkName = "RightLowerLeg" activation="tanh" />
-    <neuron name = "4" type = "proprioceptive_sensor" jointName = "Torso_BackLegRot" bodyID="1" activation="tanh"  />
-    <neuron name = "5" type = "proprioceptive_sensor" jointName = "Torso_FrontLegRot" bodyID="1" activation="tanh"  />
-    <neuron name = "6" type = "proprioceptive_sensor" jointName = "Torso_LeftLegRot" bodyID="1" activation="tanh"  />
-    <neuron name = "7" type = "proprioceptive_sensor" jointName = "Torso_RightLegRot" bodyID="1" activation="tanh"  />
-    <neuron name = "8" type = "cpg" activation="tanh"  />
-    <neuron name = "5712" type = "hidden" activation="tanh"/>
-    <neuron name = "5953" type = "hidden" activation="tanh"/>
-    <neuron name = "6068" type = "hidden" activation="tanh"/>
-    <neuron name = "9328" type = "hidden" activation="tanh"/>
-    <neuron name = "9462" type = "hidden" activation="tanh"/>
-    <neuron name = "9505" type = "hidden" activation="tanh"/>
-    <neuron name = "9549" type = "hidden" activation="tanh"/>
-    <neuron name = "10752" type = "hidden" activation="tanh"/>
-    <neuron name = "10933" type = "hidden" activation="tanh"/>
-    <neuron name = "9" type = "motor"  jointName = "Torso_BackLegRot" activation="tanh" />
-    <neuron name = "10" type = "motor"  jointName = "BackLegRot_BackLeg" activation="tanh" />
-    <neuron name = "11" type = "motor"  jointName = "Torso_FrontLegRot" activation="tanh" />
-    <neuron name = "12" type = "motor"  jointName = "FrontLegRot_FrontLeg" activation="tanh" />
-    <neuron name = "13" type = "motor"  jointName = "Torso_LeftLegRot" activation="tanh" />
-    <neuron name = "14" type = "motor"  jointName = "LeftLegRot_LeftLeg" activation="tanh" />
-    <neuron name = "15" type = "motor"  jointName = "Torso_RightLegRot" activation="tanh" />
-    <neuron name = "16" type = "motor"  jointName = "RightLegRot_RightLeg" activation="tanh" />
-    <neuron name = "17" type = "motor"  jointName = "FrontLeg_FrontLowerLeg" activation="tanh" />
-    <neuron name = "18" type = "motor"  jointName = "BackLeg_BackLowerLeg" activation="tanh" />
-    <neuron name = "19" type = "motor"  jointName = "LeftLeg_LeftLowerLeg" activation="tanh" />
-    <neuron name = "20" type = "motor"  jointName = "RightLeg_RightLowerLeg" activation="tanh" />
-    <synapse sourceNeuronName = "4" targetNeuronName = "9" weight = "0.10037528777396232" />
-    <synapse sourceNeuronName = "4" targetNeuronName = "10" weight = "-0.6606212771170998" />
-    <synapse sourceNeuronName = "4" targetNeuronName = "11" weight = "0.3656837056481159" />
-    <synapse sourceNeuronName = "4" targetNeuronName = "20" weight = "0.1888766132101638" />
-    <synapse sourceNeuronName = "5" targetNeuronName = "12" weight = "0.6375096264978567" />
-    <synapse sourceNeuronName = "6" targetNeuronName = "9328" weight = "-0.8004144255119428" />
-    <synapse sourceNeuronName = "5" targetNeuronName = "9462" weight = "0.89030622039825" />
-    <synapse sourceNeuronName = "9462" targetNeuronName = "19" weight = "-0.9679117244872909" />
-    <synapse sourceNeuronName = "15" targetNeuronName = "7" weight = "0.5241760505614625" />
-    <synapse sourceNeuronName = "9505" targetNeuronName = "9" weight = "0.1508006307514611" />
-    <synapse sourceNeuronName = "1" targetNeuronName = "9549" weight = "0.511253663148532" />
-    <synapse sourceNeuronName = "5" targetNeuronName = "10752" weight = "-0.22088928287616227" />
-    <synapse sourceNeuronName = "10752" targetNeuronName = "18" weight = "-0.014471283159879778" />
-    <synapse sourceNeuronName = "9328" targetNeuronName = "10933" weight = "-0.9305306305762922" />
-    <synapse sourceNeuronName = "10933" targetNeuronName = "9" weight = "-0.5104898467604021" />
+    <neuron name = "4" type = "rotation_sensor" jointName = "BackLegRot_BackLeg" bodyID="1" activation="tanh"  />
+    <neuron name = "5" type = "rotation_sensor" jointName = "FrontLegRot_FrontLeg" bodyID="1" activation="tanh"  />
+    <neuron name = "6" type = "rotation_sensor" jointName = "LeftLegRot_LeftLeg" bodyID="1" activation="tanh"  />
+    <neuron name = "7" type = "rotation_sensor" jointName = "LeftLegRot_LeftLeg" bodyID="1" activation="tanh"  />
+    <neuron name = "8" type = "rotation_sensor" jointName = "Torso_BackLegRot" bodyID="1" activation="tanh"  />
+    <neuron name = "9" type = "rotation_sensor" jointName = "Torso_FrontLegRot" bodyID="1" activation="tanh"  />
+    <neuron name = "10" type = "rotation_sensor" jointName = "Torso_LeftLegRot" bodyID="1" activation="tanh"  />
+    <neuron name = "11" type = "rotation_sensor" jointName = "Torso_RightLegRot" bodyID="1" activation="tanh"  />
+    <neuron name = "12" type = "rotation_sensor" jointName = "BackLeg_BackLowerLeg" bodyID="1" activation="tanh"  />
+    <neuron name = "13" type = "rotation_sensor" jointName = "FrontLeg_FrontLowerLeg" bodyID="1" activation="tanh"  />
+    <neuron name = "14" type = "rotation_sensor" jointName = "LeftLeg_LeftLowerLeg" bodyID="1" activation="tanh"  />
+    <neuron name = "15" type = "rotation_sensor" jointName = "RightLeg_RightLowerLeg" bodyID="1" activation="tanh"  />
+    <neuron name = "16" type = "base_velocity_sensor" linkName = "BASE" bodyID="1" activation="tanh"  />
+    <neuron name = "17" type = "motor"  jointName = "Torso_BackLegRot" activation="tanh" />
+    <neuron name = "18" type = "motor"  jointName = "Torso_FrontLegRot" activation="tanh" />
+    <neuron name = "19" type = "motor"  jointName = "Torso_LeftLegRot" activation="tanh" />
+    <neuron name = "20" type = "motor"  jointName = "Torso_RightLegRot" activation="tanh" />
+    <neuron name = "21" type = "motor"  jointName = "BackLeg_BackLowerLeg" activation="tanh" />
+    <neuron name = "22" type = "motor"  jointName = "FrontLeg_FrontLowerLeg" activation="tanh" />
+    <neuron name = "23" type = "motor"  jointName = "LeftLeg_LeftLowerLeg" activation="tanh" />
+    <neuron name = "24" type = "motor"  jointName = "RightLeg_RightLowerLeg" activation="tanh" />
+    <neuron name = "25" type = "motor"  jointName = "BackLegRot_BackLeg" activation="tanh" />
+    <neuron name = "26" type = "motor"  jointName = "FrontLegRot_FrontLeg" activation="tanh" />
+    <neuron name = "27" type = "motor"  jointName = "LeftLegRot_LeftLeg" activation="tanh" />
+    <neuron name = "28" type = "motor"  jointName = "RightLegRot_RightLeg" activation="tanh" />
+    <synapse sourceNeuronName = "0" targetNeuronName = "18" weight = "-1.4983457394624207" />
+    <synapse sourceNeuronName = "0" targetNeuronName = "22" weight = "-1.843160252391257" />
+    <synapse sourceNeuronName = "0" targetNeuronName = "24" weight = "0.3398452266658786" />
+    <synapse sourceNeuronName = "0" targetNeuronName = "25" weight = "0.20512094511763002" />
+    <synapse sourceNeuronName = "1" targetNeuronName = "19" weight = "-2.0" />
+    <synapse sourceNeuronName = "1" targetNeuronName = "21" weight = "-1.6443798418281592" />
+    <synapse sourceNeuronName = "1" targetNeuronName = "23" weight = "1.744577766112834" />
+    <synapse sourceNeuronName = "1" targetNeuronName = "27" weight = "-1.6084204444790982" />
+    <synapse sourceNeuronName = "2" targetNeuronName = "17" weight = "-2.0" />
+    <synapse sourceNeuronName = "2" targetNeuronName = "18" weight = "2.0" />
+    <synapse sourceNeuronName = "2" targetNeuronName = "25" weight = "1.0818608713048081" />
+    <synapse sourceNeuronName = "3" targetNeuronName = "24" weight = "-0.9023152298108886" />
+    <synapse sourceNeuronName = "3" targetNeuronName = "25" weight = "0.8407301052464019" />
+    <synapse sourceNeuronName = "3" targetNeuronName = "27" weight = "0.8061564306603706" />
+    <synapse sourceNeuronName = "4" targetNeuronName = "18" weight = "-2.0" />
+    <synapse sourceNeuronName = "4" targetNeuronName = "19" weight = "1.4557855476228556" />
+    <synapse sourceNeuronName = "4" targetNeuronName = "20" weight = "-1.7543135024994452" />
+    <synapse sourceNeuronName = "4" targetNeuronName = "24" weight = "1.9129268645559412" />
+    <synapse sourceNeuronName = "4" targetNeuronName = "26" weight = "-1.7767666069635193" />
+    <synapse sourceNeuronName = "5" targetNeuronName = "18" weight = "-0.1721638230260636" />
+    <synapse sourceNeuronName = "5" targetNeuronName = "22" weight = "1.6430906320642147" />
+    <synapse sourceNeuronName = "5" targetNeuronName = "26" weight = "-1.7313833773385632" />
+    <synapse sourceNeuronName = "6" targetNeuronName = "27" weight = "0.5518974989494208" />
+    <synapse sourceNeuronName = "7" targetNeuronName = "18" weight = "-1.4625290326689617" />
+    <synapse sourceNeuronName = "7" targetNeuronName = "22" weight = "1.7044307093497855" />
+    <synapse sourceNeuronName = "8" targetNeuronName = "20" weight = "1.1335240890829108" />
+    <synapse sourceNeuronName = "8" targetNeuronName = "21" weight = "0.569434257507671" />
+    <synapse sourceNeuronName = "8" targetNeuronName = "22" weight = "-0.8219166257276045" />
+    <synapse sourceNeuronName = "8" targetNeuronName = "23" weight = "0.3266786298294079" />
+    <synapse sourceNeuronName = "8" targetNeuronName = "27" weight = "1.1597232462273226" />
+    <synapse sourceNeuronName = "8" targetNeuronName = "28" weight = "-1.691802066317441" />
+    <synapse sourceNeuronName = "9" targetNeuronName = "18" weight = "-0.5678594912859332" />
+    <synapse sourceNeuronName = "9" targetNeuronName = "21" weight = "-1.102650199506436" />
+    <synapse sourceNeuronName = "9" targetNeuronName = "22" weight = "-0.8391449899848995" />
+    <synapse sourceNeuronName = "9" targetNeuronName = "23" weight = "-1.619922295129339" />
+    <synapse sourceNeuronName = "9" targetNeuronName = "24" weight = "-1.950525232366524" />
+    <synapse sourceNeuronName = "10" targetNeuronName = "18" weight = "-1.4469248036838476" />
+    <synapse sourceNeuronName = "10" targetNeuronName = "20" weight = "0.09107936826908847" />
+    <synapse sourceNeuronName = "10" targetNeuronName = "24" weight = "-0.1976995611916995" />
+    <synapse sourceNeuronName = "10" targetNeuronName = "25" weight = "-1.1573259855972855" />
+    <synapse sourceNeuronName = "10" targetNeuronName = "26" weight = "-1.9100079183094965" />
+    <synapse sourceNeuronName = "10" targetNeuronName = "27" weight = "0.6015548311392651" />
+    <synapse sourceNeuronName = "11" targetNeuronName = "21" weight = "1.183685172877555" />
+    <synapse sourceNeuronName = "12" targetNeuronName = "19" weight = "-1.1855285040869754" />
+    <synapse sourceNeuronName = "12" targetNeuronName = "22" weight = "-1.2982456886498306" />
+    <synapse sourceNeuronName = "12" targetNeuronName = "26" weight = "-1.7710992128078984" />
+    <synapse sourceNeuronName = "13" targetNeuronName = "17" weight = "0.78348904455104" />
+    <synapse sourceNeuronName = "13" targetNeuronName = "20" weight = "0.3593212964112231" />
+    <synapse sourceNeuronName = "13" targetNeuronName = "26" weight = "-0.9783825711296863" />
+    <synapse sourceNeuronName = "14" targetNeuronName = "18" weight = "1.0567562282507352" />
+    <synapse sourceNeuronName = "14" targetNeuronName = "20" weight = "-0.07391520378786365" />
+    <synapse sourceNeuronName = "14" targetNeuronName = "21" weight = "0.15331744746570497" />
+    <synapse sourceNeuronName = "14" targetNeuronName = "26" weight = "0.8500799091798255" />
+    <synapse sourceNeuronName = "15" targetNeuronName = "17" weight = "-0.3409226866501468" />
+    <synapse sourceNeuronName = "15" targetNeuronName = "18" weight = "0.662604776702504" />
+    <synapse sourceNeuronName = "15" targetNeuronName = "19" weight = "-0.5403542620214102" />
+    <synapse sourceNeuronName = "15" targetNeuronName = "21" weight = "1.0577172388499143" />
+    <synapse sourceNeuronName = "15" targetNeuronName = "23" weight = "0.871767657780778" />
+    <synapse sourceNeuronName = "15" targetNeuronName = "25" weight = "-1.355049615896983" />
+    <synapse sourceNeuronName = "15" targetNeuronName = "28" weight = "1.706723929087214" />
+    <synapse sourceNeuronName = "16" targetNeuronName = "20" weight = "-0.3910808462783265" />
+    <synapse sourceNeuronName = "16" targetNeuronName = "23" weight = "-0.6866399568555843" />
+    <synapse sourceNeuronName = "16" targetNeuronName = "24" weight = "0.6050297082913246" />
+    <synapse sourceNeuronName = "16" targetNeuronName = "25" weight = "1.0214701837233053" />
+    <synapse sourceNeuronName = "16" targetNeuronName = "27" weight = "-0.910745463106702" />
+    <synapse sourceNeuronName = "28" targetNeuronName = "15" weight = "-0.4368156926055019" />
+    <synapse sourceNeuronName = "18" targetNeuronName = "2" weight = "0.5938601109804448" />
+    <synapse sourceNeuronName = "28" targetNeuronName = "4" weight = "-1.5028895967941076" />
 </neuralNetwork>

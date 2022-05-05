@@ -5,8 +5,8 @@ def apply():
     c.init_species_threshold = 5.
     c.species_threshold_delta = .5
     c.activations = [tanh, sin, gaussian, sigmoid, identity]
-    c.init_connection_probability = 1.0
-    
+    c.init_connection_probability = .75
+    c.hidden_nodes_at_start = 2
     c.weight_threshold = 0.01
     c.allow_recurrent=False
     
@@ -20,7 +20,6 @@ def apply():
     c.hidden_nodes_at_start = 0
     
     c.max_phen_weight = c.max_weight
-    c.max_weight = 5.
-    
+    c.max_gen_weight = 1.
     # c.num_sensor_neurons = 4
     # c.num_motor_neurons = 4

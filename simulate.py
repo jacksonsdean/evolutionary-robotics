@@ -11,8 +11,8 @@ if __name__ == '__main__':
     save_as_best = False
     if "--generate" in args:
         Generate()
-        body_path="body.urdf"
-        brain_path="brain.nndf"
+        body_path="best_body.urdf"
+        brain_path="best_brain.nndf"
         
     if "--id" in args:
         i = args.index("--id")

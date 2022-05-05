@@ -1,4 +1,5 @@
 import argparse
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import json
@@ -27,7 +28,7 @@ def main(args):
             "threshold_results",
             "nodes_results",
             "connections_results"]
-
+    brain = None
     experiment_name = filename.split("/")[-1].split(".")[0]
     if "args" in data[0].keys():
         experiment_config = data[0]["args"]["experiment_file"]
@@ -53,6 +54,14 @@ def main(args):
 
             lengths = [len(d[k][j]) for j in range(len(d[k]))]
             d[k] = np.array(d[k])
+            if args.simulate and args.simulate == d["name"]:
+                brain = d["brain"]["network"]
+                with open("tmp.nndf", "w") as f:
+                    f.write(brain)
+                    f.close()
+    print(f"Simulating {d['name']}")
+    os.system("python simulate.py --brain tmp.nndf --body best_body.urdf")
+                
     num_runs = np.min([len(c["fitness_results"]) for c in data])
     print("\nNumber of runs: ", num_runs)
 
@@ -84,5 +93,7 @@ if __name__ == "__main__":
                         action='store', help='Experiment results file.')
     parser.add_argument('-g', '--gens', action='store',
                         help='Show only experimental runs with this number of generations.')
+    parser.add_argument('-s', '--simulate', action='store',
+                        help='Simulate the best robot from the given condition')
     args = parser.parse_args()
     main(args)
