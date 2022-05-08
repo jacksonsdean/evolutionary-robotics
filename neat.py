@@ -200,7 +200,8 @@ class NEAT():
                 
                 members = new_members
                 # members = tournament_selection(members, c, True, override_no_elitism=True) # tournament selection
-            
+            elif (len(members)==0):
+                continue # no members in species
             for i in range(sp.allowed_offspring):
                 # inheritance
                 parent1 = np.random.choice(members, size=1)[0] # pick 1 random parent
