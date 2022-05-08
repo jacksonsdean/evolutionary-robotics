@@ -170,8 +170,8 @@ class SandwichSubstrate(Substrate):
                 else:    
                     rows = self.hidden_rows
                     cols = self.hidden_cols
-            x_space = np.linspace(.5, -.5, cols) if cols > 1 else [0] * cols
-            y_space = np.linspace(.5, -.5, rows) if rows > 1 else [0] * rows
+            x_space = np.linspace(-1.0, 1.0, cols) if cols > 1 else [0] * cols
+            y_space = np.linspace(-1.0, 1.0, rows) if rows > 1 else [0] * rows
             index_in_layer = 0
             for node in nodes:
                 if node.layer != i:

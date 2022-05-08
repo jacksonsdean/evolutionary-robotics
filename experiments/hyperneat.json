@@ -15,15 +15,6 @@
                 "num_hn_hidden_nodes_per_layer": [4],
                 "num_hn_hidden_layers": 1,
                 "substrate_type": "sandwich"
-
-            }
-        },
-        {
-            "neat": {
-                "alg": "neat",
-                "pop_size": 20,
-                "species_target": 3,
-                "num_gens": 100
             }
         }
        

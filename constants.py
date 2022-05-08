@@ -11,7 +11,7 @@ gravity = 0, 0, -9.8
 # CANNOT BE CHANGED AT RUN TIME
 simulation_fps = 120
 simulation_length = 800
-motor_max_force = 50.
+motor_max_force = 25.
 motor_joint_range = .3
 ###
 
@@ -29,7 +29,7 @@ num_sensor_neurons = 4
 
 use_cpg = False
 if use_cpg: num_sensor_neurons+=1
-torso_weight = 10
+torso_weight = 4
 
 
 hidden_nodes_at_start = 0

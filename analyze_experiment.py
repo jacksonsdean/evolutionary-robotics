@@ -59,8 +59,9 @@ def main(args):
                 with open("tmp.nndf", "w") as f:
                     f.write(brain)
                     f.close()
-    print(f"Simulating {d['name']}")
-    os.system("python simulate.py --brain tmp.nndf --body best_body.urdf")
+    if args.simulate:
+        print(f"Simulating {d['name']}")
+        os.system("python simulate.py --brain tmp.nndf --body best_body.urdf")
                 
     num_runs = np.min([len(c["fitness_results"]) for c in data])
     print("\nNumber of runs: ", num_runs)
@@ -78,10 +79,25 @@ def main(args):
     plot_mean_and_bootstrapped_ci_over_time([np.array(c["connections_results"]) for c in data], [np.array(
         c["connections_results"]) for c in data], [c["name"] for c in data], "Generation", "Number of Connections", plot_bootstrap=bootst, title=f"{experiment_name} - Number of Connections")
 
+    
+
     plot_mean_and_bootstrapped_ci_over_time([np.array(c["fitness_results"]) for c in data], [np.array(
         c["fitness_results"]) for c in data], [c["name"] for c in data], "Generation", f"Best fitness (average of {num_runs} runs)", plot_bootstrap=bootst, title=f"{experiment_name} - Fitness")
+    
     plt.legend()
+    
+    fig, ax = plt.subplots() # generate figure and axes
+    plt.title("Max Fitness")
+    plt.bar(np.arange(len(data)), [np.max(c["fitness_results"]) for c in data], align="center")
+    plt.xticks(np.arange(len(data)), [c["name"] for c in data])
+    fig, ax = plt.subplots() # generate figure and axes
+    
+    plt.title("Gens to converge")
+    plt.bar(np.arange(len(data)), [np.mean(c["gens_to_converge"]) for c in data], align="center", yerr=[np.std(c["gens_to_converge"]) for c in data])
+    plt.xticks(np.arange(len(data)), [c["name"] for c in data])
+
     plt.show()
+    
 
 
 if __name__ == "__main__":
