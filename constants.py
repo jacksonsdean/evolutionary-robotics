@@ -11,7 +11,7 @@ gravity = 0, 0, -9.8
 # CANNOT BE CHANGED AT RUN TIME
 simulation_fps = 120
 simulation_length = 800
-motor_max_force = 25.
+motor_max_force = 50.
 motor_joint_range = .3
 ###
 
@@ -36,7 +36,7 @@ hidden_nodes_at_start = 0
 init_connection_probability = .35
 
 species_target = 3
-species_selection_ratio= .5
+species_selection_ratio= .2
 # species_threshold_delta = .5
 species_threshold_delta = .1
 # init_species_threshold = 7.5
@@ -48,7 +48,7 @@ use_speciation = True
 use_map_elites = False
 allow_recurrent = True
 
-max_weight = 5.0
+max_weight = 1.
 weight_threshold = .01
 weight_mutation_max = .5
 prob_random_restart =.001
@@ -57,10 +57,10 @@ prob_reenable_connection = 0.1
 
 prob_mutate_activation = .1 
 prob_mutate_weight = .4
-prob_add_connection = .3
-prob_add_node = .3
-prob_remove_node = 0.15
-prob_disable_connection = .15
+prob_add_connection = .03
+prob_disable_connection = .015
+prob_add_node = .01
+prob_remove_node = 0.005
 
 
 species_stagnation_threshold = 20
