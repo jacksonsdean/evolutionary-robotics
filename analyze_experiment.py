@@ -61,7 +61,8 @@ def main(args):
                     f.close()
     if args.simulate:
         print(f"Simulating {d['name']}")
-        os.system("python simulate.py --brain tmp.nndf --body best_body.urdf")
+        os.system("python simulate.py --brain tmp.nndf --body best_body.urdf --best")
+        os.system(f"python footprint_diagram.py -r tmp -t {args.footprint_title}")
                 
     num_runs = np.min([len(c["fitness_results"]) for c in data])
     print("\nNumber of runs: ", num_runs)
@@ -111,5 +112,7 @@ if __name__ == "__main__":
                         help='Show only experimental runs with this number of generations.')
     parser.add_argument('-s', '--simulate', action='store',
                         help='Simulate the best robot from the given condition')
+    parser.add_argument('-t', '--footprint_title',
+                        action='store', help='Footprint graph title. Defaults to robot name.')
     args = parser.parse_args()
     main(args)

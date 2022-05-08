@@ -204,19 +204,23 @@ class NEAT():
                 continue # no members in species
             for i in range(sp.allowed_offspring):
                 # inheritance
-                parent1 = np.random.choice(members, size=1)[0] # pick 1 random parent
+                parent1 = np.random.choice(members, size=max(len(members), 1))[0] # pick 1 random parent
                 #crossover
-                if(c.do_crossover):
+                if(c.do_crossover and parent1):
                     if(np.random.rand()<.001): # cross-species crossover (.001 in s/m07)
                         other_id = -1
                         for sp2 in self.all_species:
                             if count_members_of_species(self.population, sp2.id) > 0 and sp2.id!=sp.id:
                                 other_id = sp2.id
                         if(other_id>-1): members = get_members_of_species(self.population, other_id)
-                    parent2 = np.random.choice(members, size=1)[0] # allow parents to crossover with themselves
-                    child = self.crossover(parent1, parent2)
+                    parent2 = np.random.choice(members, size=max(len(members), 1))[0] # allow parents to crossover with themselves
+                    if parent2:
+                        child = self.crossover(parent1, parent2)
                 else:
-                    child = copy.deepcopy(parent1)    
+                    if parent1:
+                        child = copy.deepcopy(parent1)    
+                    else:
+                        continue
 
                 self.mutate(child, self.get_mutation_rates())
                 new_children.extend([child]) # add children to the new_children list
