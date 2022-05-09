@@ -1,0 +1,29 @@
+<neuralNetwork>
+    <neuron name = "0" type = "touch_sensor" linkName = "FrontLowerLeg" activation="tanh" />
+    <neuron name = "1" type = "touch_sensor" linkName = "BackLowerLeg" activation="tanh" />
+    <neuron name = "2" type = "touch_sensor" linkName = "LeftLowerLeg" activation="tanh" />
+    <neuron name = "3" type = "touch_sensor" linkName = "RightLowerLeg" activation="tanh" />
+    <neuron name = "4" type = "motor"  jointName = "Torso_BackLegRot" activation="tanh" />
+    <neuron name = "5" type = "motor"  jointName = "Torso_FrontLegRot" activation="tanh" />
+    <neuron name = "6" type = "motor"  jointName = "Torso_LeftLegRot" activation="tanh" />
+    <neuron name = "7" type = "motor"  jointName = "Torso_RightLegRot" activation="tanh" />
+    <neuron name = "8" type = "motor"  jointName = "BackLeg_BackLowerLeg" activation="tanh" />
+    <neuron name = "9" type = "motor"  jointName = "FrontLeg_FrontLowerLeg" activation="tanh" />
+    <neuron name = "10" type = "motor"  jointName = "LeftLeg_LeftLowerLeg" activation="tanh" />
+    <neuron name = "11" type = "motor"  jointName = "RightLeg_RightLowerLeg" activation="tanh" />
+    <neuron name = "12" type = "motor"  jointName = "BackLegRot_BackLeg" activation="tanh" />
+    <neuron name = "13" type = "motor"  jointName = "FrontLegRot_FrontLeg" activation="tanh" />
+    <neuron name = "14" type = "motor"  jointName = "LeftLegRot_LeftLeg" activation="tanh" />
+    <neuron name = "15" type = "motor"  jointName = "RightLegRot_RightLeg" activation="tanh" />
+    <synapse sourceNeuronName = "1" targetNeuronName = "14" weight = "0.1221926557641686" />
+    <synapse sourceNeuronName = "3" targetNeuronName = "11" weight = "-0.8954912527816505" />
+    <synapse sourceNeuronName = "3" targetNeuronName = "12" weight = "1.0" />
+    <synapse sourceNeuronName = "3" targetNeuronName = "13" weight = "-1.0" />
+    <synapse sourceNeuronName = "3" targetNeuronName = "15" weight = "0.30350795730231783" />
+    <synapse sourceNeuronName = "4" targetNeuronName = "8" weight = "1.0" />
+    <synapse sourceNeuronName = "0" targetNeuronName = "6" weight = "1.0" />
+    <synapse sourceNeuronName = "12" targetNeuronName = "4" weight = "-0.6324782005883974" />
+    <synapse sourceNeuronName = "4" targetNeuronName = "14" weight = "-0.4407578521752358" />
+    <synapse sourceNeuronName = "14" targetNeuronName = "15" weight = "1.0" />
+    <synapse sourceNeuronName = "8" targetNeuronName = "2" weight = "-0.016722872689162394" />
+</neuralNetwork>
