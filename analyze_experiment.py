@@ -38,6 +38,8 @@ def main(args):
 
     for i, d in enumerate(data):
         for k in keys:
+            if len(d[k]) == 0:
+                continue
             lengths = [len(d[k][j]) for j in range(len(d[k]))]
             max = np.max(lengths)
             for j, run in enumerate(d[k]):
