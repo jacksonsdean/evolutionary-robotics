@@ -9,11 +9,11 @@ args = Arguments()
 args.generations = 2
 args.pop = 10
 args.species = 2
-args.experiment_runs = 2
+args.experiment_runs = 1
 args.alg = ""
 args.generate = False
 args.debug = False
 args.print = False
 args.do_bootstrap = False
-args.experiment_file = "experiments/algorithm.json"
+args.experiment_file = "experiments/random.json"
 search(args)

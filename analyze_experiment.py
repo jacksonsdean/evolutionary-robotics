@@ -13,6 +13,7 @@ from util import plot_mean_and_bootstrapped_ci_over_time
 
 # %%
 def main(args):
+    plt.rc('font', size=20) #controls default text size
     filename = "experiments/weight_mutation_rate_low_mid_results.json"
     if args.experiment_file:
         filename = args.experiment_file

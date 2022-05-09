@@ -7,8 +7,9 @@ if __name__ == '__main__':
     solution_id = 0
     brain_path = None
     body_path = None
-    
+    save_video = None
     save_as_best = False
+
     if "--generate" in args:
         Generate()
         body_path="best_body.urdf"
@@ -29,9 +30,13 @@ if __name__ == '__main__':
     if "--length" in args:
         i = args.index("--length")
         c.simulation_length = int(args[i+1])
+
+    if "--mp4" in args:
+        i = args.index("--mp4")
+        save_video = args[i+1]
         
     headless_mode = "DIRECT" in args
-    sim = Simulation(headless_mode, solution_id, save_as_best, brain_path, body_path)
+    sim = Simulation(headless_mode, solution_id, save_as_best, brain_path, body_path, save_video)
     print("Running simulation with id:", solution_id)
     sim.run()
     sim.get_fitness()

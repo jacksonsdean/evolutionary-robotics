@@ -1,4 +1,3 @@
-import random
 import pybullet as p
 import constants as c
 import pybullet_data
@@ -13,13 +12,14 @@ import platform
 from world import World
 class Simulation():
     world = None
-    def __init__(self, headless_mode=False, solution_id=0, save_best=False, brain_path=None, body_path=None):
+    def __init__(self, headless_mode=False, solution_id=0, save_best=False, brain_path=None, body_path=None, save_video=None):
         self.solution_id = solution_id
         self.headless_mode = headless_mode
+        self.save_video = save_video
         # create physics engine client
-        self.physicsClient = p.connect(p.DIRECT if self.headless_mode else p.GUI, )
+        self.physicsClient = p.connect(p.DIRECT if (self.headless_mode or self.save_video) else p.GUI, options=f"--width=1900 --height=1060 {f'--mp4={save_video} --mp4fps=24' if save_video else ''}")
         p.setAdditionalSearchPath(pybullet_data.getDataPath()) # used by loadURDF
-
+        p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
         # set up gravity
         p.setGravity(*c.gravity)
   
@@ -54,6 +54,7 @@ class Simulation():
         
     def run(self):
         step = 0
+        p.resetDebugVisualizerCamera( cameraDistance= p.getDebugVisualizerCamera()[10],cameraYaw=138, cameraPitch=-30,cameraTargetPosition=p.getBasePositionAndOrientation(self.robot.robotId)[0])
         while True:
             try:
                 p.stepSimulation() # step
@@ -72,7 +73,10 @@ class Simulation():
                 dist = p.getDebugVisualizerCamera()[10]
                 
                 if self.camera_lock:
-                    p.resetDebugVisualizerCamera( cameraDistance=dist, cameraYaw=yaw, cameraPitch=pitch, cameraTargetPosition=p.getBasePositionAndOrientation(self.robot.robotId)[0])
+                    if self.save_video:
+                        p.resetDebugVisualizerCamera( cameraDistance= p.getDebugVisualizerCamera()[10],cameraYaw=138, cameraPitch=-30,cameraTargetPosition=p.getBasePositionAndOrientation(self.robot.robotId)[0])
+                    else:
+                        p.resetDebugVisualizerCamera( cameraDistance=dist, cameraYaw=yaw, cameraPitch=pitch, cameraTargetPosition=p.getBasePositionAndOrientation(self.robot.robotId)[0])
                 
                 step += 1
 
