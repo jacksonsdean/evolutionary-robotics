@@ -37,6 +37,8 @@ def main(args = None):
     experiment_file = "experiments/empty_experiment.json"
     if args.experiment_file:
         experiment_file = args.experiment_file
+    else:
+        args.experiment_file = experiment_file # use default empty experiment
 
     name, controls, conditions = Experiment.load_conditions_file(experiment_file)
 
@@ -158,7 +160,7 @@ if __name__ == '__main__':
     # parse args
     parser = argparse.ArgumentParser(description='Run search on the robot controller.')
     parser.add_argument('-d','--debug', action='store_true', help='Show debug messages.')
-    parser.add_argument('-p','--print', action='store_true', help='Show print messages for each gen.')
+    parser.add_argument('-pr','--print', action='store_true', help='Show print messages for each gen.')
     parser.add_argument('-g','--generate', action='store_true', help='Generate new world first.')
     parser.add_argument('-t','--generations', action='store', help='Number of generations to run.')
     parser.add_argument('-p','--pop', action='store', help='Population size.')
