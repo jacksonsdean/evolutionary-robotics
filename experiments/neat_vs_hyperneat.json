@@ -5,7 +5,7 @@
     },
     "conditions": [
         {
-            "hyperneat 8 8": {
+            "hyperneat": {
                 "alg": "hyperneat",
                 "pop_size": 20,
                 "species_target": 3,
