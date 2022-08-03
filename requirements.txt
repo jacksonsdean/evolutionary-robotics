@@ -1,3 +1,6 @@
 pybullet
 numpy
 matplotlib
+tqdm
+networkx
+scikits.bootstrap
