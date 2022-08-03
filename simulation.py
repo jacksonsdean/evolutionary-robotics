@@ -33,10 +33,10 @@ class Simulation():
             print("Saving best solution...")
             if platform.system() =="Windows":
                 os.system(f"copy brain{self.solution_id}.nndf" + " best_brain.nndf")
-                os.system(f"copy body{self.solution_id}.urdf" + " best_body.urdf")
+                os.system(f"copy body{self.solution_id}.urdf" + " quadruped.urdf")
             else:
                 os.system(f"cp brain{self.solution_id}.nndf" + " best_brain.nndf")
-                os.system(f"cp body{self.solution_id}.urdf" + " best_body.urdf")
+                os.system(f"cp body{self.solution_id}.urdf" + " quadruped.urdf")
             time.sleep(0.5)
             
         if platform.system() =="Windows":

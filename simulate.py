@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     if "--generate" in args:
         Generate()
-        body_path="best_body.urdf"
+        body_path="quadruped.urdf"
         brain_path="best_brain.nndf"
         
     if "--id" in args:

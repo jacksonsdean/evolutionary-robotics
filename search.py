@@ -151,7 +151,7 @@ def main(args = None):
                 string = result["brain"]["network"]
                 f.write(string)
                 f.close()
-            os.system(f"python simulate.py --body best_body.urdf --brain {name} --best")
+            os.system(f"python simulate.py --body quadruped.urdf --brain {name} --best")
             time.sleep(1)
             os.system(f"python footprint_diagram.py -r {robot}")
             time.sleep(1)
@@ -166,7 +166,7 @@ if __name__ == '__main__':
     parser.add_argument('-p','--pop', action='store', help='Population size.')
     parser.add_argument('-s','--species', action='store', help='Number of species.')
     parser.add_argument('-a','--alg', action='store', help='Algorithm to use.')
-    parser.add_argument('-e','--experiment_runs', action='store', help='Number of experiment runs.')
+    parser.add_argument('-r','--experiment_runs', action='store', help='Number of experiment runs.')
     parser.add_argument('-b','--do_bootstrap', action='store_true', help='Show bootstrap CI on experiment plots.')
     parser.add_argument('-f','--experiment_file', action='store', help='Experiment description file.')
     # parser.add_argument('-o','--obstacles', action='store_true', help='Use obstacles.')
