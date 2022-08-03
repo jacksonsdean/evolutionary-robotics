@@ -36,7 +36,7 @@ For example, to show the final results of this project and visualize the NEAT co
 ### Disclaimer
 This project is a work in progress. The code is not production ready, and may contain bugs.
 
-Most development/testing has been on Windows so not sure if it works on Mac or Linux.
+Most development/testing has been on Windows, so the code may or may not work as intended on Mac/Linux.
 
 ## Credits
 This project uses a custom version of [Pyrosim](https://github.com/jbongard/pyrosim) and was developed for Dr. Joshua Bongard's Evolutionary Robotics course at the University of Vermont. Check out the course's open [subreddit](https://www.reddit.com/r/ludobots/) for more information. Video examples of this project are available on [YouTube](https://www.youtube.com/channel/UCc9_Sf3XFUdJOO1ZvAcdZsg).
