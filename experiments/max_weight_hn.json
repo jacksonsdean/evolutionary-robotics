@@ -1,5 +1,6 @@
 {
     "name": "max_weight (HN)",
+    "controls":{},
     "conditions": [
         {
             "10": {

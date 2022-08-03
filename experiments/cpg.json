@@ -1,5 +1,6 @@
 {
     "name": "CPG - HyperNEAT",
+    "controls":{},
     "conditions": [
         {
             "With CPG (HyperNEAT)": {

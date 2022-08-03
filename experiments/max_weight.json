@@ -1,5 +1,6 @@
 {
-    "name": "max_weight",
+    "name": "max_weight (neat)",
+    "controls":{"alg":"neat"},
     "conditions": [
         {
             "10": {

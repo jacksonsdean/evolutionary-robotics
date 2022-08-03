@@ -1,5 +1,6 @@
 {
     "name": "Add CX Mutation Rate",
+    "controls":{},
     "conditions": [
         {
             "high": {

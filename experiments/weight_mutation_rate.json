@@ -1,6 +1,12 @@
 {
     "name": "Weight Mutation Rate",
+    "controls":{},
     "conditions": [
+        {
+            "high": {
+                "prob_mutate_weight": 1.0
+            }
+        },
         {
             "mid": {
                 "prob_mutate_weight": 0.5
@@ -10,7 +16,11 @@
             "low": {
                 "prob_mutate_weight": 0.15
             }
+        },
+        {
+            "none": {
+                "prob_mutate_weight": 0.0
+            }
         }
-       
     ]
 }

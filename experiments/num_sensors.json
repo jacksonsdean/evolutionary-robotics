@@ -1,5 +1,6 @@
 {
     "name": "Number of sensor neurons (NEAT)",
+    "controls":{},
     "conditions": [
         {
             "Low (NEAT)": {

@@ -1,5 +1,6 @@
 {
     "name": "Num hidden nodes",
+    "controls":{},
     "conditions": [
         {
            "4-8-4": {

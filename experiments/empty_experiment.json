@@ -1,5 +1,6 @@
 {
     "name": "Single run",
+    "controls":{},
     "conditions": [
         {
             "Run": {
