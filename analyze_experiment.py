@@ -4,12 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import json
 from util import plot_mean_and_bootstrapped_ci_over_time
-# %%
-# backLegSensorValues =  np.load("data/backLegSensorValues.npy")
-# frontLegSensorValues =  np.load("data/frontLegSensorValues.npy")
-# plt.plot(backLegSensorValues , label="Back Leg", linewidth=3.5)
-# plt.plot(frontLegSensorValues, label="Front Leg", linestyle="--")
-
 
 # %%
 def main(args):
@@ -66,7 +60,9 @@ def main(args):
                     f.close()
     if args.simulate:
         print(f"Simulating {d['name']}")
-        os.system("python simulate.py --brain tmp.nndf --body best_body.urdf --best")
+        if args.footprint_title is None:
+            args.footprint_title = d["name"]
+        os.system("python simulate.py --brain tmp.nndf --body quadruped.urdf --best")
         os.system(f"python footprint_diagram.py -r tmp -t {args.footprint_title}")
                 
     num_runs = np.min([len(c["fitness_results"]) for c in data])
@@ -112,7 +108,7 @@ if __name__ == "__main__":
     parser.add_argument('-b', '--do_bootstrap', action='store_true',
                         help='Show bootstrap CI on experiment plots.')
     parser.add_argument('-f', '--experiment_file',
-                        action='store', help='Experiment results file.')
+                        action='store', help='Experiment results file.', required=True)
     parser.add_argument('-g', '--gens', action='store',
                         help='Show only experimental runs with this number of generations.')
     parser.add_argument('-s', '--simulate', action='store',
