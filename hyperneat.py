@@ -232,6 +232,8 @@ class HyperNEAT(NEAT):
         super().__init__(debug)
         self.genome_type = HyperNEATGenome
 
+        os.makedirs("hyperneat_phenotypes", exist_ok=True)
+        
     def save_best_network_image(self, end_early=False):
         best = self.get_best()
         best.eval_substrate_simple()
