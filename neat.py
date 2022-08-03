@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from tqdm import trange
 from neat_genome import Connection, Genome, Node, find_node_with_id, get_matching_connections
-from util import choose_random_function, get_avg_number_of_connections, get_avg_number_of_hidden_nodes, get_max_number_of_connections, get_max_number_of_hidden_nodes, visualize_network
+from util import choose_random_function, generate_brain, get_avg_number_of_connections, get_avg_number_of_hidden_nodes, get_max_number_of_connections, get_max_number_of_hidden_nodes, visualize_network
 from species import *
 import copy 
 
@@ -39,6 +39,8 @@ class NEAT():
         self.solution = None
         
         self.solution_fitness = 0
+        self.best_brain = None
+
         # remove temp files:
         if platform.system() == "Windows":
             os.system("del brain*.nndf > nul 2> nul")
@@ -160,7 +162,7 @@ class NEAT():
             if species.population_count > 0:
                 print(f" |    Species {species.id:03d} |> fit: {species.avg_fitness:.4f} | adj: {species.avg_adjusted_fitness:.4f} | stag: {self.gen-species.last_improvement} | pop: {species.population_count} | offspring: {species.allowed_offspring if species.allowed_offspring > 0 else 'X'}")
 
-        print(f" "+ str(self.gen), f"{self.get_best().fitness:.4f}")
+        print(f" Gen "+ str(self.gen), f"fitness: {self.get_best().fitness:.4f}")
         print()
 
     def neat_selection_and_reproduction(self):
@@ -198,22 +200,28 @@ class NEAT():
                 
                 members = new_members
                 # members = tournament_selection(members, c, True, override_no_elitism=True) # tournament selection
-            
+            if (len(members)==0):
+                continue # no members in species
             for i in range(sp.allowed_offspring):
+                if len(members)==0: break
                 # inheritance
-                parent1 = np.random.choice(members, size=1)[0] # pick 1 random parent
+                parent1 = np.random.choice(members, size=max(len(members), 1))[0] # pick 1 random parent
                 #crossover
-                if(c.do_crossover):
+                if(c.do_crossover and parent1):
                     if(np.random.rand()<.001): # cross-species crossover (.001 in s/m07)
                         other_id = -1
                         for sp2 in self.all_species:
                             if count_members_of_species(self.population, sp2.id) > 0 and sp2.id!=sp.id:
                                 other_id = sp2.id
                         if(other_id>-1): members = get_members_of_species(self.population, other_id)
-                    parent2 = np.random.choice(members, size=1)[0] # allow parents to crossover with themselves
-                    child = self.crossover(parent1, parent2)
+                    parent2 = np.random.choice(members, size=max(len(members), 1))[0] # allow parents to crossover with themselves
+                    if parent2:
+                        child = self.crossover(parent1, parent2)
                 else:
-                    child = copy.deepcopy(parent1)    
+                    if parent1:
+                        child = copy.deepcopy(parent1)    
+                    else:
+                        continue
 
                 self.mutate(child, self.get_mutation_rates())
                 new_children.extend([child]) # add children to the new_children list
@@ -233,6 +241,7 @@ class NEAT():
         pbar = trange(c.num_gens, desc="Generations")
         for self.gen in pbar:
             self.run_one_generation()
+            pbar.set_postfix_str(f"f: {self.get_best().fitness:.4f}")
             
 
     def run_one_generation(self):
@@ -322,6 +331,15 @@ class NEAT():
             self.solution = self.population[0]                 # update best solution records
             self.solution_fitness = self.population[0].fitness
             self.solution_generation = self.gen
+            if hasattr(self.solution, "phenotype_nodes"):
+                generate_brain("_best", self.solution.phenotype_nodes, self.solution.phenotype_connections)
+            else:
+                generate_brain("_best", self.solution.node_genome, self.solution.connection_genome)
+            name = f"brain_best.nndf"
+            with open(name, "r") as f:
+                string = f.read()
+                self.best_brain = string
+                f.close()
                 
         self.fitness_over_time[self.gen:] = self.solution_fitness # record the fitness of the current best over evolutionary time
         self.solutions_over_time.append(copy.deepcopy(self.solution))
@@ -336,8 +354,8 @@ class NEAT():
         champs = get_current_species_champs(self.population, self.all_species)
         self.species_champs_over_time.append(champs) 
 
-        if self.show_output:
-            self.save_best_network_image()
+        # if self.show_output:
+            # self.save_best_network_image()
     
     
     def mutate(self, child, rates):
@@ -385,8 +403,8 @@ class NEAT():
             child_cx.weight = \
                 matching1[match_index].weight if inherit_from_more_fit else matching2[match_index].weight
 
-            new_from = copy.deepcopy(matching1[match_index].fromNode if inherit_from_more_fit else matching2[match_index].fromNode)
-            child_cx.fromNode = new_from
+            new_from = copy.deepcopy(matching1[match_index].from_node if inherit_from_more_fit else matching2[match_index].from_node)
+            child_cx.from_node = new_from
             # if new_from.id<len(child.node_genome):
             existing = find_node_with_id(child.node_genome, new_from.id)
             index_existing = child.node_genome.index(existing)
@@ -395,8 +413,8 @@ class NEAT():
                 # print("********ERR:new from id", new_from.id, "len:", len(child.node_genome))
                 # continue # TODO
 
-            new_to = copy.deepcopy(matching1[match_index].toNode if inherit_from_more_fit else matching2[match_index].toNode)
-            child_cx.toNode = new_to
+            new_to = copy.deepcopy(matching1[match_index].to_node if inherit_from_more_fit else matching2[match_index].to_node)
+            child_cx.to_node = new_to
 
             existing = find_node_with_id(child.node_genome, new_to.id)
             index_existing = child.node_genome.index(existing)
@@ -407,10 +425,10 @@ class NEAT():
                     child.connection_genome[match_index].enabled = False
 
         for cx in child.connection_genome:
-            cx.fromNode = find_node_with_id(child.node_genome, cx.fromNode.id)
-            cx.toNode = find_node_with_id(child.node_genome, cx.toNode.id)
-            assert cx.fromNode in child.node_genome, f"{child.id}: {cx.fromNode.id} {child.node_genome[cx.fromNode.id].id}"
-            assert cx.toNode in child.node_genome, f"{child.id}: {cx.toNode.id} {child.node_genome[cx.toNode.id].id}"
+            cx.from_node = find_node_with_id(child.node_genome, cx.from_node.id)
+            cx.to_node = find_node_with_id(child.node_genome, cx.to_node.id)
+            assert cx.from_node in child.node_genome, f"{child.id}: {cx.from_node.id} {child.node_genome[cx.from_node.id].id}"
+            assert cx.to_node in child.node_genome, f"{child.id}: {cx.to_node.id} {child.node_genome[cx.to_node.id].id}"
             # TODO this shouldn't be necessary
             
         child.update_node_layers()

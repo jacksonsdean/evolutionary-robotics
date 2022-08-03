@@ -1,0 +1,77 @@
+[
+{
+    "name": "hyperneat",
+    "condition": {
+        "alg": "hyperneat",
+        "pop_size": 150,
+        "species_target": 12,
+        "num_gens": 300,
+        "init_species_threshold": 2.0,
+        "species_threshold_delta": 0.5,
+        "num_hn_hidden_nodes_per_layer": [
+            4,
+            4,
+            4
+        ],
+        "num_hn_hidden_layers": 3,
+        "substrate_type": "sandwich"
+    },
+    "num_runs": 0,
+    "fitness_results": [],
+    "diversity_results": [],
+    "species_results": [],
+    "threshold_results": [],
+    "nodes_results": [],
+    "connections_results": [],
+    "gens_to_converge": [],
+    "args": {
+        "generations": 2,
+        "pop": 10,
+        "species": 2,
+        "experiment_runs": 2,
+        "alg": "",
+        "generate": false,
+        "debug": false,
+        "print": false,
+        "do_bootstrap": false,
+        "experiment_file": "experiments/algorithm.json"
+    },
+    "brain": {
+        "fitness": 0,
+        "network": null
+    }
+},
+{
+    "name": "neat",
+    "condition": {
+        "alg": "neat",
+        "pop_size": 150,
+        "species_target": 12,
+        "num_gens": 300
+    },
+    "num_runs": 0,
+    "fitness_results": [],
+    "diversity_results": [],
+    "species_results": [],
+    "threshold_results": [],
+    "nodes_results": [],
+    "connections_results": [],
+    "gens_to_converge": [],
+    "args": {
+        "generations": 2,
+        "pop": 10,
+        "species": 2,
+        "experiment_runs": 2,
+        "alg": "",
+        "generate": false,
+        "debug": false,
+        "print": false,
+        "do_bootstrap": false,
+        "experiment_file": "experiments/algorithm.json"
+    },
+    "brain": {
+        "fitness": 0,
+        "network": null
+    }
+}
+]

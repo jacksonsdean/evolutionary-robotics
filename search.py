@@ -1,6 +1,6 @@
 import json
 import os
-from tkinter.tix import Tree
+import time
 
 from matplotlib import pyplot as plt
 import numpy as np
@@ -12,7 +12,6 @@ import hyperneat_constants as hc
 import argparse
 
 from experiment import Experiment
-from util import plot_mean_and_bootstrapped_ci_over_time
 
 def main(args = None):
 
@@ -39,9 +38,9 @@ def main(args = None):
     if args.experiment_file:
         experiment_file = args.experiment_file
 
-    name, conditions = Experiment.load_conditions_file(experiment_file)
+    name, controls, conditions = Experiment.load_conditions_file(experiment_file)
 
-    experiments = [Experiment(condition, args, runs) for condition in conditions]
+    experiments = [Experiment(condition, controls, args, runs) for condition in conditions]
     
     results_filename = f"{experiment_file.split('.')[0]}_results.json"
     
@@ -66,16 +65,20 @@ def main(args = None):
             f.write("\n]")
             f.close()
         
-    
+    show_print = args.print or (len(experiments)<2 and runs < 2)
     print(f"Running experiment: {name}")
     for i, experiment in enumerate(experiments):
+        print("_"*80)
         print(f"\tCondition {i} ({experiment.name})")
-        experiment.apply_condition()
-        alg = c.alg
-       
+        if "alg" in experiment.condition.keys():
+            alg = experiment.condition["alg"]
+        else:
+            alg = args.alg
         if alg == "hyperneat":
             hc.apply()
-            experiment.apply_condition()
+        experiment.apply_condition()
+        
+        experiment.setup_arrays()
         pbar = trange(runs)
         for run in pbar:
             try:
@@ -86,12 +89,12 @@ def main(args = None):
                 elif alg == "hyperneat":
                     neat = HyperNEAT(args.debug)
                     
-                neat.evolve(run, show_output=len(experiments)<2)
+                neat.evolve(run, show_output=show_print)
                 
-                experiment.record_results(neat.fitness_over_time, neat.diversity_over_time, neat.solutions_over_time, neat.species_over_time, neat.species_threshold_over_time, neat.nodes_over_time, neat.connections_over_time, neat.solution_generation, neat.species_champs_over_time, None)
+                experiment.record_results(neat.fitness_over_time, neat.diversity_over_time, neat.solutions_over_time, neat.species_over_time, neat.species_threshold_over_time, neat.nodes_over_time, neat.connections_over_time, neat.solution_generation, neat.species_champs_over_time, None, neat.best_brain)
                 # print(f"\tRun {run} complete with fitness {neat.get_best().fitness}")
-                if runs<2:
-                    neat.show_best()
+                # if show_print:
+                    # neat.show_best()
                     # neat.show_fitness_curve()
                     # neat.show_diversity_curve()
                 # plt.ioff()
@@ -99,13 +102,21 @@ def main(args = None):
                 # save results to file
                 with open(results_filename, "r+") as f:
                     results = json.load(f)
-                    index = [r["name"] for r in results].index(experiment.name)
+                    try:
+                        index = [r["name"] for r in results].index(experiment.name)
+                    except ValueError as e:
+                        index = -1
+                    experiment.generate_results_dictionary()
                     if index>-1:
                         results[index]["num_runs"] += 1
-                        experiment.generate_results_dictionary()
                         for k in ["fitness_results", "diversity_results", "species_results", "threshold_results", "nodes_results", "connections_results"]:
                             results[index][k] = results[index][k] + [experiment.results[k][run]]
                         results[index]["gens_to_converge"] = results[index]["gens_to_converge"] + experiment.results["gens_to_converge"]
+                        if np.max(results[index]["fitness_results"]) >  results[index]["brain"]["fitness"]:
+                            results[index]["brain"] = experiment.results["brain"]
+                    else:
+                        results.append(experiment.results)
+
                     f.seek(0)
                     f.truncate()
                     f.write("[\n")
@@ -122,15 +133,32 @@ def main(args = None):
                     neat.save_best_network_image(True)
                 else:
                     neat.save_best_network_image()
+        print()
         print(f"\tCondition {i} complete with fitness {np.mean(experiment.fitness_results[:,-1])}\n")
     
-    
-   
+    time.sleep(1)
+    os.system(f"python ./analyze_experiment.py -f {results_filename} &")
+    time.sleep(1)
+
+    # show the best from all experimental runs
+    if args.print:
+        for result in results:
+            robot = f"brain_best_{result['name']}"
+            name = f"{robot}.nndf"
+            with open(name, "w") as f:
+                string = result["brain"]["network"]
+                f.write(string)
+                f.close()
+            os.system(f"python simulate.py --body best_body.urdf --brain {name} --best")
+            time.sleep(1)
+            os.system(f"python footprint_diagram.py -r {robot}")
+            time.sleep(1)
   
 if __name__ == '__main__':
     # parse args
     parser = argparse.ArgumentParser(description='Run search on the robot controller.')
     parser.add_argument('-d','--debug', action='store_true', help='Show debug messages.')
+    parser.add_argument('-p','--print', action='store_true', help='Show print messages for each gen.')
     parser.add_argument('-g','--generate', action='store_true', help='Generate new world first.')
     parser.add_argument('-t','--generations', action='store', help='Number of generations to run.')
     parser.add_argument('-p','--pop', action='store', help='Population size.')

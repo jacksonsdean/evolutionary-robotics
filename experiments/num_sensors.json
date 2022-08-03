@@ -1,0 +1,34 @@
+{
+    "name": "Number of sensor neurons (NEAT)",
+    "conditions": [
+        {
+            "Low (NEAT)": {
+                "alg": "neat",
+                "use_cpg": false,
+                "num_sensor_neurons": 4
+            }
+        },
+        {
+            "Mid (NEAT)": {
+                "alg": "neat",
+                "use_cpg": false,
+                "num_sensor_neurons": 8
+            }
+        },
+        {
+            "High (NEAT)": {
+                "alg": "neat",
+                "use_cpg": false,
+                "num_sensor_neurons": 12
+            }
+        },
+        {
+            "All (NEAT)": {
+                "alg": "neat",
+                "use_cpg": false,
+                "num_sensor_neurons": 17
+            }
+        }
+       
+    ]
+}

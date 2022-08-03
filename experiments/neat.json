@@ -1,0 +1,17 @@
+{
+    "name": "Algorithm",
+    "controls":
+    {
+    },
+    "conditions": [
+        {
+            "neat": {
+                "alg": "neat",
+                "pop_size": 20,
+                "species_target": 3,
+                "num_gens": 100
+            }
+        }
+       
+    ]
+}

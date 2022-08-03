@@ -22,6 +22,9 @@ def cos(x):
 def gaussian(x):
     return np.exp(-x**2)
 
+def abs(x):
+    return np.abs(-x**2)
+
 def square(x):
     return x**2
 

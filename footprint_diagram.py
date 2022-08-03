@@ -48,7 +48,7 @@ def main(args):
     plt.ylim(ymin=-0.5,ymax=3.5)
     plt.xlabel("Time")
     plt.grid(True, axis='y', which="minor")
-    plt.title(f"Touch sensor values for {robot_to_show}")
+    plt.title(f"Touch sensor values for {args.title if args.title else robot_to_show}")
     plt.imshow(footprint, cmap="binary", vmin=-1, vmax=1, aspect="auto", interpolation="none")
     plt.show()
 
@@ -62,5 +62,7 @@ if __name__ == "__main__":
                         action='store', help='Robot brain name.')
     parser.add_argument('-s', '--steps',
                         action='store', help='Number of steps to show.')
+    parser.add_argument('-t', '--title',
+                        action='store', help='Plot title. Defaults to robot name.')
     args = parser.parse_args()
     main(args)

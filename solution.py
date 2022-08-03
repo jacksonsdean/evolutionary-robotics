@@ -82,10 +82,10 @@ class Solution():
         # pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "FrontLeg"); n+=1
         # pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "LeftLeg"); n+=1
         # pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "RightLeg"); n+=1
-        pyrosim.Send_Rotation_Sensor_Neuron(name = n , linkName = "FrontLowerLeg"); n+=1
-        pyrosim.Send_Rotation_Sensor_Neuron(name = n , linkName = "BackLowerLeg"); n+=1
-        pyrosim.Send_Rotation_Sensor_Neuron(name = n , linkName = "LeftLowerLeg"); n+=1
-        pyrosim.Send_Rotation_Sensor_Neuron(name = n , linkName = "RightLowerLeg"); n+=1
+        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "FrontLowerLeg"); n+=1
+        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "BackLowerLeg"); n+=1
+        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "LeftLowerLeg"); n+=1
+        pyrosim.Send_Touch_Sensor_Neuron(name = n , linkName = "RightLowerLeg"); n+=1
 
         # -Hidden
         ...

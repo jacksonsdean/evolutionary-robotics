@@ -54,7 +54,7 @@ class Substrate:
             ax.text(node.x-.1, node.y+0.1, f"{node.layer}.{node.id}")
             
         for connection in connections:
-            ax.plot([connection.fromNode.x, connection.toNode.x], [connection.fromNode.y, connection.toNode.y], c='g', alpha=0.5)
+            ax.plot([connection.from_node.x, connection.to_node.x], [connection.from_node.y, connection.to_node.y], c='g', alpha=0.5)
         plt.show()
 
 class GridSubstrate(Substrate):
@@ -170,8 +170,8 @@ class SandwichSubstrate(Substrate):
                 else:    
                     rows = self.hidden_rows
                     cols = self.hidden_cols
-            x_space = np.linspace(1, -1, cols) if cols > 1 else [0] * cols
-            y_space = np.linspace(1, -1, rows) if rows > 1 else [0] * rows
+            x_space = np.linspace(-1.0, 1.0, cols) if cols > 1 else [0] * cols
+            y_space = np.linspace(-1.0, 1.0, rows) if rows > 1 else [0] * rows
             index_in_layer = 0
             for node in nodes:
                 if node.layer != i:
@@ -210,7 +210,7 @@ class SandwichSubstrate(Substrate):
                 alpha = abs(weights[i]) / c.max_weight
                 
 
-            ax.plot([connection.fromNode.x, connection.toNode.x],[connection.fromNode.layer, connection.toNode.layer], [connection.fromNode.y, connection.toNode.y], c=color, alpha=alpha)
+            ax.plot([connection.from_node.x, connection.to_node.x],[connection.from_node.layer, connection.to_node.layer], [connection.from_node.y, connection.to_node.y], c=color, alpha=alpha)
         plt.tight_layout()
         plt.show()
         
@@ -246,7 +246,7 @@ class HyperNEAT(NEAT):
             plt.imsave(f"hyperneat_phenotypes/{time.time()}_hyperneat_phenotype_vis.png", vis, vmin=-1, vmax=1)
             # plt.close()
             best.substrate.visualize_substrate(best.phenotype_nodes, best.phenotype_connections, best.weights)
-        
+            
 class HyperNEATGenome(Genome):
     def __init__(self, **kwargs):
         self.set_initial_values()
@@ -257,18 +257,18 @@ class HyperNEATGenome(Genome):
         self.create_cppn(c.num_hn_inputs, c.num_hn_outputs, c.hidden_nodes_at_start)
         self.phenotype_nodes = []
         
-        
+        self.max_weight = c.max_gen_weight
         for i in range(c.num_sensor_neurons):
-            self.phenotype_nodes.append(Node(tanh, NodeType.Input, i, 0))
+            self.phenotype_nodes.append(Node(tanh, NodeType.INPUT, i, 0))
 
         for j in range(c.num_motor_neurons):
-            self.phenotype_nodes.append(Node(tanh,NodeType.Output, j+c.num_sensor_neurons, 1+c.num_hn_hidden_layers))
+            self.phenotype_nodes.append(Node(tanh,NodeType.OUTPUT, j+c.num_sensor_neurons, 1+c.num_hn_hidden_layers))
 
         for i in range(c.num_hn_hidden_layers):
             if isinstance(c.num_hn_hidden_nodes_per_layer, list):
-                self.phenotype_nodes.extend([Node(tanh, NodeType.Hidden, j+c.num_sensor_neurons+c.num_motor_neurons, i+1) for j in range(c.num_hn_hidden_nodes_per_layer[i])])
+                self.phenotype_nodes.extend([Node(tanh, NodeType.HIDDEN, j+c.num_sensor_neurons+c.num_motor_neurons, i+1) for j in range(c.num_hn_hidden_nodes_per_layer[i])])
             else:
-                self.phenotype_nodes.extend([Node(tanh, NodeType.Hidden, j+c.num_sensor_neurons+c.num_motor_neurons, i+1) for j in range(c.num_hn_hidden_nodes_per_layer)])
+                self.phenotype_nodes.extend([Node(tanh, NodeType.HIDDEN, j+c.num_sensor_neurons+c.num_motor_neurons, i+1) for j in range(c.num_hn_hidden_nodes_per_layer)])
 
         # set x and y values:
         self.substrate.assign_node_positions(self.phenotype_nodes)
@@ -276,7 +276,10 @@ class HyperNEATGenome(Genome):
         self.weights = np.zeros(len(self.phenotype_connections))
 
         # self.substrate.visualize_substrate(self.phenotype_nodes, self.phenotype_connections)
-  
+    
+    
+    
+    
     def start_simulation(self, headless, show_debug_output=False, save_as_best=False):
         # self.eval_substrate_fast()
         self.eval_substrate_simple()
@@ -327,11 +330,11 @@ class HyperNEATGenome(Genome):
                             layer = self.get_layer(layer_index)
                             for node in layer:
                                 node_inputs = list(
-                                    filter(lambda x: x.toNode.id == node.id, self.enabled_connections()))  # cxs that end here
+                                    filter(lambda x: x.to_node.id == node.id, self.enabled_connections()))  # cxs that end here
 
                                 node.sum_inputs = 0
                                 for cx in node_inputs:
-                                    inputs = cx.fromNode.outputs * cx.weight
+                                    inputs = cx.from_node.outputs * cx.weight
                                     node.sum_inputs = node.sum_inputs + inputs
 
                                 node.outputs = node.fn(node.sum_inputs)  # apply activation
@@ -352,10 +355,10 @@ class HyperNEATGenome(Genome):
         output_layer = self.node_genome[self.n_inputs].layer
         self.weights = np.zeros(len(self.phenotype_connections))
         for cx_index, phen_cx in enumerate(self.phenotype_connections):
-            x1 = phen_cx.fromNode.x
-            y1 = phen_cx.toNode.y
-            x2 = phen_cx.toNode.x
-            y2 = phen_cx.fromNode.y
+            x1 = phen_cx.from_node.x
+            y1 = phen_cx.to_node.y
+            x2 = phen_cx.to_node.x
+            y2 = phen_cx.from_node.y
             coord_inputs = [x1, y1, x2, y2]
             for i in range(self.n_inputs):
                 # inputs are first N nodes
@@ -367,20 +370,24 @@ class HyperNEATGenome(Genome):
                 layer = self.get_layer(layer_index)
                 for node in layer:
                     node_inputs = list(
-                        filter(lambda x: x.toNode.id == node.id, self.enabled_connections()))  # cxs that end here
+                        filter(lambda x: x.to_node.id == node.id, self.enabled_connections()))  # cxs that end here
 
                     node.sum_inputs = 0
                     for cx in node_inputs:
-                        inputs = cx.fromNode.outputs * cx.weight
+                        inputs = cx.from_node.outputs * cx.weight
                         node.sum_inputs = node.sum_inputs + inputs
 
                     node.outputs = node.fn(node.sum_inputs)  # apply activation
 
             weight = [node.outputs for node in self.output_nodes()]
+           
+           
             net_output = weight[0] if (weight[0] > c.weight_threshold or weight[0]< -c.weight_threshold) else 0.0
+           
+           
             self.weights[cx_index] = net_output * c.max_phen_weight
             phen_cx.weight = net_output * c.max_phen_weight
-            
+
     def eval_substrate_fast(self):
         """ Calculates the weights of connections by passing the substrate through the CPPN
         Input:  (x1, y1, x2, y2)
@@ -393,10 +400,10 @@ class HyperNEATGenome(Genome):
         output_layer = self.node_genome[self.n_inputs].layer
         inputs = []
         for phen_cx in self.phenotype_connections:
-            x1 = phen_cx.fromNode.x
-            y1 = phen_cx.toNode.y
-            x2 = phen_cx.toNode.x
-            y2 = phen_cx.fromNode.y
+            x1 = phen_cx.from_node.x
+            y1 = phen_cx.to_node.y
+            x2 = phen_cx.to_node.x
+            y2 = phen_cx.from_node.y
             coord_inputs = [x1, y1, x2, y2]
             inputs.append(coord_inputs)
         inputs = np.array(inputs)
@@ -410,11 +417,11 @@ class HyperNEATGenome(Genome):
             layer = self.get_layer(layer_index)
             for node in layer:
                 node_inputs = list(
-                    filter(lambda x: x.toNode.id == node.id, self.enabled_connections()))  # cxs that end here
+                    filter(lambda x: x.to_node.id == node.id, self.enabled_connections()))  # cxs that end here
 
                 node.sum_inputs = np.zeros(len(inputs))
                 for cx in node_inputs:
-                    inputs = cx.fromNode.outputs * cx.weight
+                    inputs = cx.from_node.outputs * cx.weight
                     node.sum_inputs = node.sum_inputs + inputs
 
                 node.outputs = node.fn(node.sum_inputs)  # apply activation
@@ -438,7 +445,7 @@ if __name__ == "__main__":
     g.eval_substrate_simple()
     g.visualize_phenotype_network()    
     # for cx in g.phenotype_connections:
-        # print(cx.fromNode.x, cx.fromNode.y, "->", cx.toNode.x, cx.toNode.y, cx.weight)
+        # print(cx.from_node.x, cx.from_node.y, "->", cx.to_node.x, cx.to_node.y, cx.weight)
     # count = 0
     # z = np.zeros((len(g.phenotype_connections), len(g.phenotype_connections)))
     # x, y = [],[]

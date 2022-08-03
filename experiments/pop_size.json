@@ -1,25 +1,24 @@
 {
-    "name": "Algorithm",
+    "name": "Pop size",
     "controls":
     {
     },
     "conditions": [
         {
-            "hyperneat 8 8": {
+            "hyperneat 300 (4)": {
                 "alg": "hyperneat",
-                "pop_size": 20,
-                "species_target": 3,
+                "pop_size": 300,
+                "species_target": 45,
                 "num_gens": 100,
                 "init_species_threshold": 2.0,
                 "species_threshold_delta": 0.5,
-                "num_hn_hidden_nodes_per_layer": [8,8],
-                "num_hn_hidden_layers": 2,
+                "num_hn_hidden_nodes_per_layer": 4,
+                "num_hn_hidden_layers": 1,
                 "substrate_type": "sandwich"
-
             }
         },
         {
-            "neat": {
+            "neat 20": {
                 "alg": "neat",
                 "pop_size": 20,
                 "species_target": 3,
