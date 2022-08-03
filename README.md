@@ -35,4 +35,4 @@ For example, to show the final results of this project and visualize the NEAT co
 
 ### Disclaimer
 This project is a work in progress. The code is not production ready, and may contain bugs.
-Most development/testing has been on windows so not sure if it works on Mac or Linux.
+Most development/testing has been on Windows so not sure if it works on Mac or Linux.
